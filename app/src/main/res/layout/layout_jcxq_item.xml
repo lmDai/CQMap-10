@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:paddingLeft="20dp"
+        android:paddingRight="16dp">
+
+        <TextView
+            android:id="@+id/result_type_content"
+            android:layout_width="wrap_content"
+            android:lineSpacingExtra="4dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="成果类型1：数量111；面积1234"
+            android:textColor="#666666"
+            android:textSize="12sp" />
+
+
+
+    </RelativeLayout>
+
+</LinearLayout>

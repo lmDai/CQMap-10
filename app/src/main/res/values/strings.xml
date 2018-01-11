@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">测绘成果保密监管移动查询系统</string>
+
+    <string name="tab_unit">单位</string>
+    <string name="tab_dispatch">成果分发</string>
+    <string name="tab_directory">成果目录</string>
+    <string name="tab_check">保密检查</string>
+
+
+    <string name="sure">确定</string>
+    <string name="accept">允许</string>
+    <string name="refuse">拒绝</string>
+
+    <string name="sift">筛选</string>
+    <string name="statistic">统计</string>
+    <string name="space">空间</string>
+    <string name="cancel">取消</string>
+    <string name="clear">清除</string>
+    <string name="layer_image">影像</string>
+    <string name="layer_vector">矢量</string>
+    <string name="layer_topography">地形</string>
+    <string name="location_permission_denied">定位失败，因为定位权限被拒绝！</string>
+    <string-array name="company_array">
+        <item>重庆宝威科技有限公司</item>
+        <item>重庆地质勘查有限责任公司</item>
+        <item>重庆道路桥梁建设有限责任公司</item>
+    </string-array>
+    <string name="biaoge_feature_server_url">http://101.200.40.90:6080/arcgis/rest/services/demo/FeatureServer/0</string>
+    <!--单位查询-->
+    <string name="feature_server_url">http://www.map023.cn:6080/arcgis/rest/services/UnitService/MapServer/0</string>
+    <!--点查询-->
+    <string name="point_feature_server_url">http://www.map023.cn:6080/arcgis/rest/services/pointCG/MapServer/0</string>
+    <!--面查询-->
+    <string name="polygon_feature_server_url">http://www.map023.cn:6080/arcgis/rest/services/polygonCG/MapServer/0</string>
+    <!--矢量地图-->
+    <string name="tdt_vec_base_map_url">http://www.digitalcq.com/RemoteRest/services/CQMap_VEC/MapServer</string>
+    <!--地形图-->
+    <string name="tdt_dem_base_map_url">http://www.digitalcq.com/RemoteRest/services/CQMap_DEM/MapServer</string>
+    <!--影像地图-->
+    <string name="tdt_img_base_map_url">http://www.digitalcq.com/RemoteRest/services/CQMap_IMG/MapServer</string>
+    <!--图幅号查询 0-6-->
+    <string name="query_symbol">http://ddk.digitalcq.com:6080/arcgis/rest/services/CQGRID_2000/Mapserver/0</string>
+    <!--行政区域查询-->
+    <string name="query_admin_region">http://www.digitalcq.com/RemoteRest/services/CQ_XZQH/MapServer/1</string>
+
+
+    <string name="alert_title">提示</string>
+    <string name="alert_ok">确定</string>
+    <string name="alert_cancel">取消</string>
+</resources>

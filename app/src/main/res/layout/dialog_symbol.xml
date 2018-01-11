@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:minWidth="250dp"
+    android:padding="15dp">
+
+    <TextView
+        android:id="@+id/tv_dialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="title"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_dialogMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:textSize="17sp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_dialogTitle"
+        tools:text="message"
+        tools:visibility="visible" />
+
+    <EditText
+        android:id="@+id/et_dialogInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/et_bg"
+        android:textCursorDrawable="@drawable/et_cursor"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_dialogMessage"
+        android:text="H48B001002 H48B002002 H49B001001"
+        tools:visibility="visible" />
+<!-- H48B002002 H49B001001-->
+    <TextView
+        android:id="@+id/tv_dialogCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="@string/cancel"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_dialogInput"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_dialogOk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="20dp"
+        android:text="@string/alert_ok"
+        android:visibility="gone"
+        app:layout_constraintRight_toLeftOf="@id/tv_dialogCancel"
+        app:layout_constraintTop_toTopOf="@id/tv_dialogCancel"
+        tools:visibility="visible" />
+
+</android.support.constraint.ConstraintLayout>

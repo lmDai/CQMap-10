@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="8dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_unit_name"
+        tools:text="公司名字"
+        android:textSize="18sp"
+        android:ellipsize="end"
+        android:layout_marginBottom="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/tv_details"
+        android:layout_alignParentLeft="true"/>
+    <TextView
+        android:id="@+id/tv_details"
+        android:text="详情"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:layout_marginBottom="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:textColor="@color/colorPrimary"
+        android:layout_alignParentRight="true"/>
+
+
+    <TextView
+        android:id="@+id/tv_code"
+        tools:text="报件编号：FHG20295101"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_unit_name" />
+
+    <TextView
+        android:id="@+id/tv_date"
+        tools:text="时间：2016年12月20日"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tv_unit_name" />
+    <TextView
+        android:layout_marginTop="4dp"
+        android:layout_below="@+id/tv_date"
+        android:text="分发内容"
+        android:paddingTop="4dp"
+        android:drawableRight="@mipmap/arrow_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</RelativeLayout>

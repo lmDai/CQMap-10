@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="16dp"
+    android:background="@color/colorWhite"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp">
+
+    <TextView
+        android:id="@+id/tv_circle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@mipmap/ic_circle"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:padding="4dp"
+        android:text="圆形"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_rectangle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@mipmap/ic_rectangle"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:padding="4dp"
+        android:text="矩形" />
+
+    <TextView
+        android:id="@+id/tv_polygon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@mipmap/ic_polygon"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:padding="4dp"
+        android:text="多边形" />
+
+    <TextView
+        android:id="@+id/tv_flash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@mipmap/ic_polygon"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:padding="4dp"
+        android:text="缓冲区查询" />
+</LinearLayout>

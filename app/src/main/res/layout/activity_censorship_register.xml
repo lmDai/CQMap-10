@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_censorship_register"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context="android.zhixun.uiho.com.gissystem.ui.activity.CensorshipRegisterActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#FFFFFF"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="检查单位："
+                android:textColor="#333333"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="重庆市规划局"
+                android:textColor="#333333"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:background="#FFF"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:text="参检人员"
+            android:textColor="#333333"
+            android:textSize="14sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/colorDivider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFF"
+            android:orientation="vertical"
+            android:paddingLeft="16dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rl_checkPerson"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </android.support.v7.widget.RecyclerView>
+            <EditText
+                android:id="@+id/et_temp_check_person"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                android:background="#FFF"
+                android:completionThreshold="1"
+                android:dropDownHorizontalOffset="40dp"
+                android:hint="请输入临时参检人员"
+                android:paddingRight="16dp"
+                android:textColorHint="#BBBBBB"
+                android:textSize="12sp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/colorDivider" />
+        </LinearLayout>
+
+
+     <include  layout="@layout/activity_censorship_register_four"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginLeft="16dp"
+            android:background="@color/colorDivider" />
+
+        <EditText
+            android:id="@+id/et_match_person"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:background="#FFF"
+            android:completionThreshold="1"
+            android:dropDownHorizontalOffset="40dp"
+            android:hint="请输入被检单位配合人员姓名"
+            android:lines="1"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textColorHint="#BBBBBB"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginLeft="16dp"
+            android:background="@color/colorDivider" />
+
+        <EditText
+            android:id="@+id/et_contact"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:background="#FFF"
+            android:completionThreshold="1"
+            android:dropDownHorizontalOffset="40dp"
+            android:hint="请输入被检单位联系人"
+            android:lines="1"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textColorHint="#BBBBBB"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginLeft="16dp"
+            android:background="@color/colorDivider" />
+
+        <EditText
+            android:id="@+id/et_contact_number"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:background="#FFF"
+            android:completionThreshold="1"
+            android:dropDownHorizontalOffset="40dp"
+            android:hint="请输入被检单位联系电话"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textColorHint="#BBBBBB"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginLeft="16dp"
+            android:background="@color/colorDivider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFF"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp">
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:completionThreshold="1"
+                android:dropDownHorizontalOffset="40dp"
+                android:gravity="center_vertical"
+                android:hint="请选择检查日期"
+                android:textColorHint="#BBBBBB"
+                android:textSize="12sp" />
+
+            <FrameLayout
+                android:id="@+id/flCalendar"
+                android:layout_width="52dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="right"
+                android:background="@color/cardView">
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@mipmap/calender_white" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginLeft="16dp"
+            android:background="@color/colorDivider" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:background="#FFF"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="检查情况"
+                android:textColor="#333333"
+                android:textSize="14sp" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@mipmap/arrow_bottom"
+                android:id="@+id/arrow_JCQK"
+                />
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_arrow_JCQK"
+            android:orientation="vertical">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/colorDivider" />
+
+        <include
+            android:id="@+id/situation_check"
+            layout="@layout/activity_censorship_register_two" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFF"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:id="@+id/tv_sixteen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="（十六）"
+                android:textColor="#666666"
+                android:textSize="12sp"
+                android:visibility="gone"/>
+
+
+            <EditText
+                android:id="@+id/et_otherProblems"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:layout_toRightOf="@+id/tv_sixteen"
+                android:background="@null"
+                android:hint="其他问题说明(填写)"
+                android:textColorHint="#BBBBBB"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:background="#FFF"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="整改意见"
+                android:textColor="#333333"
+                android:textSize="14sp" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@mipmap/arrow_bottom"
+                android:id="@+id/arrow_ZGYJ"/>
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_arrow_ZGYJ"
+            android:orientation="vertical">
+
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/colorDivider" />
+
+        <include
+            android:id="@+id/rectification_opinions"
+            layout="@layout/activity_censorship_register_one" />
+        </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:background="#FFF"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="领导意见"
+                android:textColor="#333333"
+                android:textSize="14sp" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                app:srcCompat="@mipmap/arrow_bottom"
+                android:id="@+id/arrow_LDYJ"/>
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ll_arrow_LDYJ"
+            android:orientation="vertical">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/colorDivider" />
+
+        <include
+            android:id="@+id/leader_idea"
+            layout="@layout/activity_censorship_register_three" />
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginLeft="16dp"
+            android:background="@color/colorDivider" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:background="#FFF"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="图片及现场拍照"
+                android:textColor="#333333"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/recyclerView"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_marginBottom="16dp">
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/acb_save"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="保存至本地"
+                android:textSize="16sp"
+                android:textColor="@color/text_censorship_check_selector"
+                android:background="@drawable/button_censorship_check_selector_left"/>
+            <android.support.v7.widget.AppCompatButton
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="提交至服务器"
+                android:textSize="16sp"
+                android:textColor="@color/text_censorship_check_selector_right"
+                android:background="@drawable/button_censorship_check_selector"
+                android:id="@+id/acb_save_server"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

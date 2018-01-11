@@ -1,0 +1,100 @@
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'org.greenrobot.greendao'
+
+
+greendao {
+    schemaVersion 1
+    daoPackage 'android.zhixun.uiho.com.gissystem.greendao_gen'
+    targetGenDir 'src/Main/java'
+}
+
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '26.0.0'
+    defaultConfig {
+        applicationId "android.zhixun.uiho.com.gissystem"
+        minSdkVersion 16
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
+        resConfigs "zh-rCN"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+
+    dexOptions {
+        preDexLibraries = false
+    }
+    lintOptions{
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    repositories {
+        flatDir {
+            dirs 'libs' //this way we can find the .aar file in libs folder
+
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+}
+repositories {
+    mavenCentral()
+
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:26.0.0'
+    testCompile 'junit:junit:4.12'
+    compile project(':ParcoolLibrary')
+    //https://developers.arcgis.com/android/
+    //    compile 'com.esri.arcgisruntime:arcgis-android:100.2.0'
+    // Add ArcGIS Runtime SDK for Android dependency
+    compile 'com.esri.arcgis.android:arcgis-android:10.2.9'
+    //    compile 'com.esri.arcgis.android:arcgis-android:10.2.8-1'
+    //https://github.com/bignerdranch/expandable-recycler-view
+    compile 'com.bignerdranch.android:expandablerecyclerview:3.0.0-RC1'
+    compile 'org.greenrobot:greendao:3.2.0'
+    //https://github.com/greenrobot/greenDAO
+    //图片选择库
+    compile 'com.jph.takephoto:takephoto_library:3.0.2'
+    //https://github.com/wdullaer/MaterialDateTimePicker//日期时间选择器
+    compile 'com.wdullaer:materialdatetimepicker:3.0.0'
+    //Glide 图片加载库
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.android.support:support-v4:26.0.0'
+    //图片的放大缩小
+    compile 'com.github.chrisbanes.photoview:library:1.2.4'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    //
+    compile 'com.zhy:base-rvadapter:3.0.3'
+    //
+    compile 'com.qmuiteam:qmui:1.0.4'
+    //
+    compile 'com.hyman:flowlayout-lib:1.1.2'
+    //
+    compile 'com.android.support:multidex:1.0.1'
+}

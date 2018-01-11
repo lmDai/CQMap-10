@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/tab_unit"
+        android:checked="true"
+        android:icon="@mipmap/ic_launcher"
+        android:title="@string/tab_unit"/>
+    <item
+        android:id="@+id/tab_dispatch"
+        android:icon="@mipmap/ic_launcher"
+        android:title="@string/tab_dispatch"/>
+    <item
+        android:id="@+id/tab_directory"
+        android:icon="@mipmap/ic_launcher"
+        android:title="@string/tab_directory"/>
+    <item
+        android:id="@+id/tab_check"
+        android:icon="@mipmap/ic_launcher"
+        android:title="@string/tab_check"/>
+</menu>

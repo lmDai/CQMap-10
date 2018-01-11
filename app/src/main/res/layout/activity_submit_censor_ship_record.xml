@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_submit_censor_ship_record"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="android.zhixun.uiho.com.gissystem.ui.activity.SubmitCensorShipRecordActivity">
+<android.zhixun.uiho.com.gissystem.ui.widget.VerticalRecyclerView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/recyclerView">
+
+</android.zhixun.uiho.com.gissystem.ui.widget.VerticalRecyclerView>
+</RelativeLayout>

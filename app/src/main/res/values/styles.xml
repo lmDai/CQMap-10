@@ -1,0 +1,66 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="QMUI.Compat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowNoTitle">true</item>
+        <item name="editTextBackground">@null</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="android:listDivider">@drawable/my_divider</item>
+    </style>
+
+
+    <style name="BottomRadioNavigation">
+        <item name="android:button">@null</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:textColor">@color/bnv_icon_tint</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="MyDialogStyle">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <!--<item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>-->
+        <!--<item name="android:windowAnimationStyle">@style/MyDialogAnimRight</item>-->
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+    <style name="MyDialogAnimRight">
+        <item name="android:windowEnterAnimation">@anim/right_dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/right_dialog_exit</item>
+    </style>
+
+    <style name="MyDialogAnimLeft">
+        <item name="android:windowEnterAnimation">@anim/left_dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/left_dialog_exit</item>
+    </style>
+
+    <style name="MyRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:paddingLeft">4dp</item>
+        <item name="android:paddingRight">4dp</item>
+        <item name="android:button">@null</item>
+        <item name="android:drawableLeft">@drawable/selector_my_radio_button</item>
+    </style>
+
+    <style name="CardViewStyle" parent="Base.CardView">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="cardCornerRadius">0dp</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardElevation">@dimen/cardView_elevation</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
+</resources>

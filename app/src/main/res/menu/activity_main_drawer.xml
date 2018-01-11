@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group
+        android:id="@+id/todo"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_resultDeclareMessage"
+            android:title="成果申报消息" />
+
+        <item
+            android:id="@+id/menu_prepareCheckMessage"
+            android:title="预审消息" />
+
+        <item
+            android:id="@+id/menu_resultFolderUpdateMessage"
+            android:title="成果目录更新消息" />
+
+        <item
+            android:id="@+id/menu_secrecyInspectMessage"
+            android:title="保密检查消息" />
+
+        <item
+            android:id="@+id/menu_instructions"
+            android:title="使用说明" />
+
+        <item
+            android:id="@+id/exit"
+            android:title="注销登录" />
+
+    </group>
+
+    <!--<group android:id="@+id/setting">-->
+
+        <!---->
+
+    <!--</group>-->
+
+</menu>

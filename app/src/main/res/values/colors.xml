@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#5FB9F5</color>
+    <color name="colorPrimaryDark">#3292D3</color>
+    <color name="colorAccent">#5FB9F5</color>
+    <color name="colorPrimaryLight">#B2DFDB</color>
+    <color name="colorWhite">#FFFFFFFF</color>
+
+    <color name="primaryText">#FF212121</color>
+    <color name="secondaryText">#FF727272</color>
+    <color name="hintText">#FF757575</color>
+    <color name="colorDivider">#B6B6B6</color>
+    <color name="cardView">#ce8556</color>
+    <color name="cardViewTextColorFalse">#333333</color>
+    <color name="cardViewTextColorTrue">#FEFEFE</color>
+    <color name="CustomerActivityBackgroundColor">#F5F5F5</color>
+    <color name="multiple_image_select_primary">#5FB9F5</color>
+    <color name="multiple_image_select_primaryDark">#3292D3</color>
+    <color name="multiple_image_select_accent">#3292D3</color>
+</resources>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cv_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/cv_sift"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/cv_sift"
+        android:layout_marginTop="2dp"
+        android:clickable="true"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="@dimen/cardView_elevation"
+        app:cardUseCompatPadding="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_user"
+                android:layout_width="45dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:scaleType="fitXY"
+                android:src="@mipmap/username_white" />
+
+            <EditText
+                android:id="@+id/et_search"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@null"
+                android:gravity="center_vertical"
+                android:hint="请输入单位名称或组织机构代码"
+                android:imeOptions="actionDone"
+                android:maxLength="20"
+                android:maxLines="1"
+                android:paddingLeft="8dp"
+                android:singleLine="true"
+                android:textSize="14sp" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/aciv_clear"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="4dp"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_close_hint_24dp" />
+
+            <View
+                android:layout_width="1px"
+                android:layout_height="match_parent"
+                android:alpha="0.5"
+                android:background="@color/colorDivider" />
+
+            <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/aciv_search"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center_vertical"
+                android:padding="10dp"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/ic_search_black_24dp" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>
