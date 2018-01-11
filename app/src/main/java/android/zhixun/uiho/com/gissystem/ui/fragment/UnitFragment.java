@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,11 @@ import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.IndustryCategoryModel;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
+import android.zhixun.uiho.com.gissystem.ui.adapter.MainBottomAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.UnitFilterAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.UnitFilterUnitAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
+import android.zhixun.uiho.com.gissystem.ui.widget.BottomSheetPw;
 import android.zhixun.uiho.com.gissystem.ui.widget.DialogUtil;
 import android.zhixun.uiho.com.gissystem.ui.widget.DividerGridItemDecoration;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
@@ -43,7 +46,6 @@ import static android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView.DEM_LAYER;
 
 
 /**
- * Created by parcool on 2016/9/2.
  * 单位
  */
 
@@ -62,6 +64,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
     private long HYLB_CODE = -1;
     private GraphicsLayer drawLayer;
     private DrawTool drawTool;
+    //
+
 
     public UnitFragment() {
         Bundle args = new Bundle();
@@ -113,6 +117,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         getSiftZCDData();
         getSiftLBData();
     }
+
 
     @Override
     public void onClick(View v) {
@@ -285,6 +290,17 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                     public void onResponse(List<CompanyDetailModel> response) {
                         dismissLoading();
 
+                        MainBottomAdapter bottomAdapter =
+                                new MainBottomAdapter(getActivity(), response);
+//                        RecyclerView content_rv = mScrollLayout.findViewById(R.id.content_rv);
+//                        content_rv.setLayoutManager(new LinearLayoutManager(getActivity()));
+//                        content_rv.setAdapter(bottomAdapter);
+//                        View dragView = mScrollLayout.findViewById(R.id.bottom_drag_view);
+//                        mScrollLayout.setToOpen();
+//                        dragView.setVisibility(View.VISIBLE);
+                        BottomSheetPw pw = new BottomSheetPw(getActivity());
+                        pw.setAdapter(bottomAdapter);
+                        pw.showAtLocation(mCVSift, Gravity.CENTER, 0, 0);
                     }
 
                     @Override

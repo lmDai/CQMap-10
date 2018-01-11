@@ -51,7 +51,8 @@ public class MainBottomAdapter extends RecyclerView.Adapter<MainBottomAdapter.Vi
 
     @Override
     public MainBottomAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_bttom, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_main_bttom, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.rlIntro.setOnClickListener(new View.OnClickListener() {
             @Override

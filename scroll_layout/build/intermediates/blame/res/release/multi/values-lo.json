@@ -1,0 +1,26 @@
+[
+    {
+        "outputFile": "/Users/simple/Desktop/workspace/android_ws/CQMap-10/scroll_layout/build/intermediates/incremental/mergeReleaseResources/merged.dir/values-lo/values-lo.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endColumn": 100,
+                    "endOffset": 151
+                },
+                "from": {
+                    "file": "/Users/simple/.android/build-cache/063b447c818b5c5fc8f47d06b59e4467f4b1dcdb/output/res/values-lo/values-lo.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endColumn": 100,
+                        "endOffset": 151
+                    }
+                }
+            }
+        ]
+    }
+]

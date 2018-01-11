@@ -292,5 +292,32 @@
 
     <include layout="@layout/layout_search" />
 
+    <!--<com.yinglan.scrolllayout.ScrollLayout-->
+        <!--android:id="@+id/scrollLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:background="@android:color/transparent">-->
 
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:orientation="vertical">-->
+
+            <!--<RelativeLayout-->
+                <!--android:id="@+id/bottom_drag_view"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="50dp"-->
+                <!--android:background="@android:color/white">-->
+
+            <!--</RelativeLayout>-->
+
+            <!--<com.yinglan.scrolllayout.content.ContentRecyclerView-->
+                <!--android:id="@+id/content_rv"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent">-->
+
+            <!--</com.yinglan.scrolllayout.content.ContentRecyclerView>-->
+
+        <!--</LinearLayout>-->
+    <!--</com.yinglan.scrolllayout.ScrollLayout>-->
 </RelativeLayout>

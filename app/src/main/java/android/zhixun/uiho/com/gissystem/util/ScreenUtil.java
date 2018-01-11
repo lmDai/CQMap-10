@@ -1,4 +1,4 @@
-package com.yinglan.scrolllayout.demo.util;
+package android.zhixun.uiho.com.gissystem.util;
 
 import android.app.Activity;
 import android.content.Context;

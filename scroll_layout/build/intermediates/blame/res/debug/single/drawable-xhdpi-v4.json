@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "/Users/simple/Desktop/workspace/android_ws/CQMap-10/scroll_layout/build/intermediates/res/merged/debug/drawable-xhdpi-v4/notification_bg_low_pressed.9.png",
+        "source": "/Users/simple/.android/build-cache/063b447c818b5c5fc8f47d06b59e4467f4b1dcdb/output/res/drawable-xhdpi-v4/notification_bg_low_pressed.9.png"
+    },
+    {
+        "merged": "/Users/simple/Desktop/workspace/android_ws/CQMap-10/scroll_layout/build/intermediates/res/merged/debug/drawable-xhdpi-v4/notification_bg_low_normal.9.png",
+        "source": "/Users/simple/.android/build-cache/063b447c818b5c5fc8f47d06b59e4467f4b1dcdb/output/res/drawable-xhdpi-v4/notification_bg_low_normal.9.png"
+    },
+    {
+        "merged": "/Users/simple/Desktop/workspace/android_ws/CQMap-10/scroll_layout/build/intermediates/res/merged/debug/drawable-xhdpi-v4/notify_panel_notification_icon_bg.png",
+        "source": "/Users/simple/.android/build-cache/063b447c818b5c5fc8f47d06b59e4467f4b1dcdb/output/res/drawable-xhdpi-v4/notify_panel_notification_icon_bg.png"
+    },
+    {
+        "merged": "/Users/simple/Desktop/workspace/android_ws/CQMap-10/scroll_layout/build/intermediates/res/merged/debug/drawable-xhdpi-v4/notification_bg_normal.9.png",
+        "source": "/Users/simple/.android/build-cache/063b447c818b5c5fc8f47d06b59e4467f4b1dcdb/output/res/drawable-xhdpi-v4/notification_bg_normal.9.png"
+    },
+    {
+        "merged": "/Users/simple/Desktop/workspace/android_ws/CQMap-10/scroll_layout/build/intermediates/res/merged/debug/drawable-xhdpi-v4/notification_bg_normal_pressed.9.png",
+        "source": "/Users/simple/.android/build-cache/063b447c818b5c5fc8f47d06b59e4467f4b1dcdb/output/res/drawable-xhdpi-v4/notification_bg_normal_pressed.9.png"
+    }
+]

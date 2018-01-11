@@ -15,8 +15,8 @@ import android.widget.PopupWindow;
 
 public abstract class BasePopupWindow extends PopupWindow {
 
-    public Context mContext;
-    private View mRootView;
+    protected Context mContext;
+    protected View mRootView;
 
     public BasePopupWindow(Context context) {
         super(context);

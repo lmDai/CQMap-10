@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.yinglan.scrolllayout.ScrollLayout
+        android:id="@+id/scrollLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@drawable/my_divider"
+            android:orientation="vertical"
+            android:showDividers="middle">
+
+            <RelativeLayout
+                android:id="@+id/bottom_drag_view"
+                android:layout_width="match_parent"
+                android:layout_height="53dp"
+                android:background="@android:color/white">
+
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="5dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/sp_rr_gray" />
+
+            </RelativeLayout>
+
+            <com.yinglan.scrolllayout.content.ContentRecyclerView
+                android:id="@+id/content_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </com.yinglan.scrolllayout.content.ContentRecyclerView>
+
+        </LinearLayout>
+    </com.yinglan.scrolllayout.ScrollLayout>
+
+</android.support.constraint.ConstraintLayout>

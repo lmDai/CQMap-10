@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "/Users/simple/Desktop/workspace/android_ws/CQMap-10/scroll_layout/build/intermediates/res/merged/release/drawable/notification_bg.xml",
+        "source": "/Users/simple/.android/build-cache/063b447c818b5c5fc8f47d06b59e4467f4b1dcdb/output/res/drawable/notification_bg.xml"
+    },
+    {
+        "merged": "/Users/simple/Desktop/workspace/android_ws/CQMap-10/scroll_layout/build/intermediates/res/merged/release/drawable/notification_tile_bg.xml",
+        "source": "/Users/simple/.android/build-cache/063b447c818b5c5fc8f47d06b59e4467f4b1dcdb/output/res/drawable/notification_tile_bg.xml"
+    },
+    {
+        "merged": "/Users/simple/Desktop/workspace/android_ws/CQMap-10/scroll_layout/build/intermediates/res/merged/release/drawable/notification_bg_low.xml",
+        "source": "/Users/simple/.android/build-cache/063b447c818b5c5fc8f47d06b59e4467f4b1dcdb/output/res/drawable/notification_bg_low.xml"
+    },
+    {
+        "merged": "/Users/simple/Desktop/workspace/android_ws/CQMap-10/scroll_layout/build/intermediates/res/merged/release/drawable/notification_icon_background.xml",
+        "source": "/Users/simple/.android/build-cache/063b447c818b5c5fc8f47d06b59e4467f4b1dcdb/output/res/drawable/notification_icon_background.xml"
+    }
+]
