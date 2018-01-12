@@ -17,8 +17,6 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.zhixun.uiho.com.gissystem.R;
-import android.zhixun.uiho.com.gissystem.drawtool.DrawEvent;
-import android.zhixun.uiho.com.gissystem.drawtool.DrawEventListener;
 import android.zhixun.uiho.com.gissystem.drawtool.DrawTool;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
@@ -35,7 +33,7 @@ import android.zhixun.uiho.com.gissystem.ui.widget.DividerGridItemDecoration;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
 
-import com.esri.android.map.GraphicsLayer;
+import com.esri.core.geometry.Point;
 import com.esri.core.map.CallbackListener;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
@@ -61,7 +59,7 @@ import static android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView.DEM_LAYER;
  */
 
 @Keep
-public class UnitFragment extends BaseFragment implements View.OnClickListener, DrawEventListener {
+public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
     private BaseMapView mMapView;
     private View mCVLayer, mCVSift, mCVLocation, mZoomIn, mZoomOut, mCVSpace, mCVClear;
@@ -73,15 +71,11 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
     private long ZCD_CODE = -1;
     //类别的code
     private long HYLB_CODE = -1;
-    private GraphicsLayer drawLayer;
-    private DrawTool drawTool;
-    //
-    GraphicsLayer graphicsLayer = new GraphicsLayer();
-    //
+    //公司信息集合
+    private List<CompanyDetailModel> companyList = new ArrayList<>();
     private ScrollLayout mScrollLayout;
     private ContentRecyclerView mContentRv;
     private View dragView;
-
 
     public UnitFragment() {
         Bundle args = new Bundle();
@@ -114,12 +108,6 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         mCVSpace = view.findViewById(R.id.cv_space);
         mCVClear = view.findViewById(R.id.cv_clear);
 
-        drawLayer = new GraphicsLayer();
-        mMapView.addLayer(drawLayer);
-        drawTool = new DrawTool(mMapView);
-        drawTool.addEventListener(this);
-
-        mMapView.addLayer(graphicsLayer);
     }
 
     private void initEvent() {
@@ -209,8 +197,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                 }
                 break;
             case R.id.cv_clear:
-                drawLayer.removeAll();
-                drawTool.deactivate();
+                mMapView.clearAll();
                 restoreSpaceStatus();
                 hideBottomLayout();
                 break;
@@ -224,7 +211,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                         false);
         DialogUtil.getInstance().showAnchorDialog(contentView, view);
         RadioGroup rgLayerSwitch = contentView.findViewById(R.id.rg_layer_switch);
-        switch (mMapView.getCurrentLayer()) {
+        switch (mMapView.getCurrentMapLayer()) {
             case BaseMapView.DEM_LAYER:
                 ((RadioButton) rgLayerSwitch.findViewById(R.id.rb_topographic)).setChecked(true);
                 break;
@@ -239,13 +226,13 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         rgLayerSwitch.setOnCheckedChangeListener((group, checkedId) -> {
             switch (checkedId) {
                 case R.id.rb_topographic:
-                    mMapView.setCurrentLayer(DEM_LAYER);
+                    mMapView.setCurrentMapLayer(DEM_LAYER);
                     break;
                 case R.id.rb_vector:
-                    mMapView.setCurrentLayer(BaseMapView.VEC_LAYER);
+                    mMapView.setCurrentMapLayer(BaseMapView.VEC_LAYER);
                     break;
                 case R.id.rb_image:
-                    mMapView.setCurrentLayer(BaseMapView.IMG_LAYER);
+                    mMapView.setCurrentMapLayer(BaseMapView.IMG_LAYER);
                     break;
             }
             DialogUtil.getInstance().dismiss();
@@ -346,8 +333,14 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                     @Override
                     public void onResponse(List<CompanyDetailModel> response) {
                         dismissLoading();
-                        showMapSymbol(response);
-//                        showBottomLayout(response);
+                        if (response == null || response.isEmpty()) {
+                            ToastUtil.showShort("未查询到相关信息");
+                            return;
+                        }
+                        companyList.clear();
+                        companyList.addAll(response);
+                        showMapSymbol(companyList);
+                        showBottomLayout(companyList);
                     }
 
                     @Override
@@ -378,7 +371,6 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
             @Override
             public void onCallback(FeatureResult objects) {
                 showCompanyMarker(objects);
-                showBottomLayout(response, objects);
             }
 
             @Override
@@ -398,16 +390,17 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                 Feature feature = (Feature) object;
                 SimpleMarkerSymbol symbol =
                         new SimpleMarkerSymbol(Color.RED, 12, SimpleMarkerSymbol.STYLE.CIRCLE);
-                // turn feature into graphic
                 Graphic graphic = new Graphic(feature.getGeometry(),
                         symbol, feature.getAttributes());
-                // add graphic to layer
-                drawLayer.addGraphic(graphic);
+                mMapView.addGraphic(graphic);
+
+//                String UNITID = (String) feature.getAttributeValue("UNITID");
+
             }
         }
     }
 
-    private void showBottomLayout(List<CompanyDetailModel> response, FeatureResult objects) {
+    private void showBottomLayout(List<CompanyDetailModel> response) {
         mCVClear.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).hideBottomNav();
         MainBottomAdapter bottomAdapter =
@@ -417,7 +410,19 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         mScrollLayout.setToOpen();
         dragView.setVisibility(View.VISIBLE);
         bottomAdapter.setOnItemClickListener((view, position) -> {
-            ToastUtil.showShort("" + position);
+            int companyId = response.get(position).getCompanyId();
+            for (int id : mMapView.getGraphicLayer().getGraphicIDs()) {
+                Graphic graphic = mMapView.getGraphicLayer().getGraphic(id);
+                int unit_id = (int) graphic.getAttributeValue("UNITID");
+                if (companyId == unit_id) {
+//                    ToastUtil.showShort("========");
+                    if (graphic.getGeometry() instanceof Point) {
+                        Point point = (Point) graphic.getGeometry();
+                        mMapView.centerAt(point, true);
+                    }
+                }
+            }
+//            ToastUtil.showShort("" + position);
         });
     }
 
@@ -437,15 +442,15 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                 .setOnItemClickListener((view1, position) -> {
                     switch (position) {
                         case 0://矩形
-                            drawTool.activate(DrawTool.ENVELOPE);
+                            mMapView.getDrawTool().activate(DrawTool.ENVELOPE);
                             mMapView.setCurrentDrawSpace(BaseMapView.SPACE_RECT);
                             break;
                         case 1://多边形
-                            drawTool.activate(DrawTool.POLYGON);
+                            mMapView.getDrawTool().activate(DrawTool.POLYGON);
                             mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON);
                             break;
                         case 2://缓冲区查询
-                            drawTool.activate(DrawTool.POLYLINE);
+                            mMapView.getDrawTool().activate(DrawTool.POLYLINE);
                             mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER);
                             break;
                     }
@@ -459,27 +464,16 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         showLoading();
         restoreSpaceStatus();
         QueryParameters query = new QueryParameters();
-        query.setGeometry(drawLayer.getExtent());
+        query.setGeometry(mMapView.getDrawLayer().getExtent());
         query.setOutSpatialReference(mMapView.getSpatialReference());
         query.setOutFields(new String[]{"*"});
         query.setReturnGeometry(true);
-        drawLayer.removeAll();
         QueryTask queryTask = new QueryTask(getString(R.string.feature_server_url));
         queryTask.execute(query, new CallbackListener<FeatureResult>() {
             @Override
             public void onCallback(FeatureResult objects) {
                 dismissLoading();
                 showCompanyMarker(objects);
-//                if (objects.featureCount() == 0) {
-//                    ToastUtil.showShort("未查询到相关信息");
-//                    return;
-//                }
-//                for (Object object : objects) {
-//                    if (object instanceof Feature) {
-//                        Feature feature = ((Feature) object);
-//                        feature.getGeometry();
-//                    }
-//                }
             }
 
             @Override
@@ -493,8 +487,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         mMapView.setCurrentDrawSpace(BaseMapView.SPACE_NONE);
         AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
         ivSpace.setImageResource(R.mipmap.ic_kongjian);
-        drawLayer.removeAll();
-        drawTool.deactivate();
+        mMapView.clearAll();
+
     }
 
     //获取重庆各大区县
@@ -576,11 +570,6 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                         dismissLoading();
                     }
                 });
-    }
-
-    @Override
-    public void handleDrawEvent(DrawEvent event) {
-        drawLayer.addGraphic(event.getDrawGraphic());
     }
 
     private void showClearBtn() {
