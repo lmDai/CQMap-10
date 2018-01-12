@@ -22,7 +22,9 @@ public class BaseMapView extends MapView {
     private ArcGISTiledMapServiceLayer demLayer;
     private ArcGISTiledMapServiceLayer imgLayer;
     @CurrentLayer
-    private int currentLayer;
+    private int currentLayer = SPACE_NONE;
+    @CurrentSpace
+    private int currentDrawSpace;
 
     public BaseMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -89,4 +91,22 @@ public class BaseMapView extends MapView {
 //    public void zoomOut() {
 //        this.zoomout();
 //    }
+
+    public static final int SPACE_NONE = 0;
+    public static final int SPACE_RECT = 1;
+    public static final int SPACE_POLYGON = 2;
+    public static final int SPACE_BUFFER = 3;
+
+    @IntDef({SPACE_NONE, SPACE_RECT, SPACE_POLYGON, SPACE_BUFFER})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface CurrentSpace {
+    }
+
+    public int getCurrentDrawSpace() {
+        return currentDrawSpace;
+    }
+
+    public void setCurrentDrawSpace(@CurrentSpace int currentDrawSpace) {
+        this.currentDrawSpace = currentDrawSpace;
+    }
 }

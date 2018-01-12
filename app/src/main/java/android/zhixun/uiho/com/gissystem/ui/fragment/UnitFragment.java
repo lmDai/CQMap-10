@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -81,6 +82,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
     private ContentRecyclerView mContentRv;
     private View dragView;
 
+
     public UnitFragment() {
         Bundle args = new Bundle();
         setArguments(args);
@@ -152,7 +154,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         dragView.setOnClickListener(v -> mScrollLayout.scrollToOpen());
     }
 
-    private ScrollLayout.OnScrollChangedListener mOnScrollChangedListener = new ScrollLayout.OnScrollChangedListener() {
+    private ScrollLayout.OnScrollChangedListener mOnScrollChangedListener
+            = new ScrollLayout.OnScrollChangedListener() {
         @Override
         public void onScrollProgressChanged(float currentProgress) {
             if (currentProgress >= 0) {
@@ -198,13 +201,17 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
             case R.id.aiv_zoom_out://
                 mMapView.zoomout();
                 break;
-            case R.id.cv_space:
-                showSpaceDialog(v);
+            case R.id.cv_space://空间查询
+                if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
+                    showSpaceDialog(v);
+                } else {
+                    searchGeometry();
+                }
                 break;
             case R.id.cv_clear:
                 drawLayer.removeAll();
                 drawTool.deactivate();
-                mCVClear.setVisibility(View.GONE);
+                restoreSpaceStatus();
                 hideBottomLayout();
                 break;
         }
@@ -264,7 +271,6 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         zcdRv.setLayoutManager(new GridLayoutManager(getActivity(), 4));
         lbRv.setLayoutManager(new GridLayoutManager(getActivity(), 4));
         //注册地
-
         UnitFilterUnitAdapter unitZCDAdapter =
                 new UnitFilterUnitAdapter(getActivity(), areaModelList);
         zcdRv.setAdapter(unitZCDAdapter);
@@ -340,8 +346,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                     @Override
                     public void onResponse(List<CompanyDetailModel> response) {
                         dismissLoading();
-//                        showMapSymbol(response);
-                        showBottomLayout(response);
+                        showMapSymbol(response);
+//                        showBottomLayout(response);
                     }
 
                     @Override
@@ -362,28 +368,17 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         String in = sb.substring(0, sb.length() - 1);
         String whereClause = String.format("UNITID in (%s)", in);
         LogUtil.d("whereClause == " + whereClause);
-        QueryParameters qp = new QueryParameters();
-        qp.setWhere(whereClause);
+        QueryParameters query = new QueryParameters();
+        query.setOutSpatialReference(mMapView.getSpatialReference());
+        query.setOutFields(new String[]{"*"});
+        query.setReturnGeometry(true);
+        query.setWhere(whereClause);
         QueryTask qTask = new QueryTask(getString(R.string.feature_server_url));
-        qTask.execute(qp, new CallbackListener<FeatureResult>() {
+        qTask.execute(query, new CallbackListener<FeatureResult>() {
             @Override
             public void onCallback(FeatureResult objects) {
-                if (objects.featureCount() == 0) {
-                    ToastUtil.showShort("未获取单位信息,请重试");
-                    return;
-                }
-                for (Object object : objects) {
-                    if (object instanceof Feature) {
-                        Feature feature = (Feature) object;
-                        SimpleMarkerSymbol symbol =
-                                new SimpleMarkerSymbol(Color.RED, 12, SimpleMarkerSymbol.STYLE.CIRCLE);
-                        // turn feature into graphic
-                        Graphic graphic = new Graphic(feature.getGeometry(),
-                                symbol, feature.getAttributes());
-                        // add graphic to layer
-                        drawLayer.addGraphic(graphic);
-                    }
-                }
+                showCompanyMarker(objects);
+                showBottomLayout(response, objects);
             }
 
             @Override
@@ -393,7 +388,26 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         });
     }
 
-    private void showBottomLayout(List<CompanyDetailModel> response) {
+    private void showCompanyMarker(FeatureResult objects) {
+        if (objects.featureCount() == 0) {
+            ToastUtil.showShort("未获取单位信息,请重试");
+            return;
+        }
+        for (Object object : objects) {
+            if (object instanceof Feature) {
+                Feature feature = (Feature) object;
+                SimpleMarkerSymbol symbol =
+                        new SimpleMarkerSymbol(Color.RED, 12, SimpleMarkerSymbol.STYLE.CIRCLE);
+                // turn feature into graphic
+                Graphic graphic = new Graphic(feature.getGeometry(),
+                        symbol, feature.getAttributes());
+                // add graphic to layer
+                drawLayer.addGraphic(graphic);
+            }
+        }
+    }
+
+    private void showBottomLayout(List<CompanyDetailModel> response, FeatureResult objects) {
         mCVClear.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).hideBottomNav();
         MainBottomAdapter bottomAdapter =
@@ -402,9 +416,9 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         mContentRv.setAdapter(bottomAdapter);
         mScrollLayout.setToOpen();
         dragView.setVisibility(View.VISIBLE);
-//        BottomSheetPw pw = new BottomSheetPw(getActivity());
-//        pw.setAdapter(bottomAdapter);
-//        pw.showAtLocation(mCVSift, Gravity.CENTER, 0, 0);
+        bottomAdapter.setOnItemClickListener((view, position) -> {
+            ToastUtil.showShort("" + position);
+        });
     }
 
     private void hideBottomLayout() {
@@ -424,16 +438,63 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                     switch (position) {
                         case 0://矩形
                             drawTool.activate(DrawTool.ENVELOPE);
+                            mMapView.setCurrentDrawSpace(BaseMapView.SPACE_RECT);
                             break;
                         case 1://多边形
                             drawTool.activate(DrawTool.POLYGON);
+                            mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON);
                             break;
                         case 2://缓冲区查询
                             drawTool.activate(DrawTool.POLYLINE);
+                            mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER);
                             break;
                     }
+                    AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
+                    ivSpace.setImageResource(R.mipmap.ic_sure_modifi);
                     mCVClear.setVisibility(View.VISIBLE);
                 });
+    }
+
+    private void searchGeometry() {
+        showLoading();
+        restoreSpaceStatus();
+        QueryParameters query = new QueryParameters();
+        query.setGeometry(drawLayer.getExtent());
+        query.setOutSpatialReference(mMapView.getSpatialReference());
+        query.setOutFields(new String[]{"*"});
+        query.setReturnGeometry(true);
+        drawLayer.removeAll();
+        QueryTask queryTask = new QueryTask(getString(R.string.feature_server_url));
+        queryTask.execute(query, new CallbackListener<FeatureResult>() {
+            @Override
+            public void onCallback(FeatureResult objects) {
+                dismissLoading();
+                showCompanyMarker(objects);
+//                if (objects.featureCount() == 0) {
+//                    ToastUtil.showShort("未查询到相关信息");
+//                    return;
+//                }
+//                for (Object object : objects) {
+//                    if (object instanceof Feature) {
+//                        Feature feature = ((Feature) object);
+//                        feature.getGeometry();
+//                    }
+//                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                dismissLoading();
+            }
+        });
+    }
+
+    private void restoreSpaceStatus() {
+        mMapView.setCurrentDrawSpace(BaseMapView.SPACE_NONE);
+        AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
+        ivSpace.setImageResource(R.mipmap.ic_kongjian);
+        drawLayer.removeAll();
+        drawTool.deactivate();
     }
 
     //获取重庆各大区县
@@ -520,5 +581,13 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
     @Override
     public void handleDrawEvent(DrawEvent event) {
         drawLayer.addGraphic(event.getDrawGraphic());
+    }
+
+    private void showClearBtn() {
+        mCVClear.setVisibility(View.VISIBLE);
+    }
+
+    private void hideClearBtn() {
+        mCVClear.setVisibility(View.GONE);
     }
 }
