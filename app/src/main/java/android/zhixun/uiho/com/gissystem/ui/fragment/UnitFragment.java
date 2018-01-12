@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,14 +24,15 @@ import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.IndustryCategoryModel;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
+import android.zhixun.uiho.com.gissystem.ui.activity.MainActivity;
 import android.zhixun.uiho.com.gissystem.ui.adapter.MainBottomAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.UnitFilterAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.UnitFilterUnitAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
-import android.zhixun.uiho.com.gissystem.ui.widget.BottomSheetPw;
 import android.zhixun.uiho.com.gissystem.ui.widget.DialogUtil;
 import android.zhixun.uiho.com.gissystem.ui.widget.DividerGridItemDecoration;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
+import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
 
 import com.esri.android.map.GraphicsLayer;
 import com.esri.core.map.CallbackListener;
@@ -43,6 +44,8 @@ import com.esri.core.tasks.query.QueryParameters;
 import com.esri.core.tasks.query.QueryTask;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
+import com.yinglan.scrolllayout.ScrollLayout;
+import com.yinglan.scrolllayout.content.ContentRecyclerView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +76,10 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
     private DrawTool drawTool;
     //
     GraphicsLayer graphicsLayer = new GraphicsLayer();
-
+    //
+    private ScrollLayout mScrollLayout;
+    private ContentRecyclerView mContentRv;
+    private View dragView;
 
     public UnitFragment() {
         Bundle args = new Bundle();
@@ -91,6 +97,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
+        initBottomDragView(view);
         initEvent();
         initData();
     }
@@ -128,6 +135,50 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         getSiftLBData();
     }
 
+    private void initBottomDragView(View view) {
+        mScrollLayout = view.findViewById(R.id.scrollLayout);
+        mContentRv = view.findViewById(R.id.content_rv);
+        mScrollLayout.setMinOffset(0);
+        mScrollLayout.setMaxOffset((int) (ScreenUtil.getScreenHeight(getActivity()) * 0.5));
+        mScrollLayout.setExitOffset(ScreenUtil.dip2px(getActivity(), 50));
+        mScrollLayout.setIsSupportExit(true);
+        mScrollLayout.setAllowHorizontalScroll(true);
+        mScrollLayout.setOnScrollChangedListener(mOnScrollChangedListener);
+        mScrollLayout.setToExit();
+
+//        View root = findViewById(R.id.root);
+//        root.setOnClickListener(v -> mScrollLayout.scrollToExit());
+        dragView = view.findViewById(R.id.bottom_drag_view);
+        dragView.setOnClickListener(v -> mScrollLayout.scrollToOpen());
+    }
+
+    private ScrollLayout.OnScrollChangedListener mOnScrollChangedListener = new ScrollLayout.OnScrollChangedListener() {
+        @Override
+        public void onScrollProgressChanged(float currentProgress) {
+            if (currentProgress >= 0) {
+                float precent = 255 * currentProgress;
+                if (precent > 255) {
+                    precent = 255;
+                } else if (precent < 0) {
+                    precent = 0;
+                }
+                mScrollLayout.getBackground().setAlpha(255 - (int) precent);
+            }
+//            if (text_foot.getVisibility() == View.VISIBLE)
+//                text_foot.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void onScrollFinished(ScrollLayout.Status currentStatus) {
+            if (currentStatus.equals(ScrollLayout.Status.EXIT)) {
+//                text_foot.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public void onChildScroll(int top) {
+        }
+    };
 
     @Override
     public void onClick(View v) {
@@ -154,6 +205,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                 drawLayer.removeAll();
                 drawTool.deactivate();
                 mCVClear.setVisibility(View.GONE);
+                hideBottomLayout();
                 break;
         }
     }
@@ -288,8 +340,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                     @Override
                     public void onResponse(List<CompanyDetailModel> response) {
                         dismissLoading();
-                        showMapSymbol(response);
-                        showBottomPw(response);
+//                        showMapSymbol(response);
+                        showBottomLayout(response);
                     }
 
                     @Override
@@ -341,12 +393,25 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         });
     }
 
-    private void showBottomPw(List<CompanyDetailModel> response) {
+    private void showBottomLayout(List<CompanyDetailModel> response) {
+        mCVClear.setVisibility(View.VISIBLE);
+        ((MainActivity) getActivity()).hideBottomNav();
         MainBottomAdapter bottomAdapter =
                 new MainBottomAdapter(getActivity(), response);
-        BottomSheetPw pw = new BottomSheetPw(getActivity());
-        pw.setAdapter(bottomAdapter);
-        pw.showAtLocation(mCVSift, Gravity.CENTER, 0, 0);
+        mContentRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mContentRv.setAdapter(bottomAdapter);
+        mScrollLayout.setToOpen();
+        dragView.setVisibility(View.VISIBLE);
+//        BottomSheetPw pw = new BottomSheetPw(getActivity());
+//        pw.setAdapter(bottomAdapter);
+//        pw.showAtLocation(mCVSift, Gravity.CENTER, 0, 0);
+    }
+
+    private void hideBottomLayout() {
+        mCVClear.setVisibility(View.GONE);
+        mScrollLayout.setToExit();
+        dragView.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).showBottomNav();
     }
 
     private void showSpaceDialog(View view) {

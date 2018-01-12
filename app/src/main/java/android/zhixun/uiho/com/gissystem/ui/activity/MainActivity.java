@@ -1062,4 +1062,12 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
         mDrawerLayout.openDrawer(Gravity.START);
     }
 
+    public void showBottomNav(){
+        rgBottomRadioNavigation.setVisibility(View.VISIBLE);
+    }
+
+    public void hideBottomNav(){
+        rgBottomRadioNavigation.setVisibility(View.GONE);
+    }
+
 }
