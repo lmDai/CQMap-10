@@ -1,5 +1,6 @@
 package android.zhixun.uiho.com.gissystem.ui.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
@@ -33,9 +34,15 @@ import android.zhixun.uiho.com.gissystem.ui.widget.DividerGridItemDecoration;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 
 import com.esri.android.map.GraphicsLayer;
+import com.esri.core.map.CallbackListener;
+import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
+import com.esri.core.map.Graphic;
+import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.esri.core.tasks.query.QueryParameters;
 import com.esri.core.tasks.query.QueryTask;
+import com.yibogame.util.LogUtil;
+import com.yibogame.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,6 +72,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
     private GraphicsLayer drawLayer;
     private DrawTool drawTool;
     //
+    GraphicsLayer graphicsLayer = new GraphicsLayer();
 
 
     public UnitFragment() {
@@ -101,6 +109,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         mMapView.addLayer(drawLayer);
         drawTool = new DrawTool(mMapView);
         drawTool.addEventListener(this);
+
+        mMapView.addLayer(graphicsLayer);
     }
 
     private void initEvent() {
@@ -261,17 +271,6 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
         getCompanyList(searchStr, ZCD_CODE, HYLB_CODE);
     }
 
-    private void searchSQL(String url, String whereClause) {
-        QueryParameters qp = new QueryParameters();
-        qp.setWhere(whereClause);
-        QueryTask qTask = new QueryTask(url);
-        try {
-            FeatureResult results = qTask.execute(qp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private void getCompanyList(String searchStr, long industryCategoryId, long areaId) {
         showLoading();
         Map<Object, Object> map = new HashMap<>();
@@ -289,18 +288,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                     @Override
                     public void onResponse(List<CompanyDetailModel> response) {
                         dismissLoading();
-
-                        MainBottomAdapter bottomAdapter =
-                                new MainBottomAdapter(getActivity(), response);
-//                        RecyclerView content_rv = mScrollLayout.findViewById(R.id.content_rv);
-//                        content_rv.setLayoutManager(new LinearLayoutManager(getActivity()));
-//                        content_rv.setAdapter(bottomAdapter);
-//                        View dragView = mScrollLayout.findViewById(R.id.bottom_drag_view);
-//                        mScrollLayout.setToOpen();
-//                        dragView.setVisibility(View.VISIBLE);
-                        BottomSheetPw pw = new BottomSheetPw(getActivity());
-                        pw.setAdapter(bottomAdapter);
-                        pw.showAtLocation(mCVSift, Gravity.CENTER, 0, 0);
+                        showMapSymbol(response);
+                        showBottomPw(response);
                     }
 
                     @Override
@@ -309,6 +298,55 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener, 
                         dismissLoading();
                     }
                 });
+    }
+
+    private void showMapSymbol(List<CompanyDetailModel> response) {
+        if (response == null || response.isEmpty()) return;
+        StringBuilder sb = new StringBuilder();
+        for (CompanyDetailModel model : response) {
+            sb.append(model.getCompanyId());
+            sb.append(",");
+        }
+        String in = sb.substring(0, sb.length() - 1);
+        String whereClause = String.format("UNITID in (%s)", in);
+        LogUtil.d("whereClause == " + whereClause);
+        QueryParameters qp = new QueryParameters();
+        qp.setWhere(whereClause);
+        QueryTask qTask = new QueryTask(getString(R.string.feature_server_url));
+        qTask.execute(qp, new CallbackListener<FeatureResult>() {
+            @Override
+            public void onCallback(FeatureResult objects) {
+                if (objects.featureCount() == 0) {
+                    ToastUtil.showShort("未获取单位信息,请重试");
+                    return;
+                }
+                for (Object object : objects) {
+                    if (object instanceof Feature) {
+                        Feature feature = (Feature) object;
+                        SimpleMarkerSymbol symbol =
+                                new SimpleMarkerSymbol(Color.RED, 12, SimpleMarkerSymbol.STYLE.CIRCLE);
+                        // turn feature into graphic
+                        Graphic graphic = new Graphic(feature.getGeometry(),
+                                symbol, feature.getAttributes());
+                        // add graphic to layer
+                        drawLayer.addGraphic(graphic);
+                    }
+                }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                ToastUtil.showShort("获取单位信息失败");
+            }
+        });
+    }
+
+    private void showBottomPw(List<CompanyDetailModel> response) {
+        MainBottomAdapter bottomAdapter =
+                new MainBottomAdapter(getActivity(), response);
+        BottomSheetPw pw = new BottomSheetPw(getActivity());
+        pw.setAdapter(bottomAdapter);
+        pw.showAtLocation(mCVSift, Gravity.CENTER, 0, 0);
     }
 
     private void showSpaceDialog(View view) {

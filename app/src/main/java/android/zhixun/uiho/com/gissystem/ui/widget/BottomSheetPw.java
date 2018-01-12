@@ -15,9 +15,6 @@ import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
 import com.yinglan.scrolllayout.ScrollLayout;
 import com.yinglan.scrolllayout.content.ContentRecyclerView;
 
-/**
- * Created by simple on 2018/1/12.
- */
 
 public class BottomSheetPw extends PopupWindow {
 
@@ -31,7 +28,7 @@ public class BottomSheetPw extends PopupWindow {
         super(context);
         mContext = context;
         setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-        setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
+        setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mRootView = View.inflate(context, R.layout.pw_bottom_sheet, null);
         setContentView(mRootView);
         setFocusable(false);

@@ -120,7 +120,8 @@ public class APIService {
             @Override
             public Observable<T> call(Observable<T> observable) {
                 return observable.subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread()).unsubscribeOn(Schedulers.io());
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .unsubscribeOn(Schedulers.io());
             }
         };
     }
@@ -150,7 +151,7 @@ public class APIService {
     public <T> Observable.Transformer<BaseListResultModel<T>, List<T>> handleResponseList() {
         return baseListResultModelObservable ->
                 baseListResultModelObservable.flatMap(tBaseResultModel -> {
-            LogUtil.i("返回结果:" + JSON.toJSONString(tBaseResultModel));
+//            LogUtil.i("返回结果:" + JSON.toJSONString(tBaseResultModel));
             try {
                 if (!tBaseResultModel.getResponseCode().equals(SUCCESS)) {
                     return Observable.error(new ServerHttpException(tBaseResultModel.getResponseMsg()));
