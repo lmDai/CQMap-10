@@ -292,37 +292,64 @@
 
     <include layout="@layout/layout_search" />
 
-    <com.yinglan.scrolllayout.ScrollLayout
-        android:id="@+id/scrollLayout"
+    <!--<com.yinglan.scrolllayout.ScrollLayout-->
+    <!--android:id="@+id/scrollLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:background="@android:color/transparent">-->
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical">-->
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/bottom_drag_view"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="50dp"-->
+    <!--android:background="@android:color/white">-->
+
+    <!--<TextView-->
+    <!--android:layout_width="50dp"-->
+    <!--android:layout_height="5dp"-->
+    <!--android:layout_centerInParent="true"-->
+    <!--android:background="@drawable/sp_rr_gray" />-->
+    <!--</RelativeLayout>-->
+
+    <!--<com.yinglan.scrolllayout.content.ContentRecyclerView-->
+    <!--android:id="@+id/content_rv"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <!--</com.yinglan.scrolllayout.content.ContentRecyclerView>-->
+
+    <!--</LinearLayout>-->
+    <!--</com.yinglan.scrolllayout.ScrollLayout>-->
+
+    <android.zhixun.uiho.com.gissystem.ui.widget.DragLayout
+        android:id="@+id/dragLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/bottom_drag_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="50dp"
+            android:background="@android:color/white">
 
-            <RelativeLayout
-                android:id="@+id/bottom_drag_view"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@android:color/white">
+            <TextView
+                android:layout_width="50dp"
+                android:layout_height="5dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/sp_rr_gray" />
+        </RelativeLayout>
 
-                <TextView
-                    android:layout_width="50dp"
-                    android:layout_height="5dp"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/sp_rr_gray" />
-            </RelativeLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/content_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <com.yinglan.scrolllayout.content.ContentRecyclerView
-                android:id="@+id/content_rv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+        </android.support.v7.widget.RecyclerView>
 
-            </com.yinglan.scrolllayout.content.ContentRecyclerView>
-
-        </LinearLayout>
-    </com.yinglan.scrolllayout.ScrollLayout>
+    </android.zhixun.uiho.com.gissystem.ui.widget.DragLayout>
 </RelativeLayout>

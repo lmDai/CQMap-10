@@ -30,8 +30,8 @@ import android.zhixun.uiho.com.gissystem.ui.adapter.UnitFilterUnitAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
 import android.zhixun.uiho.com.gissystem.ui.widget.DialogUtil;
 import android.zhixun.uiho.com.gissystem.ui.widget.DividerGridItemDecoration;
+import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
-import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
 
 import com.esri.core.geometry.Point;
 import com.esri.core.map.CallbackListener;
@@ -43,8 +43,6 @@ import com.esri.core.tasks.query.QueryParameters;
 import com.esri.core.tasks.query.QueryTask;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
-import com.yinglan.scrolllayout.ScrollLayout;
-import com.yinglan.scrolllayout.content.ContentRecyclerView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,8 +71,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     private long HYLB_CODE = -1;
     //公司信息集合
     private List<CompanyDetailModel> companyList = new ArrayList<>();
-    private ScrollLayout mScrollLayout;
-    private ContentRecyclerView mContentRv;
+    private DragLayout mDragLayout;
+    private RecyclerView mContentRv;
     private View dragView;
 
     public UnitFragment() {
@@ -126,50 +124,10 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     }
 
     private void initBottomDragView(View view) {
-        mScrollLayout = view.findViewById(R.id.scrollLayout);
+        mDragLayout = view.findViewById(R.id.dragLayout);
         mContentRv = view.findViewById(R.id.content_rv);
-        mScrollLayout.setMinOffset(0);
-        mScrollLayout.setMaxOffset((int) (ScreenUtil.getScreenHeight(getActivity()) * 0.5));
-        mScrollLayout.setExitOffset(ScreenUtil.dip2px(getActivity(), 50));
-        mScrollLayout.setIsSupportExit(true);
-        mScrollLayout.setAllowHorizontalScroll(true);
-        mScrollLayout.setOnScrollChangedListener(mOnScrollChangedListener);
-        mScrollLayout.setToExit();
-
-//        View root = findViewById(R.id.root);
-//        root.setOnClickListener(v -> mScrollLayout.scrollToExit());
         dragView = view.findViewById(R.id.bottom_drag_view);
-        dragView.setOnClickListener(v -> mScrollLayout.scrollToOpen());
     }
-
-    private ScrollLayout.OnScrollChangedListener mOnScrollChangedListener
-            = new ScrollLayout.OnScrollChangedListener() {
-        @Override
-        public void onScrollProgressChanged(float currentProgress) {
-            if (currentProgress >= 0) {
-                float precent = 255 * currentProgress;
-                if (precent > 255) {
-                    precent = 255;
-                } else if (precent < 0) {
-                    precent = 0;
-                }
-                mScrollLayout.getBackground().setAlpha(255 - (int) precent);
-            }
-//            if (text_foot.getVisibility() == View.VISIBLE)
-//                text_foot.setVisibility(View.GONE);
-        }
-
-        @Override
-        public void onScrollFinished(ScrollLayout.Status currentStatus) {
-            if (currentStatus.equals(ScrollLayout.Status.EXIT)) {
-//                text_foot.setVisibility(View.VISIBLE);
-            }
-        }
-
-        @Override
-        public void onChildScroll(int top) {
-        }
-    };
 
     @Override
     public void onClick(View v) {
@@ -407,7 +365,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 new MainBottomAdapter(getActivity(), response);
         mContentRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mContentRv.setAdapter(bottomAdapter);
-        mScrollLayout.setToOpen();
+        mDragLayout.animaToCenter();
         dragView.setVisibility(View.VISIBLE);
         bottomAdapter.setOnItemClickListener((view, position) -> {
             int companyId = response.get(position).getCompanyId();
@@ -428,7 +386,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
     private void hideBottomLayout() {
         mCVClear.setVisibility(View.GONE);
-        mScrollLayout.setToExit();
+        mDragLayout.exit();
         dragView.setVisibility(View.GONE);
         ((MainActivity) getActivity()).showBottomNav();
     }
