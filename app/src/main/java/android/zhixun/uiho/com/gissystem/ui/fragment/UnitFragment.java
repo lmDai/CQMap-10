@@ -31,6 +31,7 @@ import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
 import android.zhixun.uiho.com.gissystem.ui.widget.DialogUtil;
 import android.zhixun.uiho.com.gissystem.ui.widget.DividerGridItemDecoration;
 import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
+import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 
 import com.esri.core.geometry.Point;
@@ -150,6 +151,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
             case R.id.cv_space://空间查询
                 if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
                     showSpaceDialog(v);
+                } else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_BUFFER) {
+                    showBufferInputDialog(v);
                 } else {
                     searchGeometry();
                 }
@@ -416,6 +419,23 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     ivSpace.setImageResource(R.mipmap.ic_sure_modifi);
                     mCVClear.setVisibility(View.VISIBLE);
                 });
+    }
+
+    private void showBufferInputDialog(View view){
+        new SimpleAlertDialog(getActivity())
+                .title("图幅号查询")
+                .message("可输入多个图幅号，图幅号直接用空格或逗号分隔如\n'G49E005001 G49E005002'\n或\n'G49E005001,G49E005002'")
+                .setOkOnClickListener(R.string.alert_ok, (dialog1, v) -> {
+                    String text = dialog1.getEditText().getText().toString();
+                    if (TextUtils.isEmpty(text)) {
+                        ToastUtil.showShort("不能为空");
+                        return;
+                    }
+
+                })
+                .visiableEditText()
+                .setCancelOnClickListener(R.string.alert_cancel, null)
+                .alert();
     }
 
     private void searchGeometry() {
