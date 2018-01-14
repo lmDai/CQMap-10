@@ -1,7 +1,6 @@
 package android.zhixun.uiho.com.gissystem.ui.fragment;
 
 import android.support.annotation.Keep;
-import android.support.v4.app.Fragment;
 
 /**
  * Created by parcool on 2016/9/2.
@@ -9,7 +8,7 @@ import android.support.v4.app.Fragment;
  */
 
 @Keep
-public class DirectoryFragment extends Fragment{
+public class DirectoryFragment extends BaseFragment{
 
 }
 //public class DirectoryFragment extends MyBaseFragment implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {

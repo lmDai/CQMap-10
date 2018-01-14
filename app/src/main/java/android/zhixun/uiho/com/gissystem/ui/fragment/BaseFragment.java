@@ -1,6 +1,7 @@
 package android.zhixun.uiho.com.gissystem.ui.fragment;
 
-import android.support.v4.app.Fragment;
+
+import android.app.Fragment;
 
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 

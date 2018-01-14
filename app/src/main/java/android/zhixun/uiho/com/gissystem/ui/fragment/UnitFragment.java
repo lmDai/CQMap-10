@@ -418,7 +418,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
     private void showSpaceDialog(View view) {
         int[] resIds = {R.mipmap.ic_add, R.mipmap.ic_add, R.mipmap.ic_add};
-        String[] texts = {"矩形", "多边形", "缓冲区查询"};
+        String[] texts = {"矩形框选", "多边形框选", "缓冲区查询"};
         new SpaceDialog(getActivity(), (ViewGroup) getView())
                 .setData(resIds, texts)
                 .show(view)

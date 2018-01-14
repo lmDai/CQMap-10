@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,7 @@ import android.zhixun.uiho.com.gissystem.ui.activity.SubmitCensorShipRecordActiv
  */
 
 @Keep
-public class CheckFragment extends Fragment {
+public class CheckFragment extends BaseFragment {
 
     private View view;
     private RelativeLayout rlCensorshipRegister,rlLocalFile,rlSubmitCensorshipRecord;

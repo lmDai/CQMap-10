@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Scroller;
 
 /**
  * Created by simple on 2018/1/13.
@@ -19,15 +18,12 @@ import android.widget.Scroller;
 public class DragLayout extends LinearLayout {
 
     private ViewDragHelper mDragHelper;
-    private Scroller mScroller;
     private View mDragView;
-    private View mScrollView;
 
     public DragLayout(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         setOrientation(VERTICAL);
         mDragHelper = ViewDragHelper.create(this, callback);
-        mScroller = new Scroller(context);
     }
 
     private boolean setPadding = false;
@@ -36,7 +32,7 @@ public class DragLayout extends LinearLayout {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         if (!setPadding) {
-            setPadding(0, getHeight(), 0, 0);
+            exit();
             setPadding = true;
         }
     }
@@ -48,11 +44,13 @@ public class DragLayout extends LinearLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mDragHelper.processTouchEvent(event);
         View topChildUnder = mDragHelper
                 .findTopChildUnder((int) event.getX(), (int) event.getY());
-
-        return topChildUnder == mDragView;
+        if (topChildUnder == mDragView) {
+            mDragHelper.processTouchEvent(event);
+            return true;
+        }
+        return false;
     }
 
     ViewDragHelper.Callback callback = new ViewDragHelper.Callback() {
@@ -98,21 +96,20 @@ public class DragLayout extends LinearLayout {
 
         ValueAnimator animator = ValueAnimator.ofInt(curPaddingTop, toPaddingTop);
         animator.setDuration(300);
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int padding = (int) animation.getAnimatedValue();
-                setPadding(0, padding, 0, 0);
-            }
+        animator.addUpdateListener(animation -> {
+            int padding = (int) animation.getAnimatedValue();
+            setPadding(0, padding, 0, 0);
         });
         animator.start();
     }
 
     public void animaToCenter() {
+        mDragView.setVisibility(VISIBLE);
         animaTo(getPaddingTop(), getHeight() / 2);
     }
 
     public void exit() {
+        mDragView.setVisibility(GONE);
         setPadding(0, getHeight(), 0, 0);
     }
 
@@ -120,7 +117,6 @@ public class DragLayout extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         mDragView = getChildAt(0);
-        mScrollView = getChildAt(1);
     }
 
 

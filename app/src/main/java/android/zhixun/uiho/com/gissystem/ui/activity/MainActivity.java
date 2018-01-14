@@ -10,8 +10,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -658,7 +658,7 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
      * @param savedInstanceState
      */
     private void initFragments(Bundle savedInstanceState) {
-        mFragmentManager = getSupportFragmentManager();
+        mFragmentManager = getFragmentManager();
         if (savedInstanceState == null) {
             createAndAddFragment(UnitFragment.class);
         } else {
@@ -954,12 +954,12 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
 //        mFragmentManager.beginTransaction().attach(myBaseFragment).commit();
     }
 
-    private android.support.v4.app.Fragment showFagmentByReplace(Class<? extends android.support.v4.app.Fragment> clazz) {
+    private android.app.Fragment showFagmentByReplace(Class<? extends android.app.Fragment> clazz) {
         if (mFragmentManager.findFragmentByTag(clazz.getSimpleName()) != null) {
-            return (android.support.v4.app.Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
+            return (android.app.Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
         }
         try {
-            android.support.v4.app.Fragment fragment = clazz.newInstance();
+            android.app.Fragment fragment = clazz.newInstance();
 //            mFragmentManager.beginTransaction().add(R.id.contentContainer, myBaseFragment,
 // myBaseFragment.getArguments().getString("name")).commit();
             mFragmentManager
@@ -991,7 +991,7 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
             Fragment myBaseFragment = clazz.newInstance();
             mFragmentManager.beginTransaction()
                     .add(R.id.contentContainer, myBaseFragment,
-                    myBaseFragment.getArguments().getString("name"))
+                            myBaseFragment.getArguments().getString("name"))
                     .commit();
             return myBaseFragment;
         } catch (InstantiationException e) {
@@ -1062,11 +1062,11 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
         mDrawerLayout.openDrawer(Gravity.START);
     }
 
-    public void showBottomNav(){
+    public void showBottomNav() {
         rgBottomRadioNavigation.setVisibility(View.VISIBLE);
     }
 
-    public void hideBottomNav(){
+    public void hideBottomNav() {
         rgBottomRadioNavigation.setVisibility(View.GONE);
     }
 
