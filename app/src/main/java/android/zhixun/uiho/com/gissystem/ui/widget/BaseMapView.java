@@ -80,7 +80,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
     @Override
     public void handleDrawEvent(DrawEvent event) {
         currentDrawGraphic = event.getDrawGraphic();
-        drawLayer.addGraphic(event.getDrawGraphic());
+        drawLayer.addGraphic(currentDrawGraphic);
     }
 
     public Graphic getCurrentDrawGraphic() {
@@ -131,10 +131,12 @@ public class BaseMapView extends MapView implements DrawEventListener {
     public static final int SPACE_NONE = 0;
     public static final int SPACE_RECT = 1;
     public static final int SPACE_POLYGON = 2;
-    public static final int SPACE_BUFFER = 3;
-    public static final int SPACE_BUFFER_FINISH = 4;
+    public static final int SPACE_POLYGON_SET_FINISH = 3;
+    public static final int SPACE_BUFFER = 4;
+    public static final int SPACE_BUFFER_SET_FINISH = 5;
 
-    @IntDef({SPACE_NONE, SPACE_RECT, SPACE_POLYGON, SPACE_BUFFER, SPACE_BUFFER_FINISH})
+    @IntDef({SPACE_NONE, SPACE_RECT, SPACE_POLYGON, SPACE_POLYGON_SET_FINISH,
+            SPACE_BUFFER, SPACE_BUFFER_SET_FINISH})
     @Retention(RetentionPolicy.SOURCE)
     public @interface CurrentSpace {
     }
@@ -147,6 +149,8 @@ public class BaseMapView extends MapView implements DrawEventListener {
         this.currentDrawSpace = currentDrawSpace;
         if (currentDrawSpace == SPACE_NONE) {
             drawTool.deactivate();
+            drawLayer.removeAll();
+//            currentDrawGraphic = null;
         }
     }
 
@@ -166,6 +170,10 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
     public void addGraphic(Graphic graphic) {
         graphicsLayer.addGraphic(graphic);
+    }
+
+    public void setCurrentDrawGraphic(Graphic graphic){
+        this.currentDrawGraphic = graphic;
     }
 
     public void addDrawLayerGraphic(Graphic graphic) {

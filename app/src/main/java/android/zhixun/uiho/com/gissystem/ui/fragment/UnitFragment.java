@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.zhixun.uiho.com.gissystem.R;
@@ -61,6 +62,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
     private BaseMapView mMapView;
     private View mCVLayer, mCVSift, mCVLocation, mZoomIn, mZoomOut, mCVSpace, mCVClear;
+    private ImageView mIvUser, mIvSearch;
+    private EditText mEtSearch;
     //各大区县，注册地
     private List<AreaModel> areaModelList = new ArrayList<>();
     //单位类别
@@ -105,7 +108,9 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mZoomOut = view.findViewById(R.id.aiv_zoom_out);
         mCVSpace = view.findViewById(R.id.cv_space);
         mCVClear = view.findViewById(R.id.cv_clear);
-
+        mIvUser = view.findViewById(R.id.iv_user);
+        mIvSearch = view.findViewById(R.id.aciv_search);
+        mEtSearch = view.findViewById(R.id.et_search);
     }
 
     private void initEvent() {
@@ -116,6 +121,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mZoomOut.setOnClickListener(this);
         mCVSpace.setOnClickListener(this);
         mCVClear.setOnClickListener(this);
+        mIvUser.setOnClickListener(this);
+        mIvSearch.setOnClickListener(this);
     }
 
     private void initData() {
@@ -152,18 +159,33 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     showSpaceDialog(v);
                 } else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_BUFFER) {
                     showBufferInputDialog(v);
-                }
-//                else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_BUFFER) {
-//
-//                }
-                else {
+                } else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_POLYGON) {
+                    setPloygon();
+                } else {
                     searchGeometry();
                 }
                 break;
             case R.id.cv_clear:
                 restoreAll();
                 break;
+            case R.id.iv_user:
+                ((MainActivity) getActivity()).openDrawer();
+                break;
+            case R.id.aciv_search:
+                String searchStr = mEtSearch.getText().toString();
+                if (TextUtils.isEmpty(searchStr)) {
+                    ToastUtil.showShort("请输入单位名称或组织机构代码后再搜索");
+                    return;
+                }
+                getCompanyList(searchStr, -1, -1);
+                break;
         }
+    }
+
+    private void setPloygon(){
+        mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
+        searchGeometry();
+//        mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON_SET_FINISH);
     }
 
     private void showSwitchLayerDialog(View view) {
@@ -309,6 +331,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     public void onError(Throwable e) {
                         super.onError(e);
                         dismissLoading();
+                        ToastUtil.showShort("未查询到相关信息");
                     }
                 });
     }
@@ -436,7 +459,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     }
                     int distance = Integer.parseInt(text);
                     setBufferGeometry(distance);
-                    mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_FINISH);
+                    mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_SET_FINISH);
                 })
                 .visiableEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
