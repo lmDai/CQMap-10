@@ -34,11 +34,12 @@ import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 
+import com.esri.core.geometry.Geometry;
 import com.esri.core.geometry.Point;
-import com.esri.core.map.CallbackListener;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
+import com.esri.core.symbol.SimpleLineSymbol;
 import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
@@ -151,14 +152,16 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     showSpaceDialog(v);
                 } else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_BUFFER) {
                     showBufferInputDialog(v);
-                } else {
+                }
+//                else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_BUFFER) {
+//
+//                }
+                else {
                     searchGeometry();
                 }
                 break;
             case R.id.cv_clear:
-                mMapView.clearAll();
-                restoreSpaceStatus();
-                hideBottomLayout();
+                restoreAll();
                 break;
         }
     }
@@ -321,8 +324,9 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         String whereClause = String.format("UNITID in (%s)", in);
         LogUtil.d("whereClause == " + whereClause);
 
-        mMapView.querySQL(getString(R.string.feature_server_url), whereClause,
-                new CallbackListener<FeatureResult>() {
+        mMapView.querySQL(getActivity(),
+                getString(R.string.feature_server_url), whereClause,
+                new BaseMapView.MainThreadCallback<FeatureResult>() {
                     @Override
                     public void onCallback(FeatureResult objects) {
                         showCompanyMarker(objects);
@@ -338,6 +342,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     private void showCompanyMarker(FeatureResult objects) {
         if (objects.featureCount() == 0) {
             ToastUtil.showShort("未获取单位信息,请重试");
+            restoreAll();
             return;
         }
         for (Object object : objects) {
@@ -405,7 +410,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                             mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON);
                             break;
                         case 2://缓冲区查询
-                            mMapView.getDrawTool().activate(DrawTool.POLYLINE);
+                            mMapView.getDrawTool().activate(DrawTool.FREEHAND_POLYLINE);
                             mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER);
                             break;
                     }
@@ -416,28 +421,45 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     }
 
     private void showBufferInputDialog(View view) {
+        if (mMapView.getDrawLayer().getExtent() == null) {
+            ToastUtil.showShort(" 请多次点击地图");
+            return;
+        }
         new SimpleAlertDialog(getActivity())
-                .title("图幅号查询")
-                .message("可输入多个图幅号，图幅号直接用空格或逗号分隔如\n'G49E005001 G49E005002'\n或\n'G49E005001,G49E005002'")
+                .title("缓冲区查询")
+                .message("请输入范围(0-100公里)")
                 .setOkOnClickListener(R.string.alert_ok, (dialog1, v) -> {
                     String text = dialog1.getEditText().getText().toString();
                     if (TextUtils.isEmpty(text)) {
                         ToastUtil.showShort("不能为空");
                         return;
                     }
-
+                    int distance = Integer.parseInt(text);
+                    setBufferGeometry(distance);
+                    mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_FINISH);
                 })
                 .visiableEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
                 .alert();
     }
 
+    private void setBufferGeometry(int distance) {
+        SimpleLineSymbol lineSymbol = new SimpleLineSymbol(Color.RED,
+                distance,
+                SimpleLineSymbol.STYLE.SOLID
+        );
+        Geometry geometry = mMapView.getCurrentDrawGraphic().getGeometry();
+        Graphic graphic = new Graphic(geometry, lineSymbol);
+        mMapView.addDrawLayerGraphic(graphic);
+    }
+
     private void searchGeometry() {
         showLoading();
         restoreSpaceStatus();
 
-        mMapView.queryGeometry(getString(R.string.feature_server_url),
-                new CallbackListener<FeatureResult>() {
+        mMapView.queryGeometry(getActivity(),
+                getString(R.string.feature_server_url),
+                new BaseMapView.MainThreadCallback<FeatureResult>() {
                     @Override
                     public void onCallback(FeatureResult objects) {
                         dismissLoading();
@@ -456,7 +478,13 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
         ivSpace.setImageResource(R.mipmap.ic_kongjian);
         mMapView.clearAll();
+    }
 
+    private void restoreAll() {
+        restoreSpaceStatus();
+        hideBottomLayout();
+        hideClearBtn();
+        mMapView.clearAll();
     }
 
     //获取重庆各大区县

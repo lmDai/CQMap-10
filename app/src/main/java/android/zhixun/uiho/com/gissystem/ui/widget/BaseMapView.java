@@ -1,5 +1,6 @@
 package android.zhixun.uiho.com.gissystem.ui.widget;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.IntDef;
 import android.util.AttributeSet;
@@ -36,6 +37,9 @@ public class BaseMapView extends MapView implements DrawEventListener {
     //
     GraphicsLayer graphicsLayer = new GraphicsLayer();
     //
+//    private List<Integer> graphicsIds = new ArrayList<>();
+
+    private Graphic currentDrawGraphic;
 
     @CurrentMapLayer
     private int currentMapLayer;
@@ -75,8 +79,14 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
     @Override
     public void handleDrawEvent(DrawEvent event) {
+        currentDrawGraphic = event.getDrawGraphic();
         drawLayer.addGraphic(event.getDrawGraphic());
     }
+
+    public Graphic getCurrentDrawGraphic() {
+        return currentDrawGraphic;
+    }
+
 
     @IntDef({DEM_LAYER, VEC_LAYER, IMG_LAYER})
     @Retention(RetentionPolicy.SOURCE)
@@ -122,8 +132,9 @@ public class BaseMapView extends MapView implements DrawEventListener {
     public static final int SPACE_RECT = 1;
     public static final int SPACE_POLYGON = 2;
     public static final int SPACE_BUFFER = 3;
+    public static final int SPACE_BUFFER_FINISH = 4;
 
-    @IntDef({SPACE_NONE, SPACE_RECT, SPACE_POLYGON, SPACE_BUFFER})
+    @IntDef({SPACE_NONE, SPACE_RECT, SPACE_POLYGON, SPACE_BUFFER, SPACE_BUFFER_FINISH})
     @Retention(RetentionPolicy.SOURCE)
     public @interface CurrentSpace {
     }
@@ -150,10 +161,16 @@ public class BaseMapView extends MapView implements DrawEventListener {
     public void clearAll() {
         drawLayer.removeAll();
         graphicsLayer.removeAll();
+//        graphicsIds.clear();
     }
 
     public void addGraphic(Graphic graphic) {
         graphicsLayer.addGraphic(graphic);
+    }
+
+    public void addDrawLayerGraphic(Graphic graphic) {
+        currentDrawGraphic = graphic;
+        drawLayer.addGraphic(graphic);
     }
 
     public DrawTool getDrawTool() {
@@ -169,23 +186,57 @@ public class BaseMapView extends MapView implements DrawEventListener {
     }
 
 
-    public void queryGeometry(String url, CallbackListener<FeatureResult> callback) {
+    public void queryGeometry(Activity act, String url,
+                              MainThreadCallback<FeatureResult> callback) {
         QueryParameters query = new QueryParameters();
-        query.setGeometry(this.getDrawLayer().getExtent());
+        query.setGeometry(currentDrawGraphic.getGeometry());
         query.setOutSpatialReference(this.getSpatialReference());
         query.setOutFields(new String[]{"*"});
         query.setReturnGeometry(true);
         QueryTask queryTask = new QueryTask(url);
-        queryTask.execute(query, callback);
+        queryTask.execute(query, new CallbackListener<FeatureResult>() {
+            @Override
+            public void onCallback(FeatureResult objects) {
+                act.runOnUiThread(() -> callback.onCallback(objects));
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                act.runOnUiThread(() -> callback.onError(throwable));
+            }
+        });
     }
 
-    public void querySQL(String url, String where, CallbackListener<FeatureResult> callback) {
+    public void querySQL(Activity act,
+                         String url, String where,
+                         MainThreadCallback<FeatureResult> callback) {
         QueryParameters query = new QueryParameters();
         query.setOutSpatialReference(this.getSpatialReference());
         query.setOutFields(new String[]{"*"});
         query.setReturnGeometry(true);
         query.setWhere(where);
         QueryTask qTask = new QueryTask(url);
-        qTask.execute(query, callback);
+        qTask.execute(query, new CallbackListener<FeatureResult>() {
+            @Override
+            public void onCallback(FeatureResult objects) {
+                act.runOnUiThread(() -> {
+                    callback.onCallback(objects);
+                });
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                act.runOnUiThread(() -> {
+                    callback.onError(throwable);
+                });
+            }
+        });
+
+    }
+
+    public interface MainThreadCallback<T> {
+        void onCallback(T result);
+
+        void onError(Throwable e);
     }
 }

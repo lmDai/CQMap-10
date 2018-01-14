@@ -23,9 +23,6 @@ import com.esri.core.symbol.SimpleMarkerSymbol;
 
 /**
  * 
- * @author ropp gispace@yeah.net
- * 
- *         ��ͼʵ���֧࣬�ֻ��㡢���Ρ��ߡ�����Ρ�Բ���ֻ��ߡ��ֻ�����Σ������ø���ͼ�ε�symbol��
  */
 public class DrawTool extends Subject {
 
@@ -63,10 +60,10 @@ public class DrawTool extends Subject {
 				this.mapView);
 		defaultListener = new MapOnTouchListener(this.mapView.getContext(),
 				this.mapView);
-		this.markerSymbol = new SimpleMarkerSymbol(Color.BLACK, 16,
+		this.markerSymbol = new SimpleMarkerSymbol(Color.RED, 16,
 				SimpleMarkerSymbol.STYLE.CIRCLE);
-		this.lineSymbol = new SimpleLineSymbol(Color.BLACK, 2);
-		this.fillSymbol = new SimpleFillSymbol(Color.BLACK);
+		this.lineSymbol = new SimpleLineSymbol(Color.RED, 2);
+		this.fillSymbol = new SimpleFillSymbol(Color.RED);
 		this.fillSymbol.setAlpha(90);
 	}
 
