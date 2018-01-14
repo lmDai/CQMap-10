@@ -5,8 +5,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -36,6 +38,7 @@ import android.zhixun.uiho.com.gissystem.flux.models.api.IndustryCategoryModel;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
 import android.zhixun.uiho.com.gissystem.ui.activity.MainActivity;
+import android.zhixun.uiho.com.gissystem.ui.adapter.AdminRegionAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.MainBottomAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
 import android.zhixun.uiho.com.gissystem.ui.widget.DialogUtil;
@@ -54,6 +57,7 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.yibogame.util.DateUtil;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
+import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
 import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
@@ -151,8 +155,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     private void initData() {
-        getSiftZCDData();
-        getSiftLBData();
+//        getSiftZCDData();
+//        getSiftLBData();
     }
 
     private void initBottomDragView(View view) {
@@ -217,7 +221,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     private ReportHandoutListBody mBody;
-    private void showClassifySearchDialog(View view){
+
+    private void showClassifySearchDialog(View view) {
         showLoading();
         View dialogRoot = LayoutInflater.from(getActivity())
                 .inflate(R.layout.dialog_classify_search, ((ViewGroup) getView()),
@@ -231,30 +236,30 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         dismissLoading();
                         TagAdapter<FruitCategoryListModel> flowTypeAdapter =
                                 new TagAdapter<FruitCategoryListModel>(response) {
-                            @Override
-                            public View getView(FlowLayout flowLayout, int i,
-                                                FruitCategoryListModel o) {
-                                TextView textView = (TextView) View.inflate(getActivity(),
-                                        R.layout.item_flow_type, null);
-                                textView.setText(o.categoryName);
-                                return textView;
-                            }
+                                    @Override
+                                    public View getView(FlowLayout flowLayout, int i,
+                                                        FruitCategoryListModel o) {
+                                        TextView textView = (TextView) View.inflate(getActivity(),
+                                                R.layout.item_flow_type, null);
+                                        textView.setText(o.categoryName);
+                                        return textView;
+                                    }
 
-                            @Override
-                            public void onSelected(int position, View view) {
-                                super.onSelected(position, view);
-                                mBody = new ReportHandoutListBody();
-                                if (response == null) {
-                                    return;
-                                }
-                                FruitCategoryListModel model = response.get(position);
-                                if (model == null) {
-                                    return;
-                                }
-                                mBody.setFruitCategoryId(model.fruitCategoryId);
-                                switchType(model, dialogRoot);
-                            }
-                        };
+                                    @Override
+                                    public void onSelected(int position, View view) {
+                                        super.onSelected(position, view);
+                                        mBody = new ReportHandoutListBody();
+                                        if (response == null) {
+                                            return;
+                                        }
+                                        FruitCategoryListModel model = response.get(position);
+                                        if (model == null) {
+                                            return;
+                                        }
+                                        mBody.setFruitCategoryId(model.fruitCategoryId);
+                                        switchType(model, dialogRoot);
+                                    }
+                                };
                         typeFlowLayout.setAdapter(flowTypeAdapter);
                         flowTypeAdapter.setSelectedList(0);
                     }
@@ -269,74 +274,74 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         showLoading();
         APIService.getInstance()
                 .gethandoutConditionByFCList(model.fruitCategoryId,
-                new SimpleSubscriber<List<GethandoutConditionByFCModel>>() {
-                    @Override
-                    public void onResponse(List<GethandoutConditionByFCModel> response) {
-                        dismissLoading();
-                        if (response == null || response.isEmpty()) {
-                            return;
-                        }
+                        new SimpleSubscriber<List<GethandoutConditionByFCModel>>() {
+                            @Override
+                            public void onResponse(List<GethandoutConditionByFCModel> response) {
+                                dismissLoading();
+                                if (response == null || response.isEmpty()) {
+                                    return;
+                                }
 
-                        LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
-                        llContainer.removeAllViews();
-                        mBody.attrValueList.clear();
+                                LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
+                                llContainer.removeAllViews();
+                                mBody.attrValueList.clear();
 
-                        for (GethandoutConditionByFCModel gethandoutConditionByFCModel : response) {
+                                for (GethandoutConditionByFCModel gethandoutConditionByFCModel : response) {
 
-                            View item = LayoutInflater.from(dialogRoot.getContext())
-                                    .inflate(R.layout.dispatch_dialog_item, llContainer, false);
+                                    View item = LayoutInflater.from(dialogRoot.getContext())
+                                            .inflate(R.layout.dispatch_dialog_item, llContainer, false);
 
-                            TagFlowLayout tagFlowLayout = (TagFlowLayout) LayoutInflater
-                                    .from(dialogRoot.getContext())
-                                    .inflate(R.layout.dispatch_dialog_item_tag_flow_layout,
-                                            llContainer, false);
+                                    TagFlowLayout tagFlowLayout = (TagFlowLayout) LayoutInflater
+                                            .from(dialogRoot.getContext())
+                                            .inflate(R.layout.dispatch_dialog_item_tag_flow_layout,
+                                                    llContainer, false);
 
-                            TextView tv1 = item.findViewById(R.id.tv_attrName);
-                            tv1.setText(gethandoutConditionByFCModel.attrName);
-                            if (gethandoutConditionByFCModel.fruitCateGoryAttrVal == null) {
-                                gethandoutConditionByFCModel.fruitCateGoryAttrVal =
-                                        new ArrayList<>();
+                                    TextView tv1 = item.findViewById(R.id.tv_attrName);
+                                    tv1.setText(gethandoutConditionByFCModel.attrName);
+                                    if (gethandoutConditionByFCModel.fruitCateGoryAttrVal == null) {
+                                        gethandoutConditionByFCModel.fruitCateGoryAttrVal =
+                                                new ArrayList<>();
+                                    }
+                                    gethandoutConditionByFCModel.fruitCateGoryAttrVal
+                                            .add(0, new GethandoutConditionByFCModel
+                                                    .FruitCateGoryAttrVal("全部"));
+
+                                    TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal> ta1
+                                            = new TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal>(gethandoutConditionByFCModel.fruitCateGoryAttrVal) {
+                                        @Override
+                                        public View getView(FlowLayout flowLayout, int i,
+                                                            GethandoutConditionByFCModel.FruitCateGoryAttrVal o) {
+                                            TextView textView = (TextView) View.inflate(getActivity(),
+                                                    R.layout.item_flow_type, null);
+                                            textView.setText(o.attrValue);
+                                            return textView;
+                                        }
+
+                                        @Override
+                                        public void onSelected(int position, View view) {
+                                            super.onSelected(position, view);
+                                            if (position == 0) return;
+                                            long fruitCategoryAttrId = gethandoutConditionByFCModel.fruitCategoryAttrId;
+                                            String attrValue = gethandoutConditionByFCModel.fruitCateGoryAttrVal.get(position).attrValue;
+                                            mBody.attrValueList
+                                                    .add(new ReportHandoutListBody
+                                                            .AttrValueList(fruitCategoryAttrId, attrValue));
+                                        }
+                                    };
+                                    tagFlowLayout.setAdapter(ta1);
+                                    ta1.setSelectedList(0);
+
+                                    llContainer.addView(item);
+                                    llContainer.addView(tagFlowLayout);
+                                }
+
+                                Button btn_search = dialogRoot.findViewById(R.id.btn_search);
+                                //查询
+                                btn_search.setOnClickListener(v -> {
+                                    reportHandoutList();
+                                });
                             }
-                            gethandoutConditionByFCModel.fruitCateGoryAttrVal
-                                    .add(0, new GethandoutConditionByFCModel
-                                            .FruitCateGoryAttrVal("全部"));
-
-                            TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal> ta1
-                                    = new TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal>(gethandoutConditionByFCModel.fruitCateGoryAttrVal) {
-                                @Override
-                                public View getView(FlowLayout flowLayout, int i,
-                                                    GethandoutConditionByFCModel.FruitCateGoryAttrVal o) {
-                                    TextView textView = (TextView) View.inflate(getActivity(),
-                                            R.layout.item_flow_type, null);
-                                    textView.setText(o.attrValue);
-                                    return textView;
-                                }
-
-                                @Override
-                                public void onSelected(int position, View view) {
-                                    super.onSelected(position, view);
-                                    if (position == 0) return;
-                                    long fruitCategoryAttrId = gethandoutConditionByFCModel.fruitCategoryAttrId;
-                                    String attrValue = gethandoutConditionByFCModel.fruitCateGoryAttrVal.get(position).attrValue;
-                                    mBody.attrValueList
-                                            .add(new ReportHandoutListBody
-                                                    .AttrValueList(fruitCategoryAttrId, attrValue));
-                                }
-                            };
-                            tagFlowLayout.setAdapter(ta1);
-                            ta1.setSelectedList(0);
-
-                            llContainer.addView(item);
-                            llContainer.addView(tagFlowLayout);
-                        }
-
-                        Button btn_search = dialogRoot.findViewById(R.id.btn_search);
-                        //查询
-                        btn_search.setOnClickListener(v -> {
-                            reportHandoutList();
                         });
-                    }
-                });
     }
 
     //查询分类
@@ -344,56 +349,56 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         showLoading();
         APIService.getInstance().getReportHandoutList(mBody,
                 new SimpleSubscriber<List<ReportHandoutListModel>>() {
-            @Override
-            public void onResponse(List<ReportHandoutListModel> response) {
-                dismissLoading();
-                if (response == null || response.isEmpty()) return;
-                StringBuilder sb = new StringBuilder();
-                sb.append("FRUITID");
-                sb.append(" in ");
-                sb.append("(");
-                int mapType = 0;
-                for (ReportHandoutListModel reportHandoutListModel : response) {
+                    @Override
+                    public void onResponse(List<ReportHandoutListModel> response) {
+                        dismissLoading();
+                        if (response == null || response.isEmpty()) return;
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("FRUITID");
+                        sb.append(" in ");
+                        sb.append("(");
+                        int mapType = 0;
+                        for (ReportHandoutListModel reportHandoutListModel : response) {
 
-                    for (ReportHandoutListModel.FruitCategoryList fruitCategoryList :
-                            reportHandoutListModel.fruitCategoryList) {
+                            for (ReportHandoutListModel.FruitCategoryList fruitCategoryList :
+                                    reportHandoutListModel.fruitCategoryList) {
 
-                        mapType = fruitCategoryList.mapType;
-                        for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
-                                fruitCategoryList.fruitList) {
+                                mapType = fruitCategoryList.mapType;
+                                for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
+                                        fruitCategoryList.fruitList) {
 
-                            long fruitId = fruitList.fruitId;
-                            sb.append(String.valueOf(fruitId));
-                            sb.append(",");
+                                    long fruitId = fruitList.fruitId;
+                                    sb.append(String.valueOf(fruitId));
+                                    sb.append(",");
+                                }
+
+                            }
+
                         }
+
+                        String whereClause = sb.substring(0, sb.lastIndexOf(",")) + ")";
+                        LogUtil.i("whereClause == " + whereClause);
+
+                        searchType(mapType, whereClause);
+                        DialogUtil.getInstance().dismiss();
 
                     }
 
-                }
-
-                String whereClause = sb.substring(0, sb.lastIndexOf(",")) + ")";
-                LogUtil.i("whereClause == " + whereClause);
-
-                searchType(mapType, whereClause);
-                DialogUtil.getInstance().dismiss();
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                super.onError(e);
-                dismissLoading();
-                ToastUtil.showShort(e.getMessage());
-                DialogUtil.getInstance().dismiss();
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                        ToastUtil.showShort(e.getMessage());
+                        DialogUtil.getInstance().dismiss();
+                    }
+                });
     }
 
     private void searchType(int mapType, String whereClause) {
         if (mapType == 0) return;
         String url;
         if (mapType == 1) {//点查询
-           url = getString(R.string.point_feature_server_url);
+            url = getString(R.string.point_feature_server_url);
         } else {//面查询
             url = getString(R.string.polygon_feature_server_url);
         }
@@ -742,9 +747,11 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             break;
                         case 3://图幅号查询
                             ToastUtil.showShort("图幅号查询");
+
                             break;
                         case 4://行政区域查询
                             ToastUtil.showShort("行政区域查询");
+                            showAdminRegionDialog();
                             break;
                     }
                     AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
@@ -774,6 +781,75 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 .visiableEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
                 .alert();
+    }
+
+    private int lastPosition = -1;
+
+    //行政区域查询show dialog
+    private void showAdminRegionDialog() {
+        showLoading();
+        lastPosition = -1;
+        Map<Object, Object> map = new HashMap<>();
+        APIService.getInstance()
+                .getAreaList(map, new SimpleSubscriber<List<AreaModel>>() {
+                    @Override
+                    public void onResponse(List<AreaModel> response) {
+                        dismissLoading();
+                        View dialogView = View.inflate(getActivity(), R.layout.dialog_admin_region,
+                                null);
+                        RecyclerView rv = dialogView.findViewById(R.id.recycler_view);
+                        Button btn_ok = dialogView.findViewById(R.id.btn_ok);
+                        rv.setLayoutManager(new GridLayoutManager(getActivity(), 4));
+                        AdminRegionAdapter adapter = new AdminRegionAdapter(getActivity(), response);
+                        adapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+//                                ToastUtil.showShort("onItemClick");
+//                                TextView textView = view.findViewById(R.id.tv_title);
+                                if (position == lastPosition) return;
+                                if (response.get(position).isChecked()) {
+                                    response.get(position).setChecked(false);
+//                                    textView.setSelected(false);
+                                } else {
+                                    response.get(position).setChecked(true);
+                                    if (lastPosition != -1) {
+                                        response.get(lastPosition).setChecked(false);
+                                    }
+//                                    textView.setSelected(true);
+                                }
+                                adapter.notifyDataSetChanged();
+                                lastPosition = position;
+                            }
+
+                            @Override
+                            public boolean onItemLongClick(View view, RecyclerView.ViewHolder holder,
+                                                           int position) {
+                                return false;
+                            }
+                        });
+                        rv.setAdapter(adapter);
+                        AppCompatDialog dialog = new AppCompatDialog(getActivity());
+                        dialog.setContentView(dialogView);
+                        dialog.show();
+                        //确定，但是不查询？
+                        btn_ok.setOnClickListener(v -> {
+                            if (lastPosition == -1) {
+                                ToastUtil.showShort("请选择一个区域");
+                                return;
+                            }
+                            dialog.dismiss();
+//                            currDrawType = DRAWTYPE_ADMIN_REGION;
+//                            showCancelButton();
+//                            searchAdminRegion(response.get(lastPosition).getAreaName());
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                    }
+                });
     }
 
     private void setBufferGeometry(int distance) {
@@ -821,85 +897,85 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     //获取重庆各大区县
-    private void getSiftZCDData() {
-        showLoading();
-        Map<Object, Object> map = new HashMap<>();
-        APIService.getInstance().getAreaList(map, new SimpleSubscriber<List<AreaModel>>() {
-            @Override
-            public void onResponse(List<AreaModel> response) {
-                dismissLoading();
-                areaModelList.clear();
-                AreaModel areaModel = new AreaModel();
-                areaModel.setAreaId(-1);
-                areaModel.setAreaName("全部");
-                areaModelList.add(areaModel);
-                areaModelList.addAll(response);
-                //如果注册地还没选，那就默认让它选择全部
-                if (ZCD_CODE == -1) {
-                    for (AreaModel cqPrefectureModel : areaModelList) {
-                        cqPrefectureModel.setChecked(false);
-                    }
-                    areaModelList.get(0).setChecked(true);
-                } else {
-                    //如果注册地已经选择，那么选中它
-                    for (AreaModel cqPrefectureModel : areaModelList) {
-                        if (cqPrefectureModel.getAreaId() == ZCD_CODE) {
-                            cqPrefectureModel.setChecked(true);
-                        } else {
-                            cqPrefectureModel.setChecked(false);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                super.onError(e);
-                dismissLoading();
-            }
-        });
-    }
+//    private void getSiftZCDData() {
+//        showLoading();
+//        Map<Object, Object> map = new HashMap<>();
+//        APIService.getInstance().getAreaList(map, new SimpleSubscriber<List<AreaModel>>() {
+//            @Override
+//            public void onResponse(List<AreaModel> response) {
+//                dismissLoading();
+//                areaModelList.clear();
+//                AreaModel areaModel = new AreaModel();
+//                areaModel.setAreaId(-1);
+//                areaModel.setAreaName("全部");
+//                areaModelList.add(areaModel);
+//                areaModelList.addAll(response);
+//                //如果注册地还没选，那就默认让它选择全部
+//                if (ZCD_CODE == -1) {
+//                    for (AreaModel cqPrefectureModel : areaModelList) {
+//                        cqPrefectureModel.setChecked(false);
+//                    }
+//                    areaModelList.get(0).setChecked(true);
+//                } else {
+//                    //如果注册地已经选择，那么选中它
+//                    for (AreaModel cqPrefectureModel : areaModelList) {
+//                        if (cqPrefectureModel.getAreaId() == ZCD_CODE) {
+//                            cqPrefectureModel.setChecked(true);
+//                        } else {
+//                            cqPrefectureModel.setChecked(false);
+//                        }
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                super.onError(e);
+//                dismissLoading();
+//            }
+//        });
+//    }
 
     //获取单位类别
-    private void getSiftLBData() {
-        showLoading();
-        Map<Object, Object> map = new HashMap<>();
-        APIService.getInstance()
-                .getIndustryCategoryList(map, new SimpleSubscriber<List<IndustryCategoryModel>>() {
-                    @Override
-                    public void onResponse(List<IndustryCategoryModel> response) {
-                        dismissLoading();
-                        industryCategoryModelList.clear();
-                        IndustryCategoryModel industryCategoryModelTemp = new IndustryCategoryModel();
-                        industryCategoryModelTemp.setIndustryCategoryId(-1);
-                        industryCategoryModelTemp.setIndustryCategoryName("全部");
-                        industryCategoryModelList.add(industryCategoryModelTemp);
-                        industryCategoryModelList.addAll(response);
-                        //如果类别还没选，那就默认让它选择全部
-                        if (HYLB_CODE == -1) {
-                            for (IndustryCategoryModel industryCategoryModel : industryCategoryModelList) {
-                                industryCategoryModel.setChecked(false);
-                            }
-                            industryCategoryModelList.get(0).setChecked(true);
-                        } else {
-                            //如果类别已经选择，那么选中它
-                            for (IndustryCategoryModel industryCategoryModel : industryCategoryModelList) {
-                                if (industryCategoryModel.getIndustryCategoryId() == HYLB_CODE) {
-                                    industryCategoryModel.setChecked(true);
-                                } else {
-                                    industryCategoryModel.setChecked(false);
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        super.onError(e);
-                        dismissLoading();
-                    }
-                });
-    }
+//    private void getSiftLBData() {
+//        showLoading();
+//        Map<Object, Object> map = new HashMap<>();
+//        APIService.getInstance()
+//                .getIndustryCategoryList(map, new SimpleSubscriber<List<IndustryCategoryModel>>() {
+//                    @Override
+//                    public void onResponse(List<IndustryCategoryModel> response) {
+//                        dismissLoading();
+//                        industryCategoryModelList.clear();
+//                        IndustryCategoryModel industryCategoryModelTemp = new IndustryCategoryModel();
+//                        industryCategoryModelTemp.setIndustryCategoryId(-1);
+//                        industryCategoryModelTemp.setIndustryCategoryName("全部");
+//                        industryCategoryModelList.add(industryCategoryModelTemp);
+//                        industryCategoryModelList.addAll(response);
+//                        //如果类别还没选，那就默认让它选择全部
+//                        if (HYLB_CODE == -1) {
+//                            for (IndustryCategoryModel industryCategoryModel : industryCategoryModelList) {
+//                                industryCategoryModel.setChecked(false);
+//                            }
+//                            industryCategoryModelList.get(0).setChecked(true);
+//                        } else {
+//                            //如果类别已经选择，那么选中它
+//                            for (IndustryCategoryModel industryCategoryModel : industryCategoryModelList) {
+//                                if (industryCategoryModel.getIndustryCategoryId() == HYLB_CODE) {
+//                                    industryCategoryModel.setChecked(true);
+//                                } else {
+//                                    industryCategoryModel.setChecked(false);
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        super.onError(e);
+//                        dismissLoading();
+//                    }
+//                });
+//    }
 
     private void showClearBtn() {
         mCVClear.setVisibility(View.VISIBLE);
