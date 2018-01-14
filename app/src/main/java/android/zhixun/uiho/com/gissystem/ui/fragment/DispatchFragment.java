@@ -16,16 +16,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
 import android.zhixun.uiho.com.gissystem.drawtool.DrawTool;
+import android.zhixun.uiho.com.gissystem.flux.body.ReportHandoutListBody;
+import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
+import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
+import android.zhixun.uiho.com.gissystem.flux.models.api.FruitCategoryListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.IndustryCategoryModel;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
@@ -48,6 +54,9 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.yibogame.util.DateUtil;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
+import com.zhy.view.flowlayout.FlowLayout;
+import com.zhy.view.flowlayout.TagAdapter;
+import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -196,7 +205,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 getCompanyList(searchStr, -1, -1);
                 break;
             case R.id.cv_classifySearch:
-                ToastUtil.showShort("cv_classifySearch");
+                showClassifySearchDialog(v);
                 break;
         }
     }
@@ -205,6 +214,219 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
         searchGeometry();
 //        mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON_SET_FINISH);
+    }
+
+    private ReportHandoutListBody mBody;
+    private void showClassifySearchDialog(View view){
+        showLoading();
+        View dialogRoot = LayoutInflater.from(getActivity())
+                .inflate(R.layout.dialog_classify_search, ((ViewGroup) getView()),
+                        false);
+        TagFlowLayout typeFlowLayout = dialogRoot.findViewById(R.id.flow_type);
+
+        APIService.getInstance().getfruitCategoryList(
+                new SimpleSubscriber<List<FruitCategoryListModel>>() {
+                    @Override
+                    public void onResponse(List<FruitCategoryListModel> response) {
+                        dismissLoading();
+                        TagAdapter<FruitCategoryListModel> flowTypeAdapter =
+                                new TagAdapter<FruitCategoryListModel>(response) {
+                            @Override
+                            public View getView(FlowLayout flowLayout, int i,
+                                                FruitCategoryListModel o) {
+                                TextView textView = (TextView) View.inflate(getActivity(),
+                                        R.layout.item_flow_type, null);
+                                textView.setText(o.categoryName);
+                                return textView;
+                            }
+
+                            @Override
+                            public void onSelected(int position, View view) {
+                                super.onSelected(position, view);
+                                mBody = new ReportHandoutListBody();
+                                if (response == null) {
+                                    return;
+                                }
+                                FruitCategoryListModel model = response.get(position);
+                                if (model == null) {
+                                    return;
+                                }
+                                mBody.setFruitCategoryId(model.fruitCategoryId);
+                                switchType(model, dialogRoot);
+                            }
+                        };
+                        typeFlowLayout.setAdapter(flowTypeAdapter);
+                        flowTypeAdapter.setSelectedList(0);
+                    }
+                });
+
+
+        DialogUtil.getInstance().showAnchorDialog(dialogRoot, view);
+    }
+
+    //切换成果类型
+    private void switchType(FruitCategoryListModel model, View dialogRoot) {
+        showLoading();
+        APIService.getInstance()
+                .gethandoutConditionByFCList(model.fruitCategoryId,
+                new SimpleSubscriber<List<GethandoutConditionByFCModel>>() {
+                    @Override
+                    public void onResponse(List<GethandoutConditionByFCModel> response) {
+                        dismissLoading();
+                        if (response == null || response.isEmpty()) {
+                            return;
+                        }
+
+                        LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
+                        llContainer.removeAllViews();
+                        mBody.attrValueList.clear();
+
+                        for (GethandoutConditionByFCModel gethandoutConditionByFCModel : response) {
+
+                            View item = LayoutInflater.from(dialogRoot.getContext())
+                                    .inflate(R.layout.dispatch_dialog_item, llContainer, false);
+
+                            TagFlowLayout tagFlowLayout = (TagFlowLayout) LayoutInflater
+                                    .from(dialogRoot.getContext())
+                                    .inflate(R.layout.dispatch_dialog_item_tag_flow_layout,
+                                            llContainer, false);
+
+                            TextView tv1 = item.findViewById(R.id.tv_attrName);
+                            tv1.setText(gethandoutConditionByFCModel.attrName);
+                            if (gethandoutConditionByFCModel.fruitCateGoryAttrVal == null) {
+                                gethandoutConditionByFCModel.fruitCateGoryAttrVal =
+                                        new ArrayList<>();
+                            }
+                            gethandoutConditionByFCModel.fruitCateGoryAttrVal
+                                    .add(0, new GethandoutConditionByFCModel
+                                            .FruitCateGoryAttrVal("全部"));
+
+                            TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal> ta1
+                                    = new TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal>(gethandoutConditionByFCModel.fruitCateGoryAttrVal) {
+                                @Override
+                                public View getView(FlowLayout flowLayout, int i,
+                                                    GethandoutConditionByFCModel.FruitCateGoryAttrVal o) {
+                                    TextView textView = (TextView) View.inflate(getActivity(),
+                                            R.layout.item_flow_type, null);
+                                    textView.setText(o.attrValue);
+                                    return textView;
+                                }
+
+                                @Override
+                                public void onSelected(int position, View view) {
+                                    super.onSelected(position, view);
+                                    if (position == 0) return;
+                                    long fruitCategoryAttrId = gethandoutConditionByFCModel.fruitCategoryAttrId;
+                                    String attrValue = gethandoutConditionByFCModel.fruitCateGoryAttrVal.get(position).attrValue;
+                                    mBody.attrValueList
+                                            .add(new ReportHandoutListBody
+                                                    .AttrValueList(fruitCategoryAttrId, attrValue));
+                                }
+                            };
+                            tagFlowLayout.setAdapter(ta1);
+                            ta1.setSelectedList(0);
+
+                            llContainer.addView(item);
+                            llContainer.addView(tagFlowLayout);
+                        }
+
+                        Button btn_search = dialogRoot.findViewById(R.id.btn_search);
+                        //查询
+                        btn_search.setOnClickListener(v -> {
+                            reportHandoutList();
+                        });
+                    }
+                });
+    }
+
+    //查询分类
+    private void reportHandoutList() {
+        showLoading();
+        APIService.getInstance().getReportHandoutList(mBody,
+                new SimpleSubscriber<List<ReportHandoutListModel>>() {
+            @Override
+            public void onResponse(List<ReportHandoutListModel> response) {
+                dismissLoading();
+                if (response == null || response.isEmpty()) return;
+                StringBuilder sb = new StringBuilder();
+                sb.append("FRUITID");
+                sb.append(" in ");
+                sb.append("(");
+                int mapType = 0;
+                for (ReportHandoutListModel reportHandoutListModel : response) {
+
+                    for (ReportHandoutListModel.FruitCategoryList fruitCategoryList :
+                            reportHandoutListModel.fruitCategoryList) {
+
+                        mapType = fruitCategoryList.mapType;
+                        for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
+                                fruitCategoryList.fruitList) {
+
+                            long fruitId = fruitList.fruitId;
+                            sb.append(String.valueOf(fruitId));
+                            sb.append(",");
+                        }
+
+                    }
+
+                }
+
+                String whereClause = sb.substring(0, sb.lastIndexOf(",")) + ")";
+                LogUtil.i("whereClause == " + whereClause);
+
+                searchType(mapType, whereClause);
+                DialogUtil.getInstance().dismiss();
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                super.onError(e);
+                dismissLoading();
+                ToastUtil.showShort(e.getMessage());
+                DialogUtil.getInstance().dismiss();
+            }
+        });
+    }
+
+    private void searchType(int mapType, String whereClause) {
+        if (mapType == 0) return;
+        String url;
+        if (mapType == 1) {//点查询
+           url = getString(R.string.point_feature_server_url);
+        } else {//面查询
+            url = getString(R.string.polygon_feature_server_url);
+        }
+        mMapView.querySQL(getActivity(), url, whereClause,
+                new BaseMapView.MainThreadCallback<FeatureResult>() {
+                    @Override
+                    public void onCallback(FeatureResult result) {
+                        if (result.featureCount() == 0) {
+                            ToastUtil.showShort("未获取信息,请重试");
+                            restoreAll();
+                            return;
+                        }
+
+                        for (Object object : result) {
+                            if (object instanceof Feature) {
+                                Feature feature = (Feature) object;
+                                SimpleMarkerSymbol symbol =
+                                        new SimpleMarkerSymbol(Color.RED, 12,
+                                                SimpleMarkerSymbol.STYLE.SQUARE);
+                                Graphic graphic = new Graphic(feature.getGeometry(),
+                                        symbol, feature.getAttributes());
+                                mMapView.addGraphic(graphic);
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtil.showShort("未获取信息,请重试");
+                    }
+                });
+        dismissLoading();
     }
 
     private void showSwitchLayerDialog(View view) {

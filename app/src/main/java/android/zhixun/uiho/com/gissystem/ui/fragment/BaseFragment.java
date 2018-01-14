@@ -7,7 +7,7 @@ import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 
 public class BaseFragment extends Fragment {
 
-    protected QMUITipDialog mProgressDialog;
+    private QMUITipDialog mProgressDialog;
 
     protected void showLoading() {
         if (mProgressDialog == null) {
