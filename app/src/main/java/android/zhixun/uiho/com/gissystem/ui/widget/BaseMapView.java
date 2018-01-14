@@ -15,7 +15,11 @@ import com.esri.android.map.LocationDisplayManager;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
 import com.esri.android.map.event.OnStatusChangedListener;
+import com.esri.core.map.CallbackListener;
+import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
+import com.esri.core.tasks.query.QueryParameters;
+import com.esri.core.tasks.query.QueryTask;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -162,5 +166,26 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
     public GraphicsLayer getGraphicLayer() {
         return graphicsLayer;
+    }
+
+
+    public void queryGeometry(String url, CallbackListener<FeatureResult> callback) {
+        QueryParameters query = new QueryParameters();
+        query.setGeometry(this.getDrawLayer().getExtent());
+        query.setOutSpatialReference(this.getSpatialReference());
+        query.setOutFields(new String[]{"*"});
+        query.setReturnGeometry(true);
+        QueryTask queryTask = new QueryTask(url);
+        queryTask.execute(query, callback);
+    }
+
+    public void querySQL(String url, String where, CallbackListener<FeatureResult> callback) {
+        QueryParameters query = new QueryParameters();
+        query.setOutSpatialReference(this.getSpatialReference());
+        query.setOutFields(new String[]{"*"});
+        query.setReturnGeometry(true);
+        query.setWhere(where);
+        QueryTask qTask = new QueryTask(url);
+        qTask.execute(query, callback);
     }
 }

@@ -40,8 +40,6 @@ import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.SimpleMarkerSymbol;
-import com.esri.core.tasks.query.QueryParameters;
-import com.esri.core.tasks.query.QueryTask;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
 
@@ -322,23 +320,19 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         String in = sb.substring(0, sb.length() - 1);
         String whereClause = String.format("UNITID in (%s)", in);
         LogUtil.d("whereClause == " + whereClause);
-        QueryParameters query = new QueryParameters();
-        query.setOutSpatialReference(mMapView.getSpatialReference());
-        query.setOutFields(new String[]{"*"});
-        query.setReturnGeometry(true);
-        query.setWhere(whereClause);
-        QueryTask qTask = new QueryTask(getString(R.string.feature_server_url));
-        qTask.execute(query, new CallbackListener<FeatureResult>() {
-            @Override
-            public void onCallback(FeatureResult objects) {
-                showCompanyMarker(objects);
-            }
 
-            @Override
-            public void onError(Throwable throwable) {
-                ToastUtil.showShort("获取单位信息失败");
-            }
-        });
+        mMapView.querySQL(getString(R.string.feature_server_url), whereClause,
+                new CallbackListener<FeatureResult>() {
+                    @Override
+                    public void onCallback(FeatureResult objects) {
+                        showCompanyMarker(objects);
+                    }
+
+                    @Override
+                    public void onError(Throwable throwable) {
+                        ToastUtil.showShort("获取单位信息失败");
+                    }
+                });
     }
 
     private void showCompanyMarker(FeatureResult objects) {
@@ -421,7 +415,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 });
     }
 
-    private void showBufferInputDialog(View view){
+    private void showBufferInputDialog(View view) {
         new SimpleAlertDialog(getActivity())
                 .title("图幅号查询")
                 .message("可输入多个图幅号，图幅号直接用空格或逗号分隔如\n'G49E005001 G49E005002'\n或\n'G49E005001,G49E005002'")
@@ -441,24 +435,20 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     private void searchGeometry() {
         showLoading();
         restoreSpaceStatus();
-        QueryParameters query = new QueryParameters();
-        query.setGeometry(mMapView.getDrawLayer().getExtent());
-        query.setOutSpatialReference(mMapView.getSpatialReference());
-        query.setOutFields(new String[]{"*"});
-        query.setReturnGeometry(true);
-        QueryTask queryTask = new QueryTask(getString(R.string.feature_server_url));
-        queryTask.execute(query, new CallbackListener<FeatureResult>() {
-            @Override
-            public void onCallback(FeatureResult objects) {
-                dismissLoading();
-                showCompanyMarker(objects);
-            }
 
-            @Override
-            public void onError(Throwable throwable) {
-                dismissLoading();
-            }
-        });
+        mMapView.queryGeometry(getString(R.string.feature_server_url),
+                new CallbackListener<FeatureResult>() {
+                    @Override
+                    public void onCallback(FeatureResult objects) {
+                        dismissLoading();
+                        showCompanyMarker(objects);
+                    }
+
+                    @Override
+                    public void onError(Throwable throwable) {
+                        dismissLoading();
+                    }
+                });
     }
 
     private void restoreSpaceStatus() {

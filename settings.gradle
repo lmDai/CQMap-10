@@ -1,1 +1,1 @@
-include ':app', ':ParcoolLibrary', ':xrecyclerview', ':scroll_layout'
+include ':app', ':ParcoolLibrary', ':xrecyclerview'
