@@ -28,14 +28,13 @@ import java.lang.annotation.RetentionPolicy;
 
 public class BaseMapView extends MapView implements DrawEventListener {
 
-    private ArcGISTiledMapServiceLayer vecLayer;
-    private ArcGISTiledMapServiceLayer demLayer;
-    private ArcGISTiledMapServiceLayer imgLayer;
+    private ArcGISTiledMapServiceLayer vecLayer, demLayer, imgLayer;
+    private TianDiTuLayer vecTTDLayer, demTTDLayer, imgTTDLayer;
     //
-    private GraphicsLayer drawLayer = new GraphicsLayer();
+    private GraphicsLayer drawLayer;
     private DrawTool drawTool;
     //
-    GraphicsLayer graphicsLayer = new GraphicsLayer();
+//    GraphicsLayer graphicsLayer;
     //
 //    private List<Integer> graphicsIds = new ArrayList<>();
 
@@ -49,11 +48,13 @@ public class BaseMapView extends MapView implements DrawEventListener {
     public BaseMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
         //天地图的layer
-        TianDiTuLayer tianDiTuLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_2000);
-        this.addLayer(tianDiTuLayer, 0);
+        vecTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_2000);
+        this.addLayer(vecTTDLayer);
+        demTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_2000);
+        imgTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_2000);
         //重庆地图的layer
         vecLayer = new ArcGISTiledMapServiceLayer(context.getString(R.string.tdt_vec_base_map_url));
-        this.addLayer(vecLayer, 1);
+        this.addLayer(vecLayer);
         currentMapLayer = VEC_LAYER;
 
         demLayer = new ArcGISTiledMapServiceLayer(context.getString(R.string.tdt_dem_base_map_url));
@@ -61,16 +62,15 @@ public class BaseMapView extends MapView implements DrawEventListener {
         imgLayer =
                 new ArcGISTiledMapServiceLayer(context.getString(R.string.tdt_img_base_map_url));
 
-        this.setOnStatusChangedListener((OnStatusChangedListener) (o, status) -> {
-            this.centerAt(29.55, 106.55, true);
-            this.setScale(100000, true);
-        });
+        this.setOnStatusChangedListener(onStatusChangedListener);
         //画图形的layer
-        this.addLayer(drawLayer, 2);
+        drawLayer = new GraphicsLayer();
+        this.addLayer(drawLayer);
         drawTool = new DrawTool(this);
         drawTool.addEventListener(this);
         //添加标注的layer
-        this.addLayer(graphicsLayer, 3);
+//        graphicsLayer = new GraphicsLayer();
+//        this.addLayer(graphicsLayer);
     }
 
     public static final int DEM_LAYER = 0;
@@ -100,18 +100,29 @@ public class BaseMapView extends MapView implements DrawEventListener {
     public void setCurrentMapLayer(@CurrentMapLayer int currentMapLayer) {
         this.currentMapLayer = currentMapLayer;
 
-        removeLayer(1);
+//        removeLayer(0);
+//        removeLayer(1);
+        removeAll();
         switch (currentMapLayer) {
             case DEM_LAYER:
-                this.addLayer(demLayer, 1);
+                this.addLayer(demTTDLayer);
+                this.addLayer(demLayer);
                 break;
             case VEC_LAYER:
-                this.addLayer(vecLayer, 1);
+                this.addLayer(vecTTDLayer);
+                this.addLayer(vecLayer);
                 break;
             case IMG_LAYER:
-                this.addLayer(imgLayer, 1);
+                this.addLayer(imgTTDLayer);
+                this.addLayer(imgLayer);
                 break;
         }
+        //画图形的layer
+        this.addLayer(drawLayer);
+        drawTool = new DrawTool(this);
+        drawTool.addEventListener(this);
+        this.setOnStatusChangedListener(onStatusChangedListener);
+//        this.addLayer(graphicsLayer);
     }
 
     public void location() {
@@ -158,21 +169,20 @@ public class BaseMapView extends MapView implements DrawEventListener {
         drawLayer.removeAll();
     }
 
-    public void clearGraphicLayerGraphics() {
-        graphicsLayer.removeAll();
-    }
+//    public void clearGraphicLayerGraphics() {
+//        graphicsLayer.removeAll();
+//    }
 
     public void clearAll() {
         drawLayer.removeAll();
-        graphicsLayer.removeAll();
-//        graphicsIds.clear();
+//        graphicsLayer.removeAll();
     }
 
     public void addGraphic(Graphic graphic) {
-        graphicsLayer.addGraphic(graphic);
+        drawLayer.addGraphic(graphic);
     }
 
-    public void setCurrentDrawGraphic(Graphic graphic){
+    public void setCurrentDrawGraphic(Graphic graphic) {
         this.currentDrawGraphic = graphic;
     }
 
@@ -189,9 +199,9 @@ public class BaseMapView extends MapView implements DrawEventListener {
         return drawLayer;
     }
 
-    public GraphicsLayer getGraphicLayer() {
-        return graphicsLayer;
-    }
+//    public GraphicsLayer getGraphicLayer() {
+//        return graphicsLayer;
+//    }
 
 
     public void queryGeometry(Activity act, String url,
@@ -247,4 +257,14 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
         void onError(Throwable e);
     }
+
+    OnStatusChangedListener onStatusChangedListener = new OnStatusChangedListener() {
+        @Override
+        public void onStatusChanged(Object o, OnStatusChangedListener.STATUS status) {
+            if (status == STATUS.LAYER_LOADED) {
+                centerAt(29.55, 106.55, true);
+                setScale(100000, true);
+            }
+        }
+    };
 }

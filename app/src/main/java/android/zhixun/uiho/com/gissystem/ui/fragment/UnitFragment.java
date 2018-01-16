@@ -123,6 +123,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mCVClear.setOnClickListener(this);
         mIvUser.setOnClickListener(this);
         mIvSearch.setOnClickListener(this);
+        showLoading();
     }
 
     private void initData() {
@@ -208,6 +209,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
         }
         rgLayerSwitch.setOnCheckedChangeListener((group, checkedId) -> {
+            restoreAll();
             switch (checkedId) {
                 case R.id.rb_topographic:
                     mMapView.setCurrentMapLayer(DEM_LAYER);
