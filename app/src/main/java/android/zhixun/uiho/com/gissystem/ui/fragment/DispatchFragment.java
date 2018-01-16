@@ -44,6 +44,8 @@ import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 
+import com.esri.android.map.GraphicsLayer;
+import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Geometry;
 import com.esri.core.geometry.Point;
 import com.esri.core.map.Feature;
@@ -97,6 +99,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
     public DispatchFragment() {
         Bundle args = new Bundle();
+        args.putString("name",this.getClass().getSimpleName());
         setArguments(args);
     }
 
@@ -459,6 +462,17 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
                             }
                         }
+                        //地图单击事件
+                        mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
+                            int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
+                                    1, 1);
+                            if (ids.length == 0) return;
+                            GraphicsLayer drawLayer = mMapView.getDrawLayer();
+                            drawLayer.getGraphic(ids[0]);
+//                            drawLayer.setSelectionColor(Color.RED);
+//                            drawLayer.setSelectedGraphics(ids, true);
+                            drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
+                        });
                     }
 
                     @Override

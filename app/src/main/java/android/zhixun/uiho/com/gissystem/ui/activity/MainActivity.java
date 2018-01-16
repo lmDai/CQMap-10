@@ -962,10 +962,11 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
             android.app.Fragment fragment = clazz.newInstance();
 //            mFragmentManager.beginTransaction().add(R.id.contentContainer, myBaseFragment,
 // myBaseFragment.getArguments().getString("name")).commit();
+            String tag = fragment.getArguments().getString("name");
             mFragmentManager
                     .beginTransaction()
-                    .replace(R.id.contentContainer, fragment,
-                            fragment.getArguments().getString("name")).commit();
+                    .replace(R.id.contentContainer, fragment, tag)
+                    .commit();
             return fragment;
         } catch (InstantiationException e) {
             e.printStackTrace();

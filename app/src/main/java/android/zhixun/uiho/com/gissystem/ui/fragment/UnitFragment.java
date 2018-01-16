@@ -82,6 +82,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
     public UnitFragment() {
         Bundle args = new Bundle();
+        args.putString("name",this.getClass().getSimpleName());
         setArguments(args);
     }
 
