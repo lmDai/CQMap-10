@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
 import android.zhixun.uiho.com.gissystem.drawtool.DrawTool;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
@@ -62,7 +63,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
     private BaseMapView mMapView;
     private View mCVLayer, mCVSift, mCVLocation, mZoomIn, mZoomOut, mCVSpace, mCVClear;
-    private ImageView mIvUser, mIvSearch;
+    private ImageView mIvUser;
+    private TextView mTvSearch;
     private EditText mEtSearch;
     //各大区县，注册地
     private List<AreaModel> areaModelList = new ArrayList<>();
@@ -109,7 +111,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mCVSpace = view.findViewById(R.id.cv_space);
         mCVClear = view.findViewById(R.id.cv_clear);
         mIvUser = view.findViewById(R.id.iv_user);
-        mIvSearch = view.findViewById(R.id.aciv_search);
+        mTvSearch = view.findViewById(R.id.tv_search);
         mEtSearch = view.findViewById(R.id.et_search);
     }
 
@@ -122,7 +124,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mCVSpace.setOnClickListener(this);
         mCVClear.setOnClickListener(this);
         mIvUser.setOnClickListener(this);
-        mIvSearch.setOnClickListener(this);
+        mTvSearch.setOnClickListener(this);
         showLoading();
     }
 
@@ -172,7 +174,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
             case R.id.iv_user:
                 ((MainActivity) getActivity()).openDrawer();
                 break;
-            case R.id.aciv_search:
+            case R.id.tv_search:
                 String searchStr = mEtSearch.getText().toString();
                 if (TextUtils.isEmpty(searchStr)) {
                     ToastUtil.showShort("请输入单位名称或组织机构代码后再搜索");
@@ -183,7 +185,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
-    private void setPloygon(){
+    private void setPloygon() {
         mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
         searchGeometry();
 //        mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON_SET_FINISH);
@@ -396,8 +398,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         dragView.setVisibility(View.VISIBLE);
         bottomAdapter.setOnItemClickListener((view, position) -> {
             int companyId = response.get(position).getCompanyId();
-            for (int id : mMapView.getGraphicLayer().getGraphicIDs()) {
-                Graphic graphic = mMapView.getGraphicLayer().getGraphic(id);
+            for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
+                Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
                 int unit_id = (int) graphic.getAttributeValue("UNITID");
                 if (companyId == unit_id) {
 //                    ToastUtil.showShort("========");

@@ -9,9 +9,9 @@ import java.util.List;
 
 public class ReportHandoutListBody {
 
-    public long fruitCategoryId;//成果类型id
+    public long fruitCategoryId = -1;//成果类型id
     public String fruitIds;//成果id（多个用逗号拼接，如1,2,3,4
-    public long mapNum;//图幅号（模糊查询）
+    public long mapNum = -1;//图幅号（模糊查询）
     public List<AttrValueList> attrValueList = new ArrayList<>();//属性值的集合
 
     public static class AttrValueList {

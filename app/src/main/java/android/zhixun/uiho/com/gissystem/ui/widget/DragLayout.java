@@ -102,12 +102,14 @@ public class DragLayout extends LinearLayout {
     }
 
     public void animaToCenter() {
-        mDragView.setVisibility(VISIBLE);
+//        mDragView.setVisibility(VISIBLE);
+        setVisibility(VISIBLE);
         animaTo(getPaddingTop(), getHeight() / 2);
     }
 
     public void exit() {
-        mDragView.setVisibility(GONE);
+//        mDragView.setVisibility(GONE);
+        setVisibility(GONE);
         setPadding(0, getHeight(), 0, 0);
     }
 

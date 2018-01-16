@@ -28,7 +28,9 @@
         </activity>
         <activity android:name=".ui.activity.TestTitleActivity" />
         <!--主页-->
-        <activity android:name=".ui.activity.MainActivity" />
+        <activity android:name=".ui.activity.MainActivity"
+            android:windowSoftInputMode="adjustPan"
+            />
         <!--持证人-->
         <activity android:name=".ui.activity.HolderSizeMarkActivity" />
         <!--单位保密检查结果-->

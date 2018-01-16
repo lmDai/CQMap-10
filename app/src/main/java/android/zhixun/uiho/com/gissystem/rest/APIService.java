@@ -1,5 +1,6 @@
 package android.zhixun.uiho.com.gissystem.rest;
 
+import android.text.TextUtils;
 import android.zhixun.uiho.com.gissystem.app.ServerHttpException;
 import android.zhixun.uiho.com.gissystem.flux.body.ReportHandoutListBody;
 import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
@@ -152,15 +153,15 @@ public class APIService {
         return baseListResultModelObservable ->
                 baseListResultModelObservable.flatMap(tBaseResultModel -> {
 //            LogUtil.i("返回结果:" + JSON.toJSONString(tBaseResultModel));
-            try {
-                if (!tBaseResultModel.getResponseCode().equals(SUCCESS)) {
-                    return Observable.error(new ServerHttpException(tBaseResultModel.getResponseMsg()));
-                }
-            } catch (Exception e) {
-                return Observable.error(new ServerHttpException(e.getMessage()));
-            }
-            return Observable.just(tBaseResultModel.getObject());
-        });
+                    try {
+                        if (!tBaseResultModel.getResponseCode().equals(SUCCESS)) {
+                            return Observable.error(new ServerHttpException(tBaseResultModel.getResponseMsg()));
+                        }
+                    } catch (Exception e) {
+                        return Observable.error(new ServerHttpException(e.getMessage()));
+                    }
+                    return Observable.just(tBaseResultModel.getObject());
+                });
     }
 
 
@@ -611,7 +612,18 @@ public class APIService {
      */
     public Subscription getReportHandoutList(ReportHandoutListBody body,
                                              DoOnSubscriber<List<ReportHandoutListModel>> subscriber) {
-        String data = buildParams(JSON.toJSONString(body), "reportHandoutList", "report");
+        Map<Object, Object> map = new HashMap<>();
+        map.put("attrValueList", body.attrValueList);
+        if (body.fruitCategoryId != -1) {
+            map.put("fruitCategoryId", body.fruitCategoryId);
+        }
+        if (!TextUtils.isEmpty(body.fruitIds)) {
+            map.put("attrValueList", body.fruitIds);
+        }
+        if (body.mapNum != -1) {
+            map.put("mapNum", body.mapNum);
+        }
+        String data = buildParams(map, "reportHandoutList", "report");
         return api.getReportHandoutList(data)
                 .compose(applySchedulers())
                 .doOnSubscribe(subscriber::doOnSubscriber)

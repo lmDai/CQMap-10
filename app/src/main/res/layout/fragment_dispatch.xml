@@ -155,7 +155,7 @@
         android:id="@+id/cv_space"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/cv_statistics"
+        android:layout_below="@+id/cv_classifySearch"
         android:layout_marginLeft="12dp"
         android:layout_marginTop="-2dp"
         android:clickable="true"
@@ -194,7 +194,7 @@
         android:id="@+id/cv_classifySearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/cv_space"
+        android:layout_below="@id/cv_statistics"
         android:layout_marginLeft="12dp"
         android:layout_marginTop="1dp"
         android:clickable="true"
@@ -239,7 +239,7 @@
         app:cardCornerRadius="0dp"
         app:cardElevation="@dimen/cardView_elevation"
         app:cardUseCompatPadding="true"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <LinearLayout
             android:id="@+id/ll_draw"
@@ -326,13 +326,17 @@
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-    <include layout="@layout/layout_search" />
+    <include
+        layout="@layout/layout_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
 
     <android.zhixun.uiho.com.gissystem.ui.widget.DragLayout
         android:id="@+id/dragLayout"
-        tools:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:visibility="gone">
 
         <RelativeLayout
             android:id="@+id/bottom_drag_view"

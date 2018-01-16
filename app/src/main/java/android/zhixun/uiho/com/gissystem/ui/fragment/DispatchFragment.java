@@ -1,6 +1,5 @@
 package android.zhixun.uiho.com.gissystem.ui.fragment;
 
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Keep;
@@ -34,7 +33,6 @@ import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.FruitCategoryListModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.IndustryCategoryModel;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
 import android.zhixun.uiho.com.gissystem.ui.activity.MainActivity;
@@ -51,6 +49,7 @@ import com.esri.core.geometry.Point;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
+import com.esri.core.symbol.SimpleFillSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
 import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -84,24 +83,17 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     private BaseMapView mMapView;
     private View mCVLayer, mCVSift, mCVLocation, mZoomIn, mZoomOut, mCVSpace, mCVClear,
             mCvClassifySearch;
-    private ImageView mIvUser, mIvSearch;
+    private ImageView mIvUser, mIvSearchClear;
+    private TextView mTvSearch;
     private EditText mEtSearch;
-    //各大区县，注册地
-    private List<AreaModel> areaModelList = new ArrayList<>();
-    //单位类别
-    private List<IndustryCategoryModel> industryCategoryModelList = new ArrayList<>();
-    //注册地的code
-    private long ZCD_CODE = -1;
-    //类别的code
-    private long HYLB_CODE = -1;
-    //公司信息集合
-    private List<CompanyDetailModel> companyList = new ArrayList<>();
     private DragLayout mDragLayout;
     private RecyclerView mContentRv;
     private View dragView;
     //
     private AppCompatImageView calendar1, calendar2;
     private RelativeLayout relativeLayoutLeft, relativeLayoutRight;
+    //分类信息集合-成果类型那一坨
+    private List<FruitCategoryListModel> mClassifyList = new ArrayList<>();
 
     public DispatchFragment() {
         Bundle args = new Bundle();
@@ -134,11 +126,14 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mCVSpace = view.findViewById(R.id.cv_space);
         mCVClear = view.findViewById(R.id.cv_clear);
         mIvUser = view.findViewById(R.id.iv_user);
-        mIvSearch = view.findViewById(R.id.aciv_search);
+        mTvSearch = view.findViewById(R.id.tv_search);
         mEtSearch = view.findViewById(R.id.et_search);
         mCvClassifySearch = view.findViewById(R.id.cv_classifySearch);
+        mIvSearchClear = view.findViewById(R.id.aciv_clear);
+
         mEtSearch.setEnabled(false);
-        mEtSearch.setText("fafafafaf");
+        mEtSearch.setHint("请选择分类或空间");
+
     }
 
     private void initEvent() {
@@ -150,13 +145,14 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mCVSpace.setOnClickListener(this);
         mCVClear.setOnClickListener(this);
         mIvUser.setOnClickListener(this);
-        mIvSearch.setOnClickListener(this);
+        mTvSearch.setOnClickListener(this);
         mCvClassifySearch.setOnClickListener(this);
+        mIvSearchClear.setOnClickListener(this);
     }
 
     private void initData() {
-//        getSiftZCDData();
-//        getSiftLBData();
+        mBody = new ReportHandoutListBody();
+        getClassifyData();
     }
 
     private void initBottomDragView(View view) {
@@ -200,18 +196,32 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
             case R.id.iv_user:
                 ((MainActivity) getActivity()).openDrawer();
                 break;
-            case R.id.aciv_search:
+            case R.id.tv_search:
                 String searchStr = mEtSearch.getText().toString();
                 if (TextUtils.isEmpty(searchStr)) {
-                    ToastUtil.showShort("请输入单位名称或组织机构代码后再搜索");
-                    return;
+                    mEtSearch.setText("全部");
                 }
-                getCompanyList(searchStr, -1, -1);
+                getReportHandoutList();
                 break;
-            case R.id.cv_classifySearch:
+            case R.id.cv_classifySearch://分类查询
                 showClassifySearchDialog(v);
                 break;
+            case R.id.aciv_clear:
+                showSearchTextView();
+                break;
         }
+    }
+
+    private void showSearchTextView() {
+        mTvSearch.setVisibility(View.VISIBLE);
+        mIvSearchClear.setVisibility(View.GONE);
+        mEtSearch.setText("");
+        mMapView.clearAll();
+    }
+
+    private void showSearchClearView() {
+        mIvSearchClear.setVisibility(View.VISIBLE);
+        mTvSearch.setVisibility(View.GONE);
     }
 
     private void setPloygon() {
@@ -224,48 +234,65 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
     private void showClassifySearchDialog(View view) {
         showLoading();
+        if (!mClassifyList.isEmpty()) {
+            bindViewClassify(view, mClassifyList);
+        } else {
+            APIService.getInstance().getfruitCategoryList(
+                    new SimpleSubscriber<List<FruitCategoryListModel>>() {
+                        @Override
+                        public void onResponse(List<FruitCategoryListModel> response) {
+                            dismissLoading();
+                            if (response == null || response.isEmpty()) {
+                                ToastUtil.showShort("未获取到信息");
+                                return;
+                            }
+                            mClassifyList.clear();
+                            mClassifyList.addAll(response);
+                            bindViewClassify(view, mClassifyList);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            super.onError(e);
+                            dismissLoading();
+                        }
+                    });
+        }
+    }
+
+    private void bindViewClassify(View view, List<FruitCategoryListModel> response) {
         View dialogRoot = LayoutInflater.from(getActivity())
                 .inflate(R.layout.dialog_classify_search, ((ViewGroup) getView()),
                         false);
         TagFlowLayout typeFlowLayout = dialogRoot.findViewById(R.id.flow_type);
-
-        APIService.getInstance().getfruitCategoryList(
-                new SimpleSubscriber<List<FruitCategoryListModel>>() {
+        TagAdapter<FruitCategoryListModel> flowTypeAdapter =
+                new TagAdapter<FruitCategoryListModel>(response) {
                     @Override
-                    public void onResponse(List<FruitCategoryListModel> response) {
-                        dismissLoading();
-                        TagAdapter<FruitCategoryListModel> flowTypeAdapter =
-                                new TagAdapter<FruitCategoryListModel>(response) {
-                                    @Override
-                                    public View getView(FlowLayout flowLayout, int i,
-                                                        FruitCategoryListModel o) {
-                                        TextView textView = (TextView) View.inflate(getActivity(),
-                                                R.layout.item_flow_type, null);
-                                        textView.setText(o.categoryName);
-                                        return textView;
-                                    }
-
-                                    @Override
-                                    public void onSelected(int position, View view) {
-                                        super.onSelected(position, view);
-                                        mBody = new ReportHandoutListBody();
-                                        if (response == null) {
-                                            return;
-                                        }
-                                        FruitCategoryListModel model = response.get(position);
-                                        if (model == null) {
-                                            return;
-                                        }
-                                        mBody.setFruitCategoryId(model.fruitCategoryId);
-                                        switchType(model, dialogRoot);
-                                    }
-                                };
-                        typeFlowLayout.setAdapter(flowTypeAdapter);
-                        flowTypeAdapter.setSelectedList(0);
+                    public View getView(FlowLayout flowLayout, int i,
+                                        FruitCategoryListModel o) {
+                        TextView textView = (TextView) View.inflate(getActivity(),
+                                R.layout.item_flow_type, null);
+                        textView.setText(o.categoryName);
+                        return textView;
                     }
-                });
 
+                    @Override
+                    public void onSelected(int position, View view) {
+                        super.onSelected(position, view);
 
+                        if (response == null) {
+                            return;
+                        }
+                        FruitCategoryListModel model = response.get(position);
+                        if (model == null) {
+                            return;
+                        }
+                        mBody.setFruitCategoryId(model.fruitCategoryId);
+                        switchType(model, dialogRoot);
+                    }
+                };
+        typeFlowLayout.setAdapter(flowTypeAdapter);
+        flowTypeAdapter.setSelectedList(0);
         DialogUtil.getInstance().showAnchorDialog(dialogRoot, view);
     }
 
@@ -302,9 +329,12 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                         gethandoutConditionByFCModel.fruitCateGoryAttrVal =
                                                 new ArrayList<>();
                                     }
-                                    gethandoutConditionByFCModel.fruitCateGoryAttrVal
-                                            .add(0, new GethandoutConditionByFCModel
-                                                    .FruitCateGoryAttrVal("全部"));
+                                    //比例尺没有全部
+                                    if (response.indexOf(gethandoutConditionByFCModel) > 0) {
+                                        gethandoutConditionByFCModel.fruitCateGoryAttrVal
+                                                .add(0, new GethandoutConditionByFCModel
+                                                        .FruitCateGoryAttrVal("全部"));
+                                    }
 
                                     TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal> ta1
                                             = new TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal>(gethandoutConditionByFCModel.fruitCateGoryAttrVal) {
@@ -338,15 +368,17 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 Button btn_search = dialogRoot.findViewById(R.id.btn_search);
                                 //查询
                                 btn_search.setOnClickListener(v -> {
-                                    reportHandoutList();
+//                                    reportHandoutList();
+                                    mEtSearch.setText("");
                                 });
                             }
                         });
     }
 
     //查询分类
-    private void reportHandoutList() {
+    private void getReportHandoutList() {
         showLoading();
+        showSearchClearView();
         APIService.getInstance().getReportHandoutList(mBody,
                 new SimpleSubscriber<List<ReportHandoutListModel>>() {
                     @Override
@@ -415,9 +447,12 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         for (Object object : result) {
                             if (object instanceof Feature) {
                                 Feature feature = (Feature) object;
-                                SimpleMarkerSymbol symbol =
-                                        new SimpleMarkerSymbol(Color.RED, 12,
-                                                SimpleMarkerSymbol.STYLE.SQUARE);
+
+                                SimpleFillSymbol symbol =
+                                        new SimpleFillSymbol(Color.parseColor("#8855ef"),
+                                                SimpleFillSymbol.STYLE.SOLID);
+                                symbol.setAlpha(180);
+                                symbol.setOutline(new SimpleLineSymbol(Color.WHITE, 2));
                                 Graphic graphic = new Graphic(feature.getGeometry(),
                                         symbol, feature.getAttributes());
                                 mMapView.addGraphic(graphic);
@@ -478,16 +513,15 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         View contentView = LayoutInflater
                 .from(getActivity())
                 .inflate(R.layout.layout_result_dispatch_filter,
-                        (ViewGroup) ((Activity) getActivity()).getWindow().getDecorView().getRootView(),
+                        (ViewGroup) getView(),
                         false);
-//                RecyclerView recyclerView1 = (RecyclerView) contentView.findViewById(R.id.recyclerView1);
-        calendar1 = (AppCompatImageView) contentView.findViewById(R.id.calendar1);
-        calendar2 = (AppCompatImageView) contentView.findViewById(R.id.calendar2);
-        relativeLayoutLeft = (RelativeLayout) contentView.findViewById(R.id.relativeLayoutLeft);
-        relativeLayoutRight = (RelativeLayout) contentView.findViewById(R.id.relativeLayoutRight);
+        calendar1 = contentView.findViewById(R.id.calendar1);
+        calendar2 = contentView.findViewById(R.id.calendar2);
+        relativeLayoutLeft = contentView.findViewById(R.id.relativeLayoutLeft);
+        relativeLayoutRight = contentView.findViewById(R.id.relativeLayoutRight);
 
-        calendar1Content = (TextView) contentView.findViewById(R.id.calendar1_content);
-        calendar2Content = (TextView) contentView.findViewById(R.id.calendar2_content);
+        calendar1Content = contentView.findViewById(R.id.calendar1_content);
+        calendar2Content = contentView.findViewById(R.id.calendar2_content);
 
 //            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");//设置日期格式
         calendar2Content.setText("结束时间");
@@ -498,36 +532,30 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 //            String dateString = year + "-" + month + "-" + day;
         calendar1Content.setText("开始时间");
 
-        relativeLayoutLeft.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isFirst = true;
-                Calendar now = Calendar.getInstance();
-                DatePickerDialog dpd1 = DatePickerDialog.newInstance(DispatchFragment.this,
-                        now.get(Calendar.YEAR),
-                        now.get(Calendar.MONTH) - 1,
-                        now.get(Calendar.DAY_OF_MONTH)
-                );
-                dpd1.setVersion(DatePickerDialog.Version.VERSION_2);
-                dpd1.show(getFragmentManager(), "Datepickerdialog");
-            }
+        relativeLayoutLeft.setOnClickListener(view1 -> {
+            isFirst = true;
+            Calendar now = Calendar.getInstance();
+            DatePickerDialog dpd1 = DatePickerDialog.newInstance(DispatchFragment.this,
+                    now.get(Calendar.YEAR),
+                    now.get(Calendar.MONTH) - 1,
+                    now.get(Calendar.DAY_OF_MONTH)
+            );
+            dpd1.setVersion(DatePickerDialog.Version.VERSION_2);
+            dpd1.show(getFragmentManager(), "Datepickerdialog");
         });
-        relativeLayoutRight.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isFirst = false;
-                Calendar now = Calendar.getInstance();
-                DatePickerDialog dpd2 = DatePickerDialog.newInstance(
-                        DispatchFragment.this,
-                        now.get(Calendar.YEAR),
-                        now.get(Calendar.MONTH),
-                        now.get(Calendar.DAY_OF_MONTH)
-                );
-                dpd2.setVersion(DatePickerDialog.Version.VERSION_2);
-                dpd2.show(getFragmentManager(), "Datepickerdialog");
-            }
+        relativeLayoutRight.setOnClickListener(view12 -> {
+            isFirst = false;
+            Calendar now = Calendar.getInstance();
+            DatePickerDialog dpd2 = DatePickerDialog.newInstance(
+                    DispatchFragment.this,
+                    now.get(Calendar.YEAR),
+                    now.get(Calendar.MONTH),
+                    now.get(Calendar.DAY_OF_MONTH)
+            );
+            dpd2.setVersion(DatePickerDialog.Version.VERSION_2);
+            dpd2.show(getFragmentManager(), "Datepickerdialog");
         });
-        AppCompatButton acbQuery = (AppCompatButton) contentView.findViewById(R.id.acb_query);
+        AppCompatButton acbQuery = contentView.findViewById(R.id.acb_query);
         initEtSearchForDialog(contentView);
         initAcbSearchForDialog(acbQuery);
         DialogUtil.getInstance().showAnchorDialog(contentView, view);
@@ -604,72 +632,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         });
     }
 
-    private void searchSift(String searchStr) {
-        getCompanyList(searchStr, ZCD_CODE, HYLB_CODE);
-    }
-
-    private void getCompanyList(String searchStr, long industryCategoryId, long areaId) {
-        showLoading();
-        Map<Object, Object> map = new HashMap<>();
-        if (!TextUtils.isEmpty(searchStr)) {
-            map.put("key", searchStr);
-        }
-        if (industryCategoryId != -1) {
-            map.put("industryCategoryId", industryCategoryId);
-        }
-        if (areaId != -1) {
-            map.put("areaId", areaId);
-        }
-        APIService.getInstance()
-                .getCompanyList(map, new SimpleSubscriber<List<CompanyDetailModel>>() {
-                    @Override
-                    public void onResponse(List<CompanyDetailModel> response) {
-                        dismissLoading();
-                        if (response == null || response.isEmpty()) {
-                            ToastUtil.showShort("未查询到相关信息");
-                            return;
-                        }
-                        companyList.clear();
-                        companyList.addAll(response);
-                        showMapSymbol(companyList);
-                        showBottomLayout(companyList);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        super.onError(e);
-                        dismissLoading();
-                        ToastUtil.showShort("未查询到相关信息");
-                    }
-                });
-    }
-
-    private void showMapSymbol(List<CompanyDetailModel> response) {
-        if (response == null || response.isEmpty()) return;
-        StringBuilder sb = new StringBuilder();
-        for (CompanyDetailModel model : response) {
-            sb.append(model.getCompanyId());
-            sb.append(",");
-        }
-        String in = sb.substring(0, sb.length() - 1);
-        String whereClause = String.format("UNITID in (%s)", in);
-        LogUtil.d("whereClause == " + whereClause);
-
-        mMapView.querySQL(getActivity(),
-                getString(R.string.feature_server_url), whereClause,
-                new BaseMapView.MainThreadCallback<FeatureResult>() {
-                    @Override
-                    public void onCallback(FeatureResult objects) {
-                        showCompanyMarker(objects);
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        ToastUtil.showShort("获取单位信息失败");
-                    }
-                });
-    }
-
     private void showCompanyMarker(FeatureResult objects) {
         if (objects.featureCount() == 0) {
             ToastUtil.showShort("未获取单位信息,请重试");
@@ -684,8 +646,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 Graphic graphic = new Graphic(feature.getGeometry(),
                         symbol, feature.getAttributes());
                 mMapView.addGraphic(graphic);
-
-//                String UNITID = (String) feature.getAttributeValue("UNITID");
 
             }
         }
@@ -702,8 +662,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         dragView.setVisibility(View.VISIBLE);
         bottomAdapter.setOnItemClickListener((view, position) -> {
             int companyId = response.get(position).getCompanyId();
-            for (int id : mMapView.getGraphicLayer().getGraphicIDs()) {
-                Graphic graphic = mMapView.getGraphicLayer().getGraphic(id);
+            for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
+                Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
                 int unit_id = (int) graphic.getAttributeValue("UNITID");
                 if (companyId == unit_id) {
 //                    ToastUtil.showShort("========");
@@ -896,87 +856,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mMapView.clearAll();
     }
 
-    //获取重庆各大区县
-//    private void getSiftZCDData() {
-//        showLoading();
-//        Map<Object, Object> map = new HashMap<>();
-//        APIService.getInstance().getAreaList(map, new SimpleSubscriber<List<AreaModel>>() {
-//            @Override
-//            public void onResponse(List<AreaModel> response) {
-//                dismissLoading();
-//                areaModelList.clear();
-//                AreaModel areaModel = new AreaModel();
-//                areaModel.setAreaId(-1);
-//                areaModel.setAreaName("全部");
-//                areaModelList.add(areaModel);
-//                areaModelList.addAll(response);
-//                //如果注册地还没选，那就默认让它选择全部
-//                if (ZCD_CODE == -1) {
-//                    for (AreaModel cqPrefectureModel : areaModelList) {
-//                        cqPrefectureModel.setChecked(false);
-//                    }
-//                    areaModelList.get(0).setChecked(true);
-//                } else {
-//                    //如果注册地已经选择，那么选中它
-//                    for (AreaModel cqPrefectureModel : areaModelList) {
-//                        if (cqPrefectureModel.getAreaId() == ZCD_CODE) {
-//                            cqPrefectureModel.setChecked(true);
-//                        } else {
-//                            cqPrefectureModel.setChecked(false);
-//                        }
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onError(Throwable e) {
-//                super.onError(e);
-//                dismissLoading();
-//            }
-//        });
-//    }
-
-    //获取单位类别
-//    private void getSiftLBData() {
-//        showLoading();
-//        Map<Object, Object> map = new HashMap<>();
-//        APIService.getInstance()
-//                .getIndustryCategoryList(map, new SimpleSubscriber<List<IndustryCategoryModel>>() {
-//                    @Override
-//                    public void onResponse(List<IndustryCategoryModel> response) {
-//                        dismissLoading();
-//                        industryCategoryModelList.clear();
-//                        IndustryCategoryModel industryCategoryModelTemp = new IndustryCategoryModel();
-//                        industryCategoryModelTemp.setIndustryCategoryId(-1);
-//                        industryCategoryModelTemp.setIndustryCategoryName("全部");
-//                        industryCategoryModelList.add(industryCategoryModelTemp);
-//                        industryCategoryModelList.addAll(response);
-//                        //如果类别还没选，那就默认让它选择全部
-//                        if (HYLB_CODE == -1) {
-//                            for (IndustryCategoryModel industryCategoryModel : industryCategoryModelList) {
-//                                industryCategoryModel.setChecked(false);
-//                            }
-//                            industryCategoryModelList.get(0).setChecked(true);
-//                        } else {
-//                            //如果类别已经选择，那么选中它
-//                            for (IndustryCategoryModel industryCategoryModel : industryCategoryModelList) {
-//                                if (industryCategoryModel.getIndustryCategoryId() == HYLB_CODE) {
-//                                    industryCategoryModel.setChecked(true);
-//                                } else {
-//                                    industryCategoryModel.setChecked(false);
-//                                }
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        super.onError(e);
-//                        dismissLoading();
-//                    }
-//                });
-//    }
-
     private void showClearBtn() {
         mCVClear.setVisibility(View.VISIBLE);
     }
@@ -1017,5 +896,25 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 calendar2Content.setText(dateString);
             }
         }
+    }
+
+    //获取分类信息，成果类型那一坨
+    private void getClassifyData() {
+        showLoading();
+        APIService.getInstance()
+                .getfruitCategoryList(new SimpleSubscriber<List<FruitCategoryListModel>>() {
+                    @Override
+                    public void onResponse(List<FruitCategoryListModel> response) {
+                        dismissLoading();
+                        mClassifyList.clear();
+                        mClassifyList.addAll(response);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                    }
+                });
     }
 }
