@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -19,11 +20,13 @@ public class DragLayout extends LinearLayout {
 
     private ViewDragHelper mDragHelper;
     private View mDragView;
+    private GestureDetector mGestureDetector;
 
     public DragLayout(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         setOrientation(VERTICAL);
         mDragHelper = ViewDragHelper.create(this, callback);
+        mGestureDetector = new GestureDetector(context, gestureListener);
     }
 
     private boolean setPadding = false;
@@ -44,13 +47,8 @@ public class DragLayout extends LinearLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        View topChildUnder = mDragHelper
-                .findTopChildUnder((int) event.getX(), (int) event.getY());
-        if (topChildUnder == mDragView) {
-            mDragHelper.processTouchEvent(event);
-            return true;
-        }
-        return false;
+        mDragHelper.processTouchEvent(event);
+        return mGestureDetector.onTouchEvent(event);
     }
 
     ViewDragHelper.Callback callback = new ViewDragHelper.Callback() {
@@ -118,6 +116,40 @@ public class DragLayout extends LinearLayout {
         super.onFinishInflate();
         mDragView = getChildAt(0);
     }
+
+    GestureDetector.OnGestureListener gestureListener = new GestureDetector.OnGestureListener() {
+        @Override
+        public boolean onDown(MotionEvent e) {
+            View topChildUnder = mDragHelper.findTopChildUnder((int) e.getX(), (int) e.getY());
+            return topChildUnder == mDragView;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent e) {
+
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+
+            return true;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            return true;
+        }
+    };
 
 
 }
