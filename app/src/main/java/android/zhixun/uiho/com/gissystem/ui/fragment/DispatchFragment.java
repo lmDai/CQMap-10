@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -33,7 +32,6 @@ import android.zhixun.uiho.com.gissystem.flux.body.ReportHandoutListBody;
 import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
 import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.FruitCategoryListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.OrderModel;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
@@ -41,7 +39,6 @@ import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
 import android.zhixun.uiho.com.gissystem.ui.activity.MainActivity;
 import android.zhixun.uiho.com.gissystem.ui.adapter.AdminRegionAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.ClassifyFlowTypeAttrValAdapter;
-import android.zhixun.uiho.com.gissystem.ui.adapter.MainBottomAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
 import android.zhixun.uiho.com.gissystem.ui.widget.DialogUtil;
 import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
@@ -52,7 +49,6 @@ import android.zhixun.uiho.com.gissystem.util.OnItemClickListener;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Geometry;
-import com.esri.core.geometry.Point;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
@@ -100,6 +96,10 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     private RelativeLayout relativeLayoutLeft, relativeLayoutRight;
     //分类信息集合-成果类型那一坨
     private List<FruitCategoryListModel> mClassifyList = new ArrayList<>();
+    //分类信息集合-成果类型下面的集合
+    private List<GethandoutConditionByFCModel> mClassifyTypeList = new ArrayList<>();
+    //分发信息集合
+    private List<ReportHandoutListModel> mHandoutList = new ArrayList<>();
     //
     private ClassifyBody classifyBody = new ClassifyBody();
 
@@ -160,7 +160,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     private void initData() {
-        mBody = new ReportHandoutListBody();
         getClassifyData();
     }
 
@@ -208,12 +207,12 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
             case R.id.tv_search:
                 String searchStr = mEtSearch.getText().toString();
                 if (TextUtils.isEmpty(searchStr)) {
-                    mEtSearch.setText("全部");
+                    setSearhText("全部");
                 }
-                getReportHandoutList();
+                getReportHandoutList(mBody);
                 break;
             case R.id.cv_classifySearch://分类查询
-                showClassifySearchDialog(v);
+                showClassifyDialog(v);
                 break;
             case R.id.aciv_clear:
                 showSearchTextView();
@@ -241,7 +240,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
     private ReportHandoutListBody mBody;
 
-    private void showClassifySearchDialog(View view) {
+    private void showClassifyDialog(View view) {
         showLoading();
         if (!mClassifyList.isEmpty()) {
             bindViewClassify(view, mClassifyList);
@@ -282,7 +281,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
             @Override
             protected void convert(ViewHolder holder, FruitCategoryListModel item,
                                    int position) {
-                if (position == 0) {
+                if (item.selected) {
                     switchType(item, dialogRoot);
                 }
                 holder.itemView.setSelected(item.selected);
@@ -299,39 +298,51 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     model.selected = response.indexOf(model) == position;
                 }
                 flowTypeAdapter.notifyDataSetChanged();
-                switchType(response.get(position), dialogRoot);
             }
         });
-//        TagFlowLayout typeFlowLayout = dialogRoot.findViewById(R.id.flow_type);
-//        TagAdapter<FruitCategoryListModel> flowTypeAdapter =
-//                new TagAdapter<FruitCategoryListModel>(response) {
-//                    @Override
-//                    public View getView(FlowLayout flowLayout, int i,
-//                                        FruitCategoryListModel o) {
-//                        TextView textView = (TextView) View.inflate(getActivity(),
-//                                R.layout.item_flow_type, null);
-//                        textView.setText(o.categoryName);
-//                        return textView;
-//                    }
-//
-//                    @Override
-//                    public void onSelected(int position, View view) {
-//                        super.onSelected(position, view);
-//                        if (response == null) {
-//                            return;
-//                        }
-//                        FruitCategoryListModel model = response.get(position);
-//                        if (model == null) {
-//                            return;
-//                        }
-//                        classifyBody.selectModel1 = model;
-//                        mBody.setFruitCategoryId(model.fruitCategoryId);
-//                        switchType(model, dialogRoot);
-//                    }
-//                };
-//        typeFlowLayout.setAdapter(flowTypeAdapter);
-//        flowTypeAdapter.setSelectedList(0);
+        Button btnSearch = dialogRoot.findViewById(R.id.btn_search);
+        btnSearch.setOnClickListener(v -> {
+
+            if (mClassifyList.isEmpty()) return;
+            mBody = new ReportHandoutListBody();
+            StringBuilder sb = new StringBuilder();
+            for (FruitCategoryListModel model : mClassifyList) {
+                if (model.selected) {
+                    sb.append(model.categoryName);
+                    sb.append(",");
+                    mBody.fruitCategoryId = model.fruitCategoryId;
+                }
+            }
+            if (!mClassifyTypeList.isEmpty()) {
+
+                for (GethandoutConditionByFCModel gethandoutConditionByFCModel : mClassifyTypeList) {
+                    if (gethandoutConditionByFCModel.fruitCateGoryAttrVal == null ||
+                            gethandoutConditionByFCModel.fruitCateGoryAttrVal.isEmpty()) {
+                        continue;
+                    }
+                    for (GethandoutConditionByFCModel.FruitCateGoryAttrVal attrVal :
+                            gethandoutConditionByFCModel.fruitCateGoryAttrVal) {
+                        if (attrVal.selected && !TextUtils.equals(attrVal.attrValue, "全部")) {
+                            sb.append(attrVal.attrValue);
+                            sb.append(",");
+                            mBody.attrValueList
+                                    .add(new ReportHandoutListBody
+                                            .AttrValueList(gethandoutConditionByFCModel.fruitCategoryAttrId,
+                                            attrVal.attrValue));
+                        }
+                    }
+                }
+            }
+            DialogUtil.getInstance().dismiss();
+            setSearhText(sb.toString());
+        });
         DialogUtil.getInstance().showAnchorDialog(dialogRoot, view);
+    }
+
+    //设置搜索框的文字
+    private void setSearhText(String text) {
+        mEtSearch.setText("");
+        mEtSearch.setText(text);
     }
 
     //切换成果类型
@@ -346,72 +357,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 if (response == null || response.isEmpty()) {
                                     return;
                                 }
-                                bindViewClassifyType(dialogRoot, response);
-//                                LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
-//                                llContainer.removeAllViews();
-//                                mBody.attrValueList.clear();
-//
-//                                for (GethandoutConditionByFCModel gethandoutConditionByFCModel : response) {
-//
-//                                    View item = LayoutInflater.from(dialogRoot.getContext())
-//                                            .inflate(R.layout.dispatch_dialog_item, llContainer, false);
-//
-//                                    TagFlowLayout tagFlowLayout = (TagFlowLayout) LayoutInflater
-//                                            .from(dialogRoot.getContext())
-//                                            .inflate(R.layout.dispatch_dialog_item_tag_flow_layout,
-//                                                    llContainer, false);
-//
-//                                    TextView tv1 = item.findViewById(R.id.tv_attrName);
-//                                    tv1.setText(gethandoutConditionByFCModel.attrName);
-//                                    if (gethandoutConditionByFCModel.fruitCateGoryAttrVal == null) {
-//                                        gethandoutConditionByFCModel.fruitCateGoryAttrVal =
-//                                                new ArrayList<>();
-//                                    }
-//                                    //比例尺没有全部
-//                                    if (response.indexOf(gethandoutConditionByFCModel) > 0) {
-//                                        gethandoutConditionByFCModel.fruitCateGoryAttrVal
-//                                                .add(0, new GethandoutConditionByFCModel
-//                                                        .FruitCateGoryAttrVal("全部"));
-//                                    }
-//
-//                                    TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal> ta1
-//                                            = new TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal>(gethandoutConditionByFCModel.fruitCateGoryAttrVal) {
-//                                        @Override
-//                                        public View getView(FlowLayout flowLayout, int i,
-//                                                            GethandoutConditionByFCModel.FruitCateGoryAttrVal o) {
-//                                            TextView textView = (TextView) View.inflate(getActivity(),
-//                                                    R.layout.item_flow_type, null);
-//                                            textView.setText(o.attrValue);
-//                                            return textView;
-//                                        }
-//
-//                                        @Override
-//                                        public void onSelected(int position, View view) {
-//                                            super.onSelected(position, view);
-//                                            if (position == 0) return;
-//                                            long fruitCategoryAttrId = gethandoutConditionByFCModel.fruitCategoryAttrId;
-//                                            String attrValue = gethandoutConditionByFCModel.fruitCateGoryAttrVal.get(position).attrValue;
-//                                            classifyBody.selectAttrValues.add(attrValue);
-//                                            mBody.attrValueList
-//                                                    .add(new ReportHandoutListBody
-//                                                            .AttrValueList(fruitCategoryAttrId, attrValue));
-//                                        }
-//                                    };
-//                                    tagFlowLayout.setAdapter(ta1);
-//                                    ta1.setSelectedList(0);
-//
-//                                    llContainer.addView(item);
-//                                    llContainer.addView(tagFlowLayout);
-//                                }
-//
-//                                Button btn_search = dialogRoot.findViewById(R.id.btn_search);
-//                                //查询
-//                                btn_search.setOnClickListener(v -> {
-////                                    reportHandoutList();
-//                                    mBody.toString();
-//                                    classifyBody.toString();
-//                                    mEtSearch.setText("");
-//                                });
+                                mClassifyTypeList.clear();
+                                mClassifyTypeList.addAll(response);
+                                bindViewClassifyType(dialogRoot, mClassifyTypeList);
                             }
                         });
     }
@@ -420,67 +368,56 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
         llContainer.removeAllViews();
         for (GethandoutConditionByFCModel gcbfModel : response) {
-            View item = LayoutInflater.from(dialogRoot.getContext())
+            View itemView = LayoutInflater.from(dialogRoot.getContext())
                     .inflate(R.layout.dispatch_dialog_item, llContainer,
                             false);
-            llContainer.addView(item);
+            TextView tv_attrName = itemView.findViewById(R.id.tv_attrName);
+            tv_attrName.setText(gcbfModel.attrName);
+            llContainer.addView(itemView);
 
             List<GethandoutConditionByFCModel.FruitCateGoryAttrVal> attrVals =
                     gcbfModel.fruitCateGoryAttrVal;
-            RecyclerView recyclerView = item.findViewById(R.id.recycler_view);
+            if (attrVals == null || attrVals.isEmpty()) {
+                return;
+            }
+            if (response.indexOf(gcbfModel) != 0) {
+                attrVals.add(0, new GethandoutConditionByFCModel.FruitCateGoryAttrVal("全部"));
+            }
+            attrVals.get(0).selected = true;
+            RecyclerView recyclerView = itemView.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
             ClassifyFlowTypeAttrValAdapter typeAdapter = new ClassifyFlowTypeAttrValAdapter(getActivity(), attrVals);
             recyclerView.setAdapter(typeAdapter);
             typeAdapter.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+                    for (GethandoutConditionByFCModel.FruitCateGoryAttrVal attrVal : attrVals) {
+                        attrVal.selected = attrVals.indexOf(attrVal) == position;
+                    }
                     attrVals.get(position).selected = true;
                     typeAdapter.notifyDataSetChanged();
                 }
             });
         }
-
-
     }
 
-    //查询分类
-    private void getReportHandoutList() {
-        showLoading();
+    //查询分发的集合
+    private void getReportHandoutList(ReportHandoutListBody body) {
+        if (body == null) {
+            body = new ReportHandoutListBody();
+        }
         showSearchClearView();
-        APIService.getInstance().getReportHandoutList(mBody,
+        showLoading();
+        APIService.getInstance().getReportHandoutList(body,
                 new SimpleSubscriber<List<ReportHandoutListModel>>() {
                     @Override
                     public void onResponse(List<ReportHandoutListModel> response) {
                         dismissLoading();
                         if (response == null || response.isEmpty()) return;
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("FRUITID");
-                        sb.append(" in ");
-                        sb.append("(");
-                        int mapType = 0;
-                        for (ReportHandoutListModel reportHandoutListModel : response) {
+                        mHandoutList.clear();
+                        mHandoutList.addAll(response);
 
-                            for (ReportHandoutListModel.FruitCategoryList fruitCategoryList :
-                                    reportHandoutListModel.fruitCategoryList) {
-
-                                mapType = fruitCategoryList.mapType;
-                                for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
-                                        fruitCategoryList.fruitList) {
-
-                                    long fruitId = fruitList.fruitId;
-                                    sb.append(String.valueOf(fruitId));
-                                    sb.append(",");
-                                }
-
-                            }
-
-                        }
-
-                        String whereClause = sb.substring(0, sb.lastIndexOf(",")) + ")";
-                        LogUtil.i("whereClause == " + whereClause);
-
-                        searchType(mapType, whereClause);
-                        DialogUtil.getInstance().dismiss();
+                        searchMapService(mHandoutList);
 
                     }
 
@@ -489,9 +426,39 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         super.onError(e);
                         dismissLoading();
                         ToastUtil.showShort(e.getMessage());
-                        DialogUtil.getInstance().dismiss();
                     }
                 });
+    }
+
+    private void searchMapService(List<ReportHandoutListModel> handoutListModels) {
+        if (this.mHandoutList.isEmpty()) return;
+        StringBuilder sb = new StringBuilder();
+        sb.append("FRUITID");
+        sb.append(" in ");
+        sb.append("(");
+        int mapType = 0;
+        for (ReportHandoutListModel reportHandoutListModel : handoutListModels) {
+
+            for (ReportHandoutListModel.FruitCategoryList fruitCategoryList :
+                    reportHandoutListModel.fruitCategoryList) {
+
+                mapType = fruitCategoryList.mapType;
+                for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
+                        fruitCategoryList.fruitList) {
+
+                    long fruitId = fruitList.fruitId;
+                    sb.append(String.valueOf(fruitId));
+                    sb.append(",");
+                }
+
+            }
+
+        }
+
+        String whereClause = sb.substring(0, sb.lastIndexOf(",")) + ")";
+        LogUtil.i("whereClause == " + whereClause);
+
+        searchType(mapType, whereClause);
     }
 
     private void searchType(int mapType, String whereClause) {
@@ -537,6 +504,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 //                            drawLayer.setSelectionColor(Color.RED);
 //                            drawLayer.setSelectedGraphics(ids, true);
                             drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
+                            showBottomLayout();
                         });
                     }
 
@@ -726,30 +694,71 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         }
     }
 
-    private void showBottomLayout(List<CompanyDetailModel> response) {
+    private void showBottomLayout() {
+        if (mHandoutList == null || mHandoutList.isEmpty()) {
+            return;
+        }
         mCVClear.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).hideBottomNav();
-        MainBottomAdapter bottomAdapter =
-                new MainBottomAdapter(getActivity(), response);
-        mContentRv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        CommonAdapter<ReportHandoutListModel> bottomAdapter =
+                new CommonAdapter<ReportHandoutListModel>(getActivity(), R.layout.item_dispatch_bottom,
+                        mHandoutList) {
+                    @Override
+                    protected void convert(ViewHolder holder, ReportHandoutListModel item, int position) {
+                        holder.setText(R.id.tv_companyName, item.companyName)
+                                .setText(R.id.tv_reportNo, item.reportNo);
+                        TextView text_handoutContent = holder.getView(R.id.text_handoutContent);
+                        LinearLayout ll_content = holder.getView(R.id.ll_content);
+                        text_handoutContent.setOnClickListener(v ->
+                                ll_content.setVisibility(ll_content.getVisibility() == View.VISIBLE
+                                        ? View.GONE : View.VISIBLE));
+
+                        if (item.fruitCategoryList == null || item.fruitCategoryList.isEmpty()) {
+                            return;
+                        }
+
+                        bindViewHandoutContent(item, ll_content);
+                    }
+                };
         mContentRv.setAdapter(bottomAdapter);
         mDragLayout.animaToCenter();
         dragView.setVisibility(View.VISIBLE);
-        bottomAdapter.setOnItemClickListener((view, position) -> {
-            int companyId = response.get(position).getCompanyId();
-            for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
-                Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
-                int unit_id = (int) graphic.getAttributeValue("UNITID");
-                if (companyId == unit_id) {
-//                    ToastUtil.showShort("========");
-                    if (graphic.getGeometry() instanceof Point) {
-                        Point point = (Point) graphic.getGeometry();
-                        mMapView.centerAt(point, true);
-                    }
-                }
+
+//        bottomAdapter.setOnItemClickListener((view, position) -> {
+//            int companyId = response.get(position).getCompanyId();
+//            for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
+//                Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
+//                int unit_id = (int) graphic.getAttributeValue("UNITID");
+//                if (companyId == unit_id) {
+//                    if (graphic.getGeometry() instanceof Point) {
+//                        Point point = (Point) graphic.getGeometry();
+//                        mMapView.centerAt(point, true);
+//                    }
+//                }
+//            }
+//        });
+    }
+
+    //设置弹出框分发内容的view
+    private void bindViewHandoutContent(ReportHandoutListModel item, LinearLayout ll_content) {
+        for (ReportHandoutListModel.FruitCategoryList fruitCategoryList : item.fruitCategoryList) {
+            View contentView = View.inflate(getActivity(),
+                    R.layout.item_dispatch_bottom_content, null);
+            ll_content.addView(contentView);
+            //设置content item的名字
+            TextView tvContent = contentView.findViewById(R.id.tv_content);
+            tvContent.setText(fruitCategoryList.categoryName);
+            //设置content 的 一行
+            for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList : fruitCategoryList.fruitList) {
+                LinearLayout ll_item = new LinearLayout(getActivity());
+                ll_item.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        20));
+                ll_item.setBackgroundColor(Color.RED);
+                ll_item.setOrientation(LinearLayout.HORIZONTAL);
+                ll_content.addView(ll_item);
             }
-//            ToastUtil.showShort("" + position);
-        });
+
+        }
     }
 
     private void hideBottomLayout() {
@@ -981,6 +990,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     @Override
                     public void onResponse(List<FruitCategoryListModel> response) {
                         dismissLoading();
+                        if (response == null || response.isEmpty()) {
+                            return;
+                        }
                         mClassifyList.clear();
                         mClassifyList.addAll(response);
                     }

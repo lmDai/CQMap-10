@@ -3,5 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="cardView_elevation">4dp</dimen>
+    <dimen name="map_option_item_size">40dp</dimen>
 
 </resources>

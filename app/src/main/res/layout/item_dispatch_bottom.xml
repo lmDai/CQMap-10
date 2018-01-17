@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_companyName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="重庆市地理信息中心" />
+
+    <TextView
+        android:id="@+id/tv_reportNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/qmui_config_color_gray_1"
+        app:layout_constraintStart_toStartOf="@+id/tv_companyName"
+        app:layout_constraintTop_toBottomOf="@+id/tv_companyName"
+        tools:text="渝测成2018-0007" />
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/my_divider"
+        app:layout_constraintLeft_toLeftOf="@id/tv_companyName"
+        app:layout_constraintTop_toBottomOf="@id/tv_reportNo" />
+
+    <TextView
+        android:id="@+id/text_handoutContent"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:text="分发内容"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintLeft_toLeftOf="@id/tv_reportNo"
+        app:layout_constraintTop_toBottomOf="@id/line" />
+
+    <LinearLayout
+        android:id="@+id/ll_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:divider="@drawable/my_divider"
+        android:orientation="vertical"
+        android:showDividers="middle"
+        app:layout_constraintLeft_toLeftOf="@id/tv_reportNo"
+        app:layout_constraintTop_toBottomOf="@id/text_handoutContent">
+
+    </LinearLayout>
+
+</LinearLayout>

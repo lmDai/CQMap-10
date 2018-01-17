@@ -97,4 +97,6 @@ dependencies {
     compile 'com.hyman:flowlayout-lib:1.1.2'
     //
     compile 'com.android.support:multidex:1.0.1'
+    //
+    compile 'com.yqritc:recyclerview-flexibledivider:1.4.0'
 }
