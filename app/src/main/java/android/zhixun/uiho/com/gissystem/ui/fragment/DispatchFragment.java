@@ -27,22 +27,27 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
 import android.zhixun.uiho.com.gissystem.drawtool.DrawTool;
+import android.zhixun.uiho.com.gissystem.flux.body.ClassifyBody;
+import android.zhixun.uiho.com.gissystem.flux.body.OrderBody;
 import android.zhixun.uiho.com.gissystem.flux.body.ReportHandoutListBody;
 import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
 import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.FruitCategoryListModel;
+import android.zhixun.uiho.com.gissystem.flux.models.api.OrderModel;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
 import android.zhixun.uiho.com.gissystem.ui.activity.MainActivity;
 import android.zhixun.uiho.com.gissystem.ui.adapter.AdminRegionAdapter;
+import android.zhixun.uiho.com.gissystem.ui.adapter.ClassifyFlowTypeAttrValAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.MainBottomAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
 import android.zhixun.uiho.com.gissystem.ui.widget.DialogUtil;
 import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
+import android.zhixun.uiho.com.gissystem.util.OnItemClickListener;
 
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.event.OnSingleTapListener;
@@ -58,10 +63,9 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.yibogame.util.DateUtil;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
+import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
-import com.zhy.view.flowlayout.FlowLayout;
-import com.zhy.view.flowlayout.TagAdapter;
-import com.zhy.view.flowlayout.TagFlowLayout;
+import com.zhy.adapter.recyclerview.base.ViewHolder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -96,10 +100,12 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     private RelativeLayout relativeLayoutLeft, relativeLayoutRight;
     //分类信息集合-成果类型那一坨
     private List<FruitCategoryListModel> mClassifyList = new ArrayList<>();
+    //
+    private ClassifyBody classifyBody = new ClassifyBody();
 
     public DispatchFragment() {
         Bundle args = new Bundle();
-        args.putString("name",this.getClass().getSimpleName());
+        args.putString("name", this.getClass().getSimpleName());
         setArguments(args);
     }
 
@@ -267,35 +273,64 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         View dialogRoot = LayoutInflater.from(getActivity())
                 .inflate(R.layout.dialog_classify_search, ((ViewGroup) getView()),
                         false);
-        TagFlowLayout typeFlowLayout = dialogRoot.findViewById(R.id.flow_type);
-        TagAdapter<FruitCategoryListModel> flowTypeAdapter =
-                new TagAdapter<FruitCategoryListModel>(response) {
-                    @Override
-                    public View getView(FlowLayout flowLayout, int i,
-                                        FruitCategoryListModel o) {
-                        TextView textView = (TextView) View.inflate(getActivity(),
-                                R.layout.item_flow_type, null);
-                        textView.setText(o.categoryName);
-                        return textView;
-                    }
 
-                    @Override
-                    public void onSelected(int position, View view) {
-                        super.onSelected(position, view);
-
-                        if (response == null) {
-                            return;
-                        }
-                        FruitCategoryListModel model = response.get(position);
-                        if (model == null) {
-                            return;
-                        }
-                        mBody.setFruitCategoryId(model.fruitCategoryId);
-                        switchType(model, dialogRoot);
-                    }
-                };
-        typeFlowLayout.setAdapter(flowTypeAdapter);
-        flowTypeAdapter.setSelectedList(0);
+        response.get(0).selected = true;
+        RecyclerView rv_flowType = dialogRoot.findViewById(R.id.rv_flow_type);
+        rv_flowType.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        CommonAdapter flowTypeAdapter = new CommonAdapter<FruitCategoryListModel>(getActivity(),
+                R.layout.item_flow_type, response) {
+            @Override
+            protected void convert(ViewHolder holder, FruitCategoryListModel item,
+                                   int position) {
+                if (position == 0) {
+                    switchType(item, dialogRoot);
+                }
+                holder.itemView.setSelected(item.selected);
+                TextView tvType = holder.getView(R.id.tv_text);
+                tvType.setText(item.categoryName);
+            }
+        };
+        rv_flowType.setAdapter(flowTypeAdapter);
+        flowTypeAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+                response.get(position).selected = true;
+                for (FruitCategoryListModel model : response) {
+                    model.selected = response.indexOf(model) == position;
+                }
+                flowTypeAdapter.notifyDataSetChanged();
+                switchType(response.get(position), dialogRoot);
+            }
+        });
+//        TagFlowLayout typeFlowLayout = dialogRoot.findViewById(R.id.flow_type);
+//        TagAdapter<FruitCategoryListModel> flowTypeAdapter =
+//                new TagAdapter<FruitCategoryListModel>(response) {
+//                    @Override
+//                    public View getView(FlowLayout flowLayout, int i,
+//                                        FruitCategoryListModel o) {
+//                        TextView textView = (TextView) View.inflate(getActivity(),
+//                                R.layout.item_flow_type, null);
+//                        textView.setText(o.categoryName);
+//                        return textView;
+//                    }
+//
+//                    @Override
+//                    public void onSelected(int position, View view) {
+//                        super.onSelected(position, view);
+//                        if (response == null) {
+//                            return;
+//                        }
+//                        FruitCategoryListModel model = response.get(position);
+//                        if (model == null) {
+//                            return;
+//                        }
+//                        classifyBody.selectModel1 = model;
+//                        mBody.setFruitCategoryId(model.fruitCategoryId);
+//                        switchType(model, dialogRoot);
+//                    }
+//                };
+//        typeFlowLayout.setAdapter(flowTypeAdapter);
+//        flowTypeAdapter.setSelectedList(0);
         DialogUtil.getInstance().showAnchorDialog(dialogRoot, view);
     }
 
@@ -311,71 +346,101 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 if (response == null || response.isEmpty()) {
                                     return;
                                 }
-
-                                LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
-                                llContainer.removeAllViews();
-                                mBody.attrValueList.clear();
-
-                                for (GethandoutConditionByFCModel gethandoutConditionByFCModel : response) {
-
-                                    View item = LayoutInflater.from(dialogRoot.getContext())
-                                            .inflate(R.layout.dispatch_dialog_item, llContainer, false);
-
-                                    TagFlowLayout tagFlowLayout = (TagFlowLayout) LayoutInflater
-                                            .from(dialogRoot.getContext())
-                                            .inflate(R.layout.dispatch_dialog_item_tag_flow_layout,
-                                                    llContainer, false);
-
-                                    TextView tv1 = item.findViewById(R.id.tv_attrName);
-                                    tv1.setText(gethandoutConditionByFCModel.attrName);
-                                    if (gethandoutConditionByFCModel.fruitCateGoryAttrVal == null) {
-                                        gethandoutConditionByFCModel.fruitCateGoryAttrVal =
-                                                new ArrayList<>();
-                                    }
-                                    //比例尺没有全部
-                                    if (response.indexOf(gethandoutConditionByFCModel) > 0) {
-                                        gethandoutConditionByFCModel.fruitCateGoryAttrVal
-                                                .add(0, new GethandoutConditionByFCModel
-                                                        .FruitCateGoryAttrVal("全部"));
-                                    }
-
-                                    TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal> ta1
-                                            = new TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal>(gethandoutConditionByFCModel.fruitCateGoryAttrVal) {
-                                        @Override
-                                        public View getView(FlowLayout flowLayout, int i,
-                                                            GethandoutConditionByFCModel.FruitCateGoryAttrVal o) {
-                                            TextView textView = (TextView) View.inflate(getActivity(),
-                                                    R.layout.item_flow_type, null);
-                                            textView.setText(o.attrValue);
-                                            return textView;
-                                        }
-
-                                        @Override
-                                        public void onSelected(int position, View view) {
-                                            super.onSelected(position, view);
-                                            if (position == 0) return;
-                                            long fruitCategoryAttrId = gethandoutConditionByFCModel.fruitCategoryAttrId;
-                                            String attrValue = gethandoutConditionByFCModel.fruitCateGoryAttrVal.get(position).attrValue;
-                                            mBody.attrValueList
-                                                    .add(new ReportHandoutListBody
-                                                            .AttrValueList(fruitCategoryAttrId, attrValue));
-                                        }
-                                    };
-                                    tagFlowLayout.setAdapter(ta1);
-                                    ta1.setSelectedList(0);
-
-                                    llContainer.addView(item);
-                                    llContainer.addView(tagFlowLayout);
-                                }
-
-                                Button btn_search = dialogRoot.findViewById(R.id.btn_search);
-                                //查询
-                                btn_search.setOnClickListener(v -> {
-//                                    reportHandoutList();
-                                    mEtSearch.setText("");
-                                });
+                                bindViewClassifyType(dialogRoot, response);
+//                                LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
+//                                llContainer.removeAllViews();
+//                                mBody.attrValueList.clear();
+//
+//                                for (GethandoutConditionByFCModel gethandoutConditionByFCModel : response) {
+//
+//                                    View item = LayoutInflater.from(dialogRoot.getContext())
+//                                            .inflate(R.layout.dispatch_dialog_item, llContainer, false);
+//
+//                                    TagFlowLayout tagFlowLayout = (TagFlowLayout) LayoutInflater
+//                                            .from(dialogRoot.getContext())
+//                                            .inflate(R.layout.dispatch_dialog_item_tag_flow_layout,
+//                                                    llContainer, false);
+//
+//                                    TextView tv1 = item.findViewById(R.id.tv_attrName);
+//                                    tv1.setText(gethandoutConditionByFCModel.attrName);
+//                                    if (gethandoutConditionByFCModel.fruitCateGoryAttrVal == null) {
+//                                        gethandoutConditionByFCModel.fruitCateGoryAttrVal =
+//                                                new ArrayList<>();
+//                                    }
+//                                    //比例尺没有全部
+//                                    if (response.indexOf(gethandoutConditionByFCModel) > 0) {
+//                                        gethandoutConditionByFCModel.fruitCateGoryAttrVal
+//                                                .add(0, new GethandoutConditionByFCModel
+//                                                        .FruitCateGoryAttrVal("全部"));
+//                                    }
+//
+//                                    TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal> ta1
+//                                            = new TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal>(gethandoutConditionByFCModel.fruitCateGoryAttrVal) {
+//                                        @Override
+//                                        public View getView(FlowLayout flowLayout, int i,
+//                                                            GethandoutConditionByFCModel.FruitCateGoryAttrVal o) {
+//                                            TextView textView = (TextView) View.inflate(getActivity(),
+//                                                    R.layout.item_flow_type, null);
+//                                            textView.setText(o.attrValue);
+//                                            return textView;
+//                                        }
+//
+//                                        @Override
+//                                        public void onSelected(int position, View view) {
+//                                            super.onSelected(position, view);
+//                                            if (position == 0) return;
+//                                            long fruitCategoryAttrId = gethandoutConditionByFCModel.fruitCategoryAttrId;
+//                                            String attrValue = gethandoutConditionByFCModel.fruitCateGoryAttrVal.get(position).attrValue;
+//                                            classifyBody.selectAttrValues.add(attrValue);
+//                                            mBody.attrValueList
+//                                                    .add(new ReportHandoutListBody
+//                                                            .AttrValueList(fruitCategoryAttrId, attrValue));
+//                                        }
+//                                    };
+//                                    tagFlowLayout.setAdapter(ta1);
+//                                    ta1.setSelectedList(0);
+//
+//                                    llContainer.addView(item);
+//                                    llContainer.addView(tagFlowLayout);
+//                                }
+//
+//                                Button btn_search = dialogRoot.findViewById(R.id.btn_search);
+//                                //查询
+//                                btn_search.setOnClickListener(v -> {
+////                                    reportHandoutList();
+//                                    mBody.toString();
+//                                    classifyBody.toString();
+//                                    mEtSearch.setText("");
+//                                });
                             }
                         });
+    }
+
+    private void bindViewClassifyType(View dialogRoot, List<GethandoutConditionByFCModel> response) {
+        LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
+        llContainer.removeAllViews();
+        for (GethandoutConditionByFCModel gcbfModel : response) {
+            View item = LayoutInflater.from(dialogRoot.getContext())
+                    .inflate(R.layout.dispatch_dialog_item, llContainer,
+                            false);
+            llContainer.addView(item);
+
+            List<GethandoutConditionByFCModel.FruitCateGoryAttrVal> attrVals =
+                    gcbfModel.fruitCateGoryAttrVal;
+            RecyclerView recyclerView = item.findViewById(R.id.recycler_view);
+            recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+            ClassifyFlowTypeAttrValAdapter typeAdapter = new ClassifyFlowTypeAttrValAdapter(getActivity(), attrVals);
+            recyclerView.setAdapter(typeAdapter);
+            typeAdapter.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+                    attrVals.get(position).selected = true;
+                    typeAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+
+
     }
 
     //查询分类
@@ -518,9 +583,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         });
     }
 
-    private int zcdLastPosition = 0;
-    private int lbLastPosition = 0;
-
     private TextView calendar1_content, calendar2_content;
 
     private void showSiftDialog(View view) {
@@ -571,7 +633,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         });
         AppCompatButton acbQuery = contentView.findViewById(R.id.acb_query);
         initEtSearchForDialog(contentView);
-        initAcbSearchForDialog(acbQuery);
+        initAcbSearchForDialog(contentView, acbQuery);
         DialogUtil.getInstance().showAnchorDialog(contentView, view);
     }
 
@@ -610,7 +672,10 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     //条件查询确定按钮点击事件
-    private void initAcbSearchForDialog(AppCompatButton acbQuery) {
+    private void initAcbSearchForDialog(View contentView, AppCompatButton acbQuery) {
+        EditText et_search = contentView.findViewById(R.id.et_search);
+        EditText et_caseCode = contentView.findViewById(R.id.et_case_code);
+        EditText et_dataCode = contentView.findViewById(R.id.et_data_code);
         //设置'查询'按钮功能
         acbQuery.setOnClickListener(view -> {
             long data1 = 0, data2 = 0;
@@ -632,17 +697,14 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 ToastUtil.showShort("请选择开始时间");
                 return;
             }
-//            RxBus.getInstance()
-//                    .send(new MainActivityAction(MainActivityAction.CLEAR_TEXT));
-//            mProgressDialog.setMessage("搜索中……");
-//            mProgressDialog.show();
-//            mDispatchFragmentActionsCreator
-//                    .buildSql(
-//                            etSearchDialog.getText().toString(),
-//                            etCaseCode.getText().toString(),
-//                            etDataCode.getText().toString(),
-//                            data1,
-//                            data2);
+
+            OrderBody orderBody = new OrderBody();
+            orderBody.key = et_search.getText().toString();
+            orderBody.reportNo = et_caseCode.getText().toString();
+            orderBody.otherKey = et_dataCode.getText().toString();
+            orderBody.reportTimeBegin = String.valueOf(data1);
+            orderBody.reportTimeEnd = String.valueOf(data2);
+            getOrderList(orderBody);
         });
     }
 
@@ -660,7 +722,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 Graphic graphic = new Graphic(feature.getGeometry(),
                         symbol, feature.getAttributes());
                 mMapView.addGraphic(graphic);
-
             }
         }
     }
@@ -922,6 +983,39 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         dismissLoading();
                         mClassifyList.clear();
                         mClassifyList.addAll(response);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                    }
+                });
+    }
+
+    private void getOrderList(OrderBody orderBody) {
+        showLoading();
+        Map<Object, Object> map = new HashMap<>();
+        if (!TextUtils.isEmpty(orderBody.key)) {
+            map.put("key", orderBody.key);
+        }
+        if (!TextUtils.isEmpty(orderBody.reportNo)) {
+            map.put("reportNo", orderBody.reportNo);
+        }
+        if (!TextUtils.isEmpty(orderBody.otherKey)) {
+            map.put("otherKey", orderBody.otherKey);
+        }
+        if (!TextUtils.isEmpty(orderBody.reportTimeBegin)) {
+            map.put("reportTimeBegin", orderBody.reportTimeBegin);
+        }
+        if (!TextUtils.isEmpty(orderBody.reportTimeBegin)) {
+            map.put("reportTimeEnd", orderBody.reportTimeBegin);
+        }
+        APIService.getInstance()
+                .getOrderList(map, new SimpleSubscriber<List<OrderModel>>() {
+                    @Override
+                    public void onResponse(List<OrderModel> response) {
+                        dismissLoading();
                     }
 
                     @Override

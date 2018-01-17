@@ -14,4 +14,6 @@ public class FruitCategoryListModel {
     public int spareA;
     public int createPerson;
     public int mapType;//地图类型（1点,2线,3面）
+
+    public boolean selected;
 }

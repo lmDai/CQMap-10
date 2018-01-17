@@ -13,8 +13,8 @@
         android:background="#FFFFFF"
         android:gravity="center_vertical"
         android:paddingLeft="8dp"
-        android:singleLine="true"
         android:paddingRight="8dp"
+        android:singleLine="true"
         android:text="单位名称/组织机构代码"
         android:textColor="@color/colorPrimary"
         android:textSize="14sp" />
@@ -25,12 +25,12 @@
         android:layout_height="32dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:imeOptions="actionDone"
-        android:singleLine="true"
-        android:maxLines="1"
         android:background="#F5F5F5"
         android:hint="请输入单位名称或组织机构代码"
+        android:imeOptions="actionDone"
+        android:maxLines="1"
         android:paddingLeft="8dp"
+        android:singleLine="true"
         android:textColorHint="#BBBBBB"
         android:textSize="12sp" />
 
@@ -58,13 +58,13 @@
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:layout_marginLeft="8dp"
-        android:singleLine="true"
-        android:maxLines="1"
         android:layout_marginRight="8dp"
         android:background="#F5F5F5"
-        android:imeOptions="actionDone"
         android:hint="请输入报件编号"
+        android:imeOptions="actionDone"
+        android:maxLines="1"
         android:paddingLeft="8dp"
+        android:singleLine="true"
         android:textColorHint="#BBBBBB"
         android:textSize="12sp" />
 
@@ -81,19 +81,19 @@
         android:textSize="14sp" />
 
     <EditText
+        android:id="@+id/et_data_code"
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        android:singleLine="true"
-        android:maxLines="1"
         android:background="#F5F5F5"
         android:hint="请输入图幅号或数据编号"
-        android:paddingLeft="8dp"
         android:imeOptions="actionDone"
+        android:maxLines="1"
+        android:paddingLeft="8dp"
+        android:singleLine="true"
         android:textColorHint="#BBBBBB"
-        android:textSize="12sp"
-        android:id="@+id/et_data_code" />
+        android:textSize="12sp" />
 
     <View
         android:layout_width="match_parent"
@@ -172,7 +172,7 @@
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:background="#D1D1D1"
-                app:srcCompat="@mipmap/clender"/>
+                app:srcCompat="@mipmap/clender" />
 
             <TextView
                 android:id="@+id/calendar2_content"

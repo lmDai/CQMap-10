@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/sr_bg_item_flow_type"
-    android:paddingBottom="6dp"
-    android:paddingLeft="14dp"
-    android:paddingRight="14dp"
-    android:paddingTop="6dp"
-    android:textColor="@drawable/sr_item_flow_type_text"
-    tools:text="xxxxxxxx">
+    android:layout_marginRight="1px"
+    android:minHeight="35dp">
 
-</TextView>
+    <TextView
+        android:id="@+id/tv_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:ellipsize="end"
+        android:padding="5dp"
+        android:maxLines="1"
+        android:textColor="@drawable/sr_item_flow_type_text"
+        tools:text="xxxxxxxx">
+
+    </TextView>
+</RelativeLayout>

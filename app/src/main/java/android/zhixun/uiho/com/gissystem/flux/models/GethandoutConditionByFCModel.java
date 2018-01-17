@@ -25,5 +25,6 @@ public class GethandoutConditionByFCModel {
 
         public int type;
         public String attrValue;
+        public boolean selected;
     }
 }
