@@ -164,7 +164,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 } else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_BUFFER) {
                     showBufferInputDialog(v);
                 } else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_POLYGON) {
-                    setPloygon();
+                    setPolygon();
                 } else {
                     searchGeometry();
                 }
@@ -186,7 +186,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
-    private void setPloygon() {
+    private void setPolygon() {
         mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
         searchGeometry();
 //        mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON_SET_FINISH);
@@ -380,7 +380,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                         new SimpleMarkerSymbol(Color.RED, 12, SimpleMarkerSymbol.STYLE.CIRCLE);
                 Graphic graphic = new Graphic(feature.getGeometry(),
                         symbol, feature.getAttributes());
-                mMapView.addGraphic(graphic);
+                mMapView.addDrawLayerGraphic(graphic);
 
 //                String UNITID = (String) feature.getAttributeValue("UNITID");
 

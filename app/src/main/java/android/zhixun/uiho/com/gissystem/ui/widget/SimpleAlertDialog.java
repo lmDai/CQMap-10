@@ -51,10 +51,10 @@ public class SimpleAlertDialog extends AppCompatDialog {
         mTvOk.setOnClickListener(v -> {
             if (onClickListener != null) {
                 onClickListener.onClick(SimpleAlertDialog.this, v);
+            } else {
+                dismiss();
             }
-            dismiss();
         });
-        this.dismiss();
         return this;
     }
 
@@ -70,8 +70,9 @@ public class SimpleAlertDialog extends AppCompatDialog {
         mTvCancel.setOnClickListener(v -> {
             if (onClickListener != null) {
                 onClickListener.onClick(SimpleAlertDialog.this, v);
+            } else {
+                dismiss();
             }
-            dismiss();
         });
         return this;
     }

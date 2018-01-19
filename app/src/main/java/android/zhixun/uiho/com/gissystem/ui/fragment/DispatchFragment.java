@@ -58,7 +58,6 @@ import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.SimpleFillSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
-import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.yibogame.util.DateUtil;
 import com.yibogame.util.LogUtil;
@@ -195,18 +194,11 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 mMapView.zoomout();
                 break;
             case R.id.cv_space://空间查询
-                if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
-                    showSpaceDialog(v);
-                } else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_BUFFER) {
-                    showBufferInputDialog(v);
-                } else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_POLYGON) {
-                    setPloygon();
-                } else {
-                    searchGeometry();
-                }
+                onSpaceClick(v);
                 break;
             case R.id.cv_clear:
-                restoreAll();
+                setSearhText("");
+                restoreSpaceStatus();
                 break;
             case R.id.iv_user:
                 ((MainActivity) getActivity()).openDrawer();
@@ -222,9 +214,61 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 showClassifyDialog(v);
                 break;
             case R.id.aciv_clear:
+                restoreAll();
                 showSearchTextView();
                 break;
         }
+    }
+
+    private void onSpaceClick(View v) {
+        switch (mMapView.getCurrentDrawSpace()) {
+            case BaseMapView.SPACE_NONE:
+                showSpaceDialog(v);
+                break;
+            case BaseMapView.SPACE_RECT:
+                if (mMapView.getCurrentDrawGraphic() == null) {
+                    ToastUtil.showShort("请滑动屏幕框选查询区域");
+                    return;
+                }
+                setSearhText(mEtSearch.getText().toString() + "矩形框选");
+                break;
+            case BaseMapView.SPACE_BUFFER:
+                showBufferInputDialog(v);
+                break;
+            case BaseMapView.SPACE_POLYGON:
+                setPolygon();
+                if (mMapView.getCurrentDrawGraphic().getGeometry().isEmpty()) {
+                    ToastUtil.showShort("请多次点击屏幕选择多边形查询的范围");
+                    return;
+                }
+                setSearhText(mEtSearch.getText().toString() + "多边形框选");
+                break;
+            case BaseMapView.SPACE_BUFFER_SET_FINISH:
+                if (mMapView.getCurrentDrawGraphic() == null) {
+                    ToastUtil.showShort("请滑动屏幕框并输入缓冲区的范围");
+                    return;
+                }
+                setSearhText(mEtSearch.getText().toString() + "缓冲区查询");
+                break;
+            case BaseMapView.SPACE_MAP_NUMBER:
+//                if (mMapView.getCurrentDrawGraphic() == null) {
+//                    ToastUtil.showShort("请滑动屏幕框并输入缓冲区的范围");
+//                    return;
+//                }
+                setSearhText(mEtSearch.getText().toString() + "图幅号查询");
+                break;
+            case BaseMapView.SPACE_ADMIN_REGION:
+                if (mMapView.getCurrentDrawGraphic() == null) {
+                    ToastUtil.showShort("请选择行政区域");
+                    return;
+                }
+                setSearhText(mEtSearch.getText().toString() + "行政区域查询");
+                break;
+        }
+    }
+
+    private void setPolygon() {
+        mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
     }
 
     private void showSearchTextView() {
@@ -239,11 +283,10 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mTvSearch.setVisibility(View.GONE);
     }
 
-    private void setPloygon() {
-        mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
-        searchGeometry();
-//        mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON_SET_FINISH);
-    }
+//    private void setPloygon() {
+//        mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
+//        searchGeometry();
+//    }
 
     private ReportHandoutListBody mBody;
 
@@ -425,7 +468,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         mHandoutList.addAll(response);
 
                         searchMapService(mHandoutList);
-
                     }
 
                     @Override
@@ -457,9 +499,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     sb.append(fruitId);
                     sb.append(",");
                 }
-
             }
-
         }
 
         String whereClause = sb.substring(0, sb.lastIndexOf(",")) + ")";
@@ -497,7 +537,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 symbol.setOutline(new SimpleLineSymbol(Color.WHITE, 2));
                                 Graphic graphic = new Graphic(feature.getGeometry(),
                                         symbol, feature.getAttributes());
-                                mMapView.addGraphic(graphic);
+                                mMapView.addDrawLayerGraphic(graphic);
                             }
                         }
                         //地图单击事件
@@ -694,29 +734,29 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         });
     }
 
-    private void showCompanyMarker(FeatureResult objects) {
-        if (objects.featureCount() == 0) {
-            ToastUtil.showShort("未获取单位信息,请重试");
-            restoreAll();
-            return;
-        }
-        for (Object object : objects) {
-            if (object instanceof Feature) {
-                Feature feature = (Feature) object;
-                SimpleMarkerSymbol symbol =
-                        new SimpleMarkerSymbol(Color.RED, 12, SimpleMarkerSymbol.STYLE.CIRCLE);
-                Graphic graphic = new Graphic(feature.getGeometry(),
-                        symbol, feature.getAttributes());
-                mMapView.addGraphic(graphic);
-            }
-        }
-    }
+//    private void showCompanyMarker(FeatureResult objects) {
+//        if (objects.featureCount() == 0) {
+//            ToastUtil.showShort("未获取单位信息,请重试");
+//            restoreAll();
+//            return;
+//        }
+//        for (Object object : objects) {
+//            if (object instanceof Feature) {
+//                Feature feature = (Feature) object;
+//                SimpleMarkerSymbol symbol =
+//                        new SimpleMarkerSymbol(Color.RED, 12, SimpleMarkerSymbol.STYLE.CIRCLE);
+//                Graphic graphic = new Graphic(feature.getGeometry(),
+//                        symbol, feature.getAttributes());
+//                mMapView.addDrawLayerGraphic(graphic);
+//            }
+//        }
+//    }
 
     private void showBottomLayout(List<ReportHandoutListModel> handoutList) {
         if (handoutList == null || handoutList.isEmpty()) {
             return;
         }
-        mCVClear.setVisibility(View.VISIBLE);
+//        mCVClear.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).hideBottomNav();
         CommonAdapter<ReportHandoutListModel> bottomAdapter =
                 new CommonAdapter<ReportHandoutListModel>(getActivity(), R.layout.item_dispatch_bottom,
@@ -898,17 +938,17 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER);
                             break;
                         case 3://图幅号查询
-                            ToastUtil.showShort("图幅号查询");
-
+                            mMapView.setCurrentDrawSpace(BaseMapView.SPACE_MAP_NUMBER);
+                            showMapNumberDialog();
                             break;
                         case 4://行政区域查询
-                            ToastUtil.showShort("行政区域查询");
+                            mMapView.setCurrentDrawSpace(BaseMapView.SPACE_ADMIN_REGION);
                             showAdminRegionDialog();
                             break;
                     }
                     AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
                     ivSpace.setImageResource(R.mipmap.ic_sure_modifi);
-                    mCVClear.setVisibility(View.VISIBLE);
+                    showClearBtn();
                 });
     }
 
@@ -935,6 +975,75 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 .alert();
     }
 
+    private void showMapNumberDialog() {
+        new SimpleAlertDialog(getActivity())
+                .title("图幅号查询")
+                .message("可输入多个图幅号，图幅号直接用空格或逗号分隔如\n'G49E005001 G49E005002'\n或\n'G49E005001,G49E005002'")
+                .setOkOnClickListener(R.string.alert_ok, (dialog1, view) -> {
+                    String text = dialog1.getEditText().getText().toString();
+                    if (TextUtils.isEmpty(text)) {
+                        ToastUtil.showShort("不能为空");
+                        return;
+                    }
+                    dialog1.dismiss();
+                    searchSymbol(text);
+                })
+                .visiableEditText()
+                .setCancelOnClickListener(R.string.alert_cancel, null)
+                .alert();
+    }
+
+    private void searchSymbol(String text) {
+        if (text.contains(",")) {
+            String[] split = text.split(",");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < split.length; i++) {
+                sb.append(String.format("'%s',", split[i]));
+            }
+            text = sb.substring(0, sb.lastIndexOf(","));
+        }
+        if (text.contains(" ")) {
+            String[] split = text.split(" ");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < split.length; i++) {
+                sb.append(String.format("'%s',", split[i]));
+            }
+            text = sb.substring(0, sb.lastIndexOf(","));
+        }
+        for (int i = 0; i < 7; i++) {
+            String url = String.format("http://ddk.digitalcq.com:6080/arcgis/rest/" +
+                    "services/CQGRID_2000/Mapserver/%s", i);
+            String where = String.format("1=1 and 新图号 in (%s)", text);
+            showLoading();
+            mMapView.querySQL(getActivity(), url, where,
+                    new BaseMapView.MainThreadCallback<FeatureResult>() {
+                        @Override
+                        public void onCallback(FeatureResult result) {
+                            dismissLoading();
+                            if (result.featureCount() == 0) {
+                                return;
+                            }
+                            SimpleLineSymbol symbol =
+                                    new SimpleLineSymbol(Color.RED, 2,
+                                            SimpleLineSymbol.STYLE.SOLID);
+                            for (Object o : result) {
+                                if (o instanceof Feature) {
+                                    Feature feature = (Feature) o;
+                                    Graphic graphic = new Graphic(feature.getGeometry(), symbol);
+                                    mMapView.addDrawLayerGraphic(graphic);
+                                }
+                            }
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dismissLoading();
+                        }
+                    });
+        }
+    }
+
     private int lastPosition = -1;
 
     //行政区域查询show dialog
@@ -956,18 +1065,14 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         adapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
                             @Override
                             public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
-//                                ToastUtil.showShort("onItemClick");
-//                                TextView textView = view.findViewById(R.id.tv_title);
                                 if (position == lastPosition) return;
                                 if (response.get(position).isChecked()) {
                                     response.get(position).setChecked(false);
-//                                    textView.setSelected(false);
                                 } else {
                                     response.get(position).setChecked(true);
                                     if (lastPosition != -1) {
                                         response.get(lastPosition).setChecked(false);
                                     }
-//                                    textView.setSelected(true);
                                 }
                                 adapter.notifyDataSetChanged();
                                 lastPosition = position;
@@ -983,22 +1088,54 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         AppCompatDialog dialog = new AppCompatDialog(getActivity());
                         dialog.setContentView(dialogView);
                         dialog.show();
-                        //确定，但是不查询？
+                        //确定，但是不查询
                         btn_ok.setOnClickListener(v -> {
                             if (lastPosition == -1) {
                                 ToastUtil.showShort("请选择一个区域");
                                 return;
                             }
                             dialog.dismiss();
-//                            currDrawType = DRAWTYPE_ADMIN_REGION;
-//                            showCancelButton();
-//                            searchAdminRegion(response.get(lastPosition).getAreaName());
+                            searchAdminRegion(response.get(lastPosition).getAreaName());
                         });
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
+                        dismissLoading();
+                    }
+                });
+    }
+
+    //查询行政区域
+    private void searchAdminRegion(String searchText) {
+        showLoading();
+        String url = getString(R.string.query_admin_region);
+        String where = String.format("1=1 and MC='%s'", searchText);
+        mMapView.querySQL(getActivity(), url, where,
+                new BaseMapView.MainThreadCallback<FeatureResult>() {
+                    @Override
+                    public void onCallback(FeatureResult result) {
+                        dismissLoading();
+                        if (result.featureCount() == 0) {
+                            ToastUtil.showShort(" 未获取到相关信息");
+                            return;
+                        }
+
+                        for (Object o : result) {
+                            if (o instanceof Feature) {
+                                Feature feature = (Feature) o;
+                                SimpleLineSymbol symbol =
+                                        new SimpleLineSymbol(Color.RED, 2,
+                                                SimpleLineSymbol.STYLE.SOLID);
+                                Graphic graphic = new Graphic(feature.getGeometry(), symbol);
+                                mMapView.addDrawLayerGraphic(graphic);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
                         dismissLoading();
                     }
                 });
@@ -1014,31 +1151,32 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mMapView.addDrawLayerGraphic(graphic);
     }
 
-    private void searchGeometry() {
-        showLoading();
-        restoreSpaceStatus();
-
-        mMapView.queryGeometry(getActivity(),
-                getString(R.string.feature_server_url),
-                new BaseMapView.MainThreadCallback<FeatureResult>() {
-                    @Override
-                    public void onCallback(FeatureResult objects) {
-                        dismissLoading();
-                        showCompanyMarker(objects);
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        dismissLoading();
-                    }
-                });
-    }
+//    private void searchGeometry() {
+//        showLoading();
+//        restoreSpaceStatus();
+//
+//        mMapView.queryGeometry(getActivity(),
+//                getString(R.string.feature_server_url),
+//                new BaseMapView.MainThreadCallback<FeatureResult>() {
+//                    @Override
+//                    public void onCallback(FeatureResult objects) {
+//                        dismissLoading();
+//                        showCompanyMarker(objects);
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable throwable) {
+//                        dismissLoading();
+//                    }
+//                });
+//    }
 
     private void restoreSpaceStatus() {
         mMapView.setCurrentDrawSpace(BaseMapView.SPACE_NONE);
         AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
         ivSpace.setImageResource(R.mipmap.ic_kongjian);
         mMapView.clearAll();
+        hideClearBtn();
     }
 
     private void restoreAll() {

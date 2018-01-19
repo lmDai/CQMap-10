@@ -142,12 +142,15 @@ public class BaseMapView extends MapView implements DrawEventListener {
     public static final int SPACE_NONE = 0;
     public static final int SPACE_RECT = 1;
     public static final int SPACE_POLYGON = 2;
-    public static final int SPACE_POLYGON_SET_FINISH = 3;
+    //    public static final int SPACE_POLYGON_SET_FINISH = 3;
     public static final int SPACE_BUFFER = 4;
     public static final int SPACE_BUFFER_SET_FINISH = 5;
+    public static final int SPACE_MAP_NUMBER = 6;// 图符号
+    public static final int SPACE_ADMIN_REGION = 7;// 行政区域
 
-    @IntDef({SPACE_NONE, SPACE_RECT, SPACE_POLYGON, SPACE_POLYGON_SET_FINISH,
-            SPACE_BUFFER, SPACE_BUFFER_SET_FINISH})
+    @IntDef({SPACE_NONE, SPACE_RECT, SPACE_POLYGON,
+            SPACE_BUFFER, SPACE_BUFFER_SET_FINISH, SPACE_MAP_NUMBER,
+            SPACE_ADMIN_REGION})
     @Retention(RetentionPolicy.SOURCE)
     public @interface CurrentSpace {
     }
@@ -175,19 +178,20 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
     public void clearAll() {
         drawLayer.removeAll();
+        currentDrawGraphic = null;
 //        graphicsLayer.removeAll();
     }
 
-    public void addGraphic(Graphic graphic) {
-        drawLayer.addGraphic(graphic);
-    }
+//    public void addGraphic(Graphic graphic) {
+//        drawLayer.addGraphic(graphic);
+//    }
 
     public void setCurrentDrawGraphic(Graphic graphic) {
         this.currentDrawGraphic = graphic;
     }
 
     public void addDrawLayerGraphic(Graphic graphic) {
-        currentDrawGraphic = graphic;
+        this.currentDrawGraphic = graphic;
         drawLayer.addGraphic(graphic);
     }
 
