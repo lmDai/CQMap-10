@@ -79,10 +79,10 @@ public class DragLayout extends LinearLayout {
         public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
             super.onViewReleased(releasedChild, xvel, yvel);
             Log.d("simple", "onViewReleased");
-            if (getPaddingTop() >= getHeight() / 3 * 2) {//to bottom
+            if (getPaddingTop() >= getHeight() / 5 * 4) {//to bottom
 //                Log.d("simple", "to bottom");
                 animaTo(getPaddingTop(), getHeight() - mDragView.getMeasuredHeight());
-            } else if (getPaddingTop() <= getHeight() / 3) {//to top
+            } else if (getPaddingTop() <= getHeight() / 2) {//to top
                 animaTo(getPaddingTop(), 0);
             } else {
                 animaToCenter();
@@ -103,7 +103,7 @@ public class DragLayout extends LinearLayout {
 
     public void animaToCenter() {
         setVisibility(VISIBLE);
-        animaTo(getPaddingTop(), getHeight() / 2);
+        animaTo(getPaddingTop(), getHeight() / 4 * 3);
     }
 
     public void exit() {

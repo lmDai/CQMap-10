@@ -453,8 +453,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
                         fruitCategoryList.fruitList) {
 
-                    long fruitId = fruitList.fruitId;
-                    sb.append(String.valueOf(fruitId));
+                    String fruitId = fruitList.fruitId;
+                    sb.append(fruitId);
                     sb.append(",");
                 }
 
@@ -498,7 +498,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 Graphic graphic = new Graphic(feature.getGeometry(),
                                         symbol, feature.getAttributes());
                                 mMapView.addGraphic(graphic);
-
                             }
                         }
                         //地图单击事件
@@ -507,11 +506,23 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                     1, 1);
                             if (ids.length == 0) return;
                             GraphicsLayer drawLayer = mMapView.getDrawLayer();
-                            drawLayer.getGraphic(ids[0]);
-//                            drawLayer.setSelectionColor(Color.RED);
-//                            drawLayer.setSelectedGraphics(ids, true);
+                            Graphic graphic = drawLayer.getGraphic(ids[0]);
+                            if (graphic == null) return;
                             drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
-                            showBottomLayout();
+                            String FRUIT_ID = String.valueOf(graphic.getAttributeValue("FRUITID"));
+                            List<ReportHandoutListModel> handoutList = new ArrayList<>();
+                            for (ReportHandoutListModel handout : mHandoutList) {
+                                for (ReportHandoutListModel.FruitCategoryList fruitCategory :
+                                        handout.fruitCategoryList) {
+                                    for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList
+                                            : fruitCategory.fruitList) {
+                                        if (!FRUIT_ID.contains(fruitList.fruitId))
+                                            continue;
+                                        handoutList.add(handout);
+                                    }
+                                }
+                            }
+                            showBottomLayout(handoutList);
                         });
                     }
 
@@ -701,15 +712,15 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         }
     }
 
-    private void showBottomLayout() {
-        if (mHandoutList == null || mHandoutList.isEmpty()) {
+    private void showBottomLayout(List<ReportHandoutListModel> handoutList) {
+        if (handoutList == null || handoutList.isEmpty()) {
             return;
         }
         mCVClear.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).hideBottomNav();
         CommonAdapter<ReportHandoutListModel> bottomAdapter =
                 new CommonAdapter<ReportHandoutListModel>(getActivity(), R.layout.item_dispatch_bottom,
-                        mHandoutList) {
+                        handoutList) {
                     @Override
                     protected void convert(ViewHolder holder, ReportHandoutListModel item, int position) {
                         holder.setText(R.id.tv_companyName, item.companyName)
@@ -854,7 +865,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         return ll_row;
     }
 
-    private void showInfoDialog(){
+    private void showInfoDialog() {
 
     }
 
