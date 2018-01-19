@@ -3,7 +3,9 @@ package android.zhixun.uiho.com.gissystem.ui.fragment;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageView;
@@ -12,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +48,7 @@ import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 import android.zhixun.uiho.com.gissystem.util.OnItemClickListener;
+import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
 
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.event.OnSingleTapListener;
@@ -72,6 +76,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static android.widget.LinearLayout.SHOW_DIVIDER_MIDDLE;
 import static android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView.DEM_LAYER;
 
 
@@ -707,16 +714,21 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     protected void convert(ViewHolder holder, ReportHandoutListModel item, int position) {
                         holder.setText(R.id.tv_companyName, item.companyName)
                                 .setText(R.id.tv_reportNo, item.reportNo);
+                        View rl_handoutConntent = holder.getView(R.id.rl_handoutContent);
                         TextView text_handoutContent = holder.getView(R.id.text_handoutContent);
+                        ImageView iv_arrow = holder.getView(R.id.iv_arrow);
                         LinearLayout ll_content = holder.getView(R.id.ll_content);
-                        text_handoutContent.setOnClickListener(v ->
-                                ll_content.setVisibility(ll_content.getVisibility() == View.VISIBLE
-                                        ? View.GONE : View.VISIBLE));
-
+                        //分发内容的点击事件
+                        rl_handoutConntent.setOnClickListener(v -> {
+                            ll_content.setVisibility(ll_content.getVisibility() == View.VISIBLE
+                                    ? View.GONE : View.VISIBLE);
+                            iv_arrow.animate()
+                                    .rotationBy(180)
+                                    .start();
+                        });
                         if (item.fruitCategoryList == null || item.fruitCategoryList.isEmpty()) {
                             return;
                         }
-
                         bindViewHandoutContent(item, ll_content);
                     }
                 };
@@ -741,24 +753,109 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
     //设置弹出框分发内容的view
     private void bindViewHandoutContent(ReportHandoutListModel item, LinearLayout ll_content) {
-        for (ReportHandoutListModel.FruitCategoryList fruitCategoryList : item.fruitCategoryList) {
+        for (ReportHandoutListModel.FruitCategoryList fruitCategory : item.fruitCategoryList) {
             View contentView = View.inflate(getActivity(),
                     R.layout.item_dispatch_bottom_content, null);
             ll_content.addView(contentView);
-            //设置content item的名字
-            TextView tvContent = contentView.findViewById(R.id.tv_content);
-            tvContent.setText(fruitCategoryList.categoryName);
-            //设置content 的 一行
-            for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList : fruitCategoryList.fruitList) {
-                LinearLayout ll_item = new LinearLayout(getActivity());
-                ll_item.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        20));
-                ll_item.setBackgroundColor(Color.RED);
-                ll_item.setOrientation(LinearLayout.HORIZONTAL);
-                ll_content.addView(ll_item);
-            }
 
+            View rl_content = contentView.findViewById(R.id.rl_content);
+            TextView tvContent = contentView.findViewById(R.id.tv_content);
+            LinearLayout ll_data = contentView.findViewById(R.id.ll_data);
+            LinearLayout ll_data_parent = contentView.findViewById(R.id.ll_data_parent);
+            TextView tvCount = contentView.findViewById(R.id.tv_count);
+            ImageView iv_arrow = contentView.findViewById(R.id.iv_contentArrow);
+            rl_content.setOnClickListener(v -> {
+                int visible = ll_data_parent.getVisibility() == View.VISIBLE ? GONE : VISIBLE;
+                ll_data_parent.setVisibility(visible);
+                iv_arrow.animate()
+                        .rotationBy(180)
+                        .start();
+            });
+            //设置content item的名字
+            tvContent.setText(fruitCategory.categoryName);
+            //设置content 的 列表
+            tvCount.setText(String.format("共%s条数据", fruitCategory.fruitList.size()));
+            //设置行的数据
+            if (fruitCategory.fruitList.isEmpty()) continue;
+            //需要显示的数据的集合
+            List<ReportHandoutListModel.FruitCategoryList.FruitList.FruitAttrList> isShowList =
+                    new ArrayList<>();
+            for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList : fruitCategory.fruitList) {
+                LinearLayout ll_row = createRowLL();
+                isShowList.clear();
+                for (ReportHandoutListModel.FruitCategoryList.FruitList.FruitAttrList fruitAttrList
+                        : fruitList.fruitAttrList) {
+                    if (!fruitAttrList.isListShow) continue;
+                    isShowList.add(fruitAttrList);
+                }
+                //设置表格的数据
+                for (ReportHandoutListModel.FruitCategoryList.
+                        FruitList.FruitAttrList fruitAttrList : isShowList) {
+                    TextView textView = createRowText();
+                    textView.setText(fruitAttrList.attrValue);
+                    ll_row.addView(textView);
+                }
+                //详情按钮
+                TextView tv_info = createRowText();
+                tv_info.setTextColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+                tv_info.setText("详情");
+                ll_row.addView(tv_info);
+                tv_info.setOnClickListener(v -> {
+                    ToastUtil.showShort("详情");
+                    showInfoDialog();
+                });
+                //行的点击事件
+                ll_row.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ToastUtil.showShort("行的点击事件");
+                    }
+                });
+                ll_data.addView(ll_row);
+            }
+            //设置表格的标题
+            LinearLayout ll_title = createRowLL();
+            for (ReportHandoutListModel.FruitCategoryList.
+                    FruitList.FruitAttrList fruitAttrList : isShowList) {
+                TextView tv_title = createRowText();
+                tv_title.setText(fruitAttrList.attrName);
+                ll_title.addView(tv_title);
+            }
+            TextView tv_option = createRowText();
+            tv_option.setText("操作");
+            ll_title.addView(tv_option);
+            ll_data.addView(ll_title, 0);
         }
+    }
+
+    @NonNull
+    private TextView createRowText() {
+        TextView textView = new TextView(getActivity());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.weight = 1;
+        textView.setLayoutParams(params);
+        textView.setGravity(Gravity.CENTER);
+        textView.setMaxLines(1);
+        textView.setTextSize(13);
+        textView.setEllipsize(TextUtils.TruncateAt.END);
+        return textView;
+    }
+
+    @NonNull
+    private LinearLayout createRowLL() {
+        LinearLayout ll_row = new LinearLayout(getActivity());
+        ll_row.setPadding(0, ScreenUtil.dip2px(getActivity(), 5),
+                0, ScreenUtil.dip2px(getActivity(), 5));
+        ll_row.setOrientation(LinearLayout.HORIZONTAL);
+        ll_row.setDividerDrawable(ContextCompat.getDrawable(getActivity(),
+                R.drawable.horizontal_divider));
+        ll_row.setShowDividers(SHOW_DIVIDER_MIDDLE);
+        return ll_row;
+    }
+
+    private void showInfoDialog(){
+
     }
 
     private void hideBottomLayout() {

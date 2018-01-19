@@ -6,20 +6,62 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <View
-        android:id="@+id/line2"
+    <RelativeLayout
+        android:id="@+id/rl_content"
         android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@drawable/my_divider" />
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tv_content"
+        <TextView
+            android:id="@+id/tv_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:minHeight="38dp"
+            android:textSize="16sp"
+            tools:text="矢量地图数据" />
+
+        <ImageView
+            android:id="@+id/iv_contentArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:src="@mipmap/arrow_down" />
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_data_parent"
         android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:gravity="center_vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="矢量地图数据" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:text="共0条数据"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/ll_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@drawable/my_divider"
+            android:orientation="vertical"
+            android:showDividers="middle">
+
+        </LinearLayout>
+    </LinearLayout>
+
 
 </LinearLayout>

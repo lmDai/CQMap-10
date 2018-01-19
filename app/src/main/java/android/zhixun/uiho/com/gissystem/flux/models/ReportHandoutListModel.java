@@ -53,7 +53,7 @@ public class ReportHandoutListModel {
                 public long spareA;
                 public long isQueryCriteria;
                 public String attrType;
-                public long isListShow;
+                public boolean isListShow;
                 public String attrName;
                 public String attrValue;
 
