@@ -148,7 +148,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
         mEtSearch.setEnabled(false);
         mEtSearch.setHint("请选择分类或空间");
-
     }
 
     private void initEvent() {
@@ -285,7 +284,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
 //    private void setPloygon() {
 //        mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
-//        searchGeometry();
+//        queryGeometry();
 //    }
 
     private ReportHandoutListBody mBody;
@@ -466,8 +465,11 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         if (response == null || response.isEmpty()) return;
                         mHandoutList.clear();
                         mHandoutList.addAll(response);
-
-                        searchMapService(mHandoutList);
+                        if (mMapView.getCurrentDrawSpace() != BaseMapView.SPACE_NONE) {
+                            queryGeometry();
+                        } else {
+                            searchMapService(mHandoutList);
+                        }
                     }
 
                     @Override
@@ -574,6 +576,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         dismissLoading();
     }
 
+    //切换地图底图类型
     private void showSwitchLayerDialog(View view) {
         View contentView = LayoutInflater
                 .from(getActivity())
@@ -611,6 +614,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
     private TextView calendar1_content, calendar2_content;
 
+    //显示条件查询dialog
     private void showSiftDialog(View view) {
         View contentView = LayoutInflater
                 .from(getActivity())
@@ -734,29 +738,11 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         });
     }
 
-//    private void showCompanyMarker(FeatureResult objects) {
-//        if (objects.featureCount() == 0) {
-//            ToastUtil.showShort("未获取单位信息,请重试");
-//            restoreAll();
-//            return;
-//        }
-//        for (Object object : objects) {
-//            if (object instanceof Feature) {
-//                Feature feature = (Feature) object;
-//                SimpleMarkerSymbol symbol =
-//                        new SimpleMarkerSymbol(Color.RED, 12, SimpleMarkerSymbol.STYLE.CIRCLE);
-//                Graphic graphic = new Graphic(feature.getGeometry(),
-//                        symbol, feature.getAttributes());
-//                mMapView.addDrawLayerGraphic(graphic);
-//            }
-//        }
-//    }
-
     private void showBottomLayout(List<ReportHandoutListModel> handoutList) {
         if (handoutList == null || handoutList.isEmpty()) {
             return;
         }
-//        mCVClear.setVisibility(View.VISIBLE);
+
         ((MainActivity) getActivity()).hideBottomNav();
         CommonAdapter<ReportHandoutListModel> bottomAdapter =
                 new CommonAdapter<ReportHandoutListModel>(getActivity(), R.layout.item_dispatch_bottom,
@@ -905,6 +891,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         return ll_row;
     }
 
+    //显示详情dialog
     private void showInfoDialog() {
 
     }
@@ -916,6 +903,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         ((MainActivity) getActivity()).showBottomNav();
     }
 
+    //显示空间查询dialog
     private void showSpaceDialog(View view) {
         int[] resIds = {R.mipmap.ic_add, R.mipmap.ic_add, R.mipmap.ic_add
                 , R.mipmap.ic_add, R.mipmap.ic_add};
@@ -986,14 +974,14 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         return;
                     }
                     dialog1.dismiss();
-                    searchSymbol(text);
+                    searchMapNumber(text);
                 })
                 .visiableEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
                 .alert();
     }
 
-    private void searchSymbol(String text) {
+    private void searchMapNumber(String text) {
         if (text.contains(",")) {
             String[] split = text.split(",");
             StringBuilder sb = new StringBuilder();
@@ -1141,6 +1129,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 });
     }
 
+    //设置缓冲区的图形
     private void setBufferGeometry(int distance) {
         SimpleLineSymbol lineSymbol = new SimpleLineSymbol(Color.RED,
                 distance,
@@ -1151,25 +1140,24 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mMapView.addDrawLayerGraphic(graphic);
     }
 
-//    private void searchGeometry() {
-//        showLoading();
+    private void queryGeometry() {
+        showLoading();
 //        restoreSpaceStatus();
-//
-//        mMapView.queryGeometry(getActivity(),
-//                getString(R.string.feature_server_url),
-//                new BaseMapView.MainThreadCallback<FeatureResult>() {
-//                    @Override
-//                    public void onCallback(FeatureResult objects) {
-//                        dismissLoading();
+        mMapView.queryGeometry(getActivity(),
+                getString(R.string.feature_server_url),
+                new BaseMapView.MainThreadCallback<FeatureResult>() {
+                    @Override
+                    public void onCallback(FeatureResult objects) {
+                        dismissLoading();
 //                        showCompanyMarker(objects);
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable throwable) {
-//                        dismissLoading();
-//                    }
-//                });
-//    }
+                    }
+
+                    @Override
+                    public void onError(Throwable throwable) {
+                        dismissLoading();
+                    }
+                });
+    }
 
     private void restoreSpaceStatus() {
         mMapView.setCurrentDrawSpace(BaseMapView.SPACE_NONE);
