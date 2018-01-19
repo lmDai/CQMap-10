@@ -17,101 +17,65 @@
 
     </android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView>
 
-    <android.support.v7.widget.CardView
+    <RelativeLayout
         android:id="@+id/cv_sift"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginTop="55dp"
+        android:layout_below="@+id/search_bar"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="@dimen/cardView_elevation"
-        app:cardUseCompatPadding="true">
+        android:foreground="?android:attr/selectableItemBackground">
 
-        <LinearLayout
-            android:id="@+id/ll_filtrate"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:gravity="center"
-            android:orientation="vertical">
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="10dp"
+            app:srcCompat="@mipmap/ic_filter" />
 
-            <android.support.v7.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                app:srcCompat="@mipmap/ic_filter" />
+    </RelativeLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-5dp"
-                android:gravity="center"
-                android:text="@string/sift"
-                android:textColor="@color/primaryText"
-                android:visibility="gone" />
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
-
-    <android.support.v7.widget.CardView
+    <RelativeLayout
         android:id="@+id/cv_layer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="12dp"
-        android:layout_marginTop="55dp"
+        android:layout_below="@+id/search_bar"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="@dimen/cardView_elevation"
-        app:cardUseCompatPadding="true">
+        android:foreground="?android:attr/selectableItemBackground">
 
         <android.support.v7.widget.AppCompatImageView
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:padding="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="10dp"
             app:srcCompat="@mipmap/ic_switch" />
-    </android.support.v7.widget.CardView>
+    </RelativeLayout>
 
-    <android.support.v7.widget.CardView
+    <RelativeLayout
         android:id="@+id/cv_clear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/cv_layer"
-        android:layout_marginRight="12dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
         android:visibility="gone"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="@dimen/cardView_elevation"
-        app:cardUseCompatPadding="true"
         tools:visibility="visible">
 
-        <LinearLayout
-            android:id="@+id/ll_clear"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:gravity="center"
-            android:orientation="vertical">
+        <android.support.v7.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="10dp"
+            app:srcCompat="@mipmap/ic_quxiao" />
 
-            <android.support.v7.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                app:srcCompat="@mipmap/ic_quxiao" />
-
-            <TextView
-                android:id="@+id/tv_clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-5dp"
-                android:gravity="center"
-                android:text="@string/clear"
-                android:textColor="@color/primaryText"
-                android:visibility="gone" />
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </RelativeLayout>
 
     <android.support.v7.widget.CardView
         android:id="@+id/cv_statistics"
@@ -151,44 +115,25 @@
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <RelativeLayout
         android:id="@+id/cv_space"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/cv_statistics"
-        android:layout_marginLeft="12dp"
-        android:layout_marginTop="-2dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="@dimen/cardView_elevation"
-        app:cardUseCompatPadding="true">
+        android:foreground="?android:attr/selectableItemBackground">
 
-        <LinearLayout
-            android:id="@+id/ll_space"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:gravity="center"
-            android:orientation="vertical">
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/aci_space"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="10dp"
+            android:src="@mipmap/ic_kongjian" />
 
-            <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/aci_space"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:src="@mipmap/ic_kongjian" />
-
-            <TextView
-                android:id="@+id/tv_space"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-5dp"
-                android:gravity="center"
-                android:text="@string/space"
-                android:textColor="@color/primaryText"
-                android:visibility="gone" />
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </RelativeLayout>
 
     <android.support.v7.widget.CardView
         android:id="@+id/cv_cancel"
@@ -203,7 +148,7 @@
         app:cardCornerRadius="0dp"
         app:cardElevation="@dimen/cardView_elevation"
         app:cardUseCompatPadding="true"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <LinearLayout
             android:id="@+id/ll_draw"
@@ -230,73 +175,74 @@
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <RelativeLayout
         android:id="@+id/cv_my_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="6dp"
-        android:layout_marginLeft="12dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="@dimen/cardView_elevation"
-        app:cardUseCompatPadding="true">
+        android:foreground="?android:attr/selectableItemBackground">
 
         <android.support.v7.widget.AppCompatImageView
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:padding="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="10dp"
             app:srcCompat="@mipmap/ic_location" />
-    </android.support.v7.widget.CardView>
+    </RelativeLayout>
 
-    <android.support.v7.widget.CardView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="6dp"
-        android:layout_marginRight="12dp"
-        android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="@dimen/cardView_elevation"
-        app:cardUseCompatPadding="true">
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/shadow_rr"
+        android:divider="@drawable/my_divider"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:showDividers="middle">
 
-        <LinearLayout
-            android:layout_width="45dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
+        <RelativeLayout
+            android:id="@+id/aiv_zoom_in"
+            android:layout_width="@dimen/map_option_item_size"
+            android:layout_height="@dimen/map_option_item_size">
 
             <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/aiv_zoom_in"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:padding="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 app:srcCompat="@mipmap/ic_blow_up" />
+        </RelativeLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1px"
-                android:background="@color/colorDivider" />
+        <RelativeLayout
+            android:id="@+id/aiv_zoom_out"
+            android:layout_width="@dimen/map_option_item_size"
+            android:layout_height="@dimen/map_option_item_size">
 
             <android.support.v7.widget.AppCompatImageView
-                android:id="@+id/aiv_zoom_out"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:padding="8dp"
                 app:srcCompat="@mipmap/ic_shrink" />
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
+        </RelativeLayout>
+    </LinearLayout>
 
-    <include layout="@layout/layout_search" />
+    <include
+        android:id="@+id/search_bar"
+        layout="@layout/layout_search" />
 
     <android.zhixun.uiho.com.gissystem.ui.widget.DragLayout
         android:id="@+id/dragLayout"
-        tools:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:visibility="gone">
 
         <RelativeLayout
             android:id="@+id/bottom_drag_view"

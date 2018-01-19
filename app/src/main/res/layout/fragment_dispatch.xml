@@ -19,11 +19,11 @@
 
     <RelativeLayout
         android:id="@+id/cv_sift"
-        android:layout_width="@dimen/map_option_item_size"
-        android:layout_height="@dimen/map_option_item_size"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="55dp"
-        android:background="@android:color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/search_bar"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground">
 
@@ -31,18 +31,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_marginTop="3dp"
+            android:layout_margin="10dp"
             app:srcCompat="@mipmap/ic_filter" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/cv_layer"
-        android:layout_width="@dimen/map_option_item_size"
-        android:layout_height="@dimen/map_option_item_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="55dp"
-        android:background="@android:color/white"
+        android:layout_below="@+id/search_bar"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground">
 
@@ -50,18 +50,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_margin="10dp"
             app:srcCompat="@mipmap/ic_switch" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/cv_clear"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/cv_layer"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="5dp"
-        android:background="@android:color/white"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
         android:visibility="gone"
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_marginTop="3dp"
+            android:layout_margin="10dp"
             app:srcCompat="@mipmap/ic_quxiao" />
     </RelativeLayout>
 
@@ -115,33 +115,30 @@
 
     <RelativeLayout
         android:id="@+id/cv_space"
-        android:layout_width="@dimen/map_option_item_size"
-        android:layout_height="@dimen/map_option_item_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/cv_classifySearch"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="5dp"
-        android:background="@android:color/white"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground">
-
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/aci_space"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_marginTop="3dp"
+            android:layout_margin="10dp"
             android:src="@mipmap/ic_kongjian" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/cv_classifySearch"
-        android:layout_width="@dimen/map_option_item_size"
-        android:layout_height="@dimen/map_option_item_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/cv_statistics"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="5dp"
-        android:background="@android:color/white"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground">
 
@@ -149,6 +146,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_margin="10dp"
             app:srcCompat="@mipmap/ic_directory_false" />
     </RelativeLayout>
 
@@ -173,12 +171,12 @@
 
     <RelativeLayout
         android:id="@+id/cv_my_location"
-        android:layout_width="@dimen/map_option_item_size"
-        android:layout_height="@dimen/map_option_item_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginLeft="16dp"
-        android:background="@android:color/white"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/shadow_rr"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground">
 
@@ -186,6 +184,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_margin="10dp"
             app:srcCompat="@mipmap/ic_location" />
     </RelativeLayout>
 
@@ -195,9 +194,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:background="@android:color/white"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/shadow_rr"
         android:divider="@drawable/my_divider"
         android:orientation="vertical"
         android:showDividers="middle">
@@ -225,13 +224,11 @@
                 android:layout_centerInParent="true"
                 app:srcCompat="@mipmap/ic_shrink" />
         </RelativeLayout>
-
     </LinearLayout>
 
     <include
-        layout="@layout/layout_search"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:id="@+id/search_bar"
+        layout="@layout/layout_search" />
 
     <android.zhixun.uiho.com.gissystem.ui.widget.DragLayout
         android:id="@+id/dragLayout"
