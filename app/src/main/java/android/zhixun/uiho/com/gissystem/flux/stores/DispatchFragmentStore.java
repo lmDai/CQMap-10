@@ -1,23 +1,17 @@
 package android.zhixun.uiho.com.gissystem.flux.stores;
 
 import android.text.TextUtils;
-import android.zhixun.uiho.com.gissystem.app.Config;
 import android.zhixun.uiho.com.gissystem.flux.actions.DispatchFragmentAction;
 import android.zhixun.uiho.com.gissystem.flux.models.CQPrefectureModel;
 import android.zhixun.uiho.com.gissystem.flux.models.IndustryCategoryModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.OrderModel;
 import android.zhixun.uiho.com.gissystem.greendao_gen.CQPrefectureModelDao;
 import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
 import android.zhixun.uiho.com.gissystem.greendao_gen.IndustryCategoryModelDao;
-import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.ui.itemY.OwnSMCHResultItem;
 
-import com.yibogame.app.DoOnSubscriber;
 import com.yibogame.flux.actions.Action;
 import com.yibogame.flux.dispatcher.Dispatcher;
 import com.yibogame.flux.stores.Store;
-import com.yibogame.util.LogUtil;
-import com.yibogame.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,54 +121,53 @@ public class DispatchFragmentStore extends Store {
         if (endTime != 0) {
             map.put("reportTimeEnd", endTime);
         }
-        APIService.getInstance().getOrderList(map, new DoOnSubscriber<List<OrderModel>>() {
-            @Override
-            public void doOnSubscriber() {
-
-            }
-
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onNext(List<OrderModel> orderModelList) {
-                StringBuilder stringBuilder = new StringBuilder();
-                for (int i = 0; i < orderModelList.size(); i++) {
-//                    LogUtil.i(companyModels.get(i).getCompanyName()+","+companyModels.get(i).getOrganizationCode());
-                    stringBuilder.append(Config.ARCGIS_UNITID);
-                    stringBuilder.append(" = ");
-                    stringBuilder.append(orderModelList.get(i).getCompanyId());
-                    if (i != orderModelList.size() - 1) {
-                        stringBuilder.append(" or ");
-                    }
-                }
-                sql = stringBuilder.toString();
-
-
-                listOwnSMCHResultItem.clear();
-                for (OrderModel orderModel : orderModelList) {
-                    listOwnSMCHResultItem.add(new OwnSMCHResultItem(orderModel));
-                }
-                LogUtil.d("askldjflasjflasjdfl;asjklfjas;ldfjklaskjf3333");
-                for (Object object : listOwnSMCHResultItem) {
-                    OwnSMCHResultItem ownSMCHResultItem = (OwnSMCHResultItem) object;
-                    LogUtil.i("---------->"+ownSMCHResultItem.getData().getCompanyName());
-                }
-                StoreChangeEvent storeChangeEvent = new StoreChangeEvent(action);
-                emitStoreChange(storeChangeEvent);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                super.onError(e);
-                action.setType(DispatchFragmentAction.NO_DATA);
-                StoreChangeEvent storeChangeEvent = new StoreChangeEvent(action);
-                emitStoreChange(storeChangeEvent);
-                ToastUtil.showShort(e.getMessage());
-            }
-        });
+//        APIService.getInstance().getOrderList(map, new DoOnSubscriber<List<OrderModel>>() {
+//            @Override
+//            public void doOnSubscriber() {
+//
+//            }
+//
+//            @Override
+//            public void onCompleted() {
+//
+//            }
+//
+//            @Override
+//            public void onNext(List<OrderModel> orderModelList) {
+//                StringBuilder stringBuilder = new StringBuilder();
+//                for (int i = 0; i < orderModelList.size(); i++) {
+////                    LogUtil.i(companyModels.get(i).getCompanyName()+","+companyModels.get(i).getOrganizationCode());
+//                    stringBuilder.append(Config.ARCGIS_UNITID);
+//                    stringBuilder.append(" = ");
+//                    stringBuilder.append(orderModelList.get(i).getCompanyId());
+//                    if (i != orderModelList.size() - 1) {
+//                        stringBuilder.append(" or ");
+//                    }
+//                }
+//                sql = stringBuilder.toString();
+//
+//                listOwnSMCHResultItem.clear();
+//                for (OrderModel orderModel : orderModelList) {
+//                    listOwnSMCHResultItem.add(new OwnSMCHResultItem(orderModel));
+//                }
+//                LogUtil.d("askldjflasjflasjdfl;asjklfjas;ldfjklaskjf3333");
+//                for (Object object : listOwnSMCHResultItem) {
+//                    OwnSMCHResultItem ownSMCHResultItem = (OwnSMCHResultItem) object;
+//                    LogUtil.i("---------->"+ownSMCHResultItem.getData().getCompanyName());
+//                }
+//                StoreChangeEvent storeChangeEvent = new StoreChangeEvent(action);
+//                emitStoreChange(storeChangeEvent);
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                super.onError(e);
+//                action.setType(DispatchFragmentAction.NO_DATA);
+//                StoreChangeEvent storeChangeEvent = new StoreChangeEvent(action);
+//                emitStoreChange(storeChangeEvent);
+//                ToastUtil.showShort(e.getMessage());
+//            }
+//        });
 
 
 

@@ -99,7 +99,11 @@ public interface API {
      */
     @FormUrlEncoded
     @POST(BASE_URL)
-    Observable<BaseListResultModel<OrderModel>> getOrderList(@Field("data") String data);
+    Observable<BaseListResultModel<ReportHandoutListModel>> getOrderList(@Field("data") String data);
+
+    @FormUrlEncoded
+    @POST(BASE_URL)
+    Observable<BaseListResultModel<OrderModel>> getOrderList_handout(@Field("data") String data);
 
     /***
      * 获取订单(报件)详情

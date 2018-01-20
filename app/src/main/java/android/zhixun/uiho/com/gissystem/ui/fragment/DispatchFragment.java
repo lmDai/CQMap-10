@@ -36,7 +36,6 @@ import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCMode
 import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.FruitCategoryListModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.OrderModel;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
 import android.zhixun.uiho.com.gissystem.ui.activity.MainActivity;
@@ -748,11 +747,18 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
             }
 
             OrderBody orderBody = new OrderBody();
-            orderBody.key = et_search.getText().toString();
-            orderBody.reportNo = et_caseCode.getText().toString();
-            orderBody.otherKey = et_dataCode.getText().toString();
-            orderBody.reportTimeBegin = String.valueOf(data1);
-            orderBody.reportTimeEnd = String.valueOf(data2);
+            orderBody.companyName = et_search.getText().toString();
+            if (!TextUtils.isEmpty(et_caseCode.getText().toString())) {
+                orderBody.reportNo = Long.parseLong(et_caseCode.getText().toString());
+            }
+//            orderBody.otherKey = et_dataCode.getText().toString();
+            if (data1 != 0) {
+                orderBody.handoutBeginTimes = String.valueOf(data1);
+            }
+            if (data2 != 0) {
+                orderBody.handoutEndTimes = String.valueOf(data2);
+            }
+            DialogUtil.getInstance().dismiss();
             getOrderList(orderBody);
         });
     }
@@ -1286,26 +1292,35 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     private void getOrderList(OrderBody orderBody) {
         showLoading();
         Map<Object, Object> map = new HashMap<>();
-        if (!TextUtils.isEmpty(orderBody.key)) {
-            map.put("key", orderBody.key);
+        if (!TextUtils.isEmpty(orderBody.companyName)) {
+            map.put("companyName", orderBody.companyName);
         }
-        if (!TextUtils.isEmpty(orderBody.reportNo)) {
+        if (orderBody.reportNo != 0) {
             map.put("reportNo", orderBody.reportNo);
         }
-        if (!TextUtils.isEmpty(orderBody.otherKey)) {
-            map.put("otherKey", orderBody.otherKey);
+//        if (!TextUtils.isEmpty(orderBody.otherKey)) {
+//            map.put("otherKey", orderBody.otherKey);
+//        }
+        if (!TextUtils.isEmpty(orderBody.handoutBeginTimes)) {
+            map.put("handoutBeginTimes", orderBody.handoutBeginTimes);
         }
-        if (!TextUtils.isEmpty(orderBody.reportTimeBegin)) {
-            map.put("reportTimeBegin", orderBody.reportTimeBegin);
+        if (!TextUtils.isEmpty(orderBody.handoutEndTimes)) {
+            map.put("reportTimeEnd", orderBody.handoutEndTimes);
         }
-        if (!TextUtils.isEmpty(orderBody.reportTimeBegin)) {
-            map.put("reportTimeEnd", orderBody.reportTimeBegin);
-        }
+        map.put("page", 1);
+        map.put("rows", 20);
         APIService.getInstance()
-                .getOrderList(map, new SimpleSubscriber<List<OrderModel>>() {
+                .getOrderList(map, new SimpleSubscriber<List<ReportHandoutListModel>>() {
                     @Override
-                    public void onResponse(List<OrderModel> response) {
+                    public void onResponse(List<ReportHandoutListModel> response) {
                         dismissLoading();
+                        if (response == null || response.isEmpty()) {
+                            ToastUtil.showShort("未查询到相关信息");
+                            return;
+                        }
+                        setSearhText("全部");
+                        showSearchClearView();
+                        showBottomLayout(response);
                     }
 
                     @Override

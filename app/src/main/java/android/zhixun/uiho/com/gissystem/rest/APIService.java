@@ -408,12 +408,10 @@ public class APIService {
 
     /***
      * 查询成果分发的订单/报件的列表
-     * @param map
-     * @param subscriber
      * @return
      */
-    public Subscription getOrderList(Map<Object, Object> map, DoOnSubscriber<List<OrderModel>> subscriber) {
-        return api.getOrderList(buildParams(map, "handoutList", "handout"))
+    public Subscription getOrderList(Map<Object, Object> map, DoOnSubscriber<List<ReportHandoutListModel>> subscriber) {
+        return api.getOrderList(buildParams(map, "reportHandoutList", "report"))
                 .compose(applySchedulers())
                 .doOnSubscribe(subscriber::doOnSubscriber)
                 .compose(handleResponseList())
@@ -426,7 +424,7 @@ public class APIService {
      * @return
      */
     public Observable<List<OrderModel>> getOrderListObservable(Map<Object, Object> map) {
-        return api.getOrderList(buildParams(map, "handoutList", "handout"))
+        return api.getOrderList_handout(buildParams(map, "handoutList", "handout"))
 //                .compose(applySchedulers())
 //                .doOnSubscribe(subscriber::doOnSubscriber)
                 .compose(handleResponseList());

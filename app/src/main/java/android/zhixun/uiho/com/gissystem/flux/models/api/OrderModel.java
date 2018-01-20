@@ -18,14 +18,14 @@ public class OrderModel {
      * status : 2
      */
 
-    private int companyId;
-    private String companyName;
-    private long createTime;
-    private int handoutId;
-    private int isDelete;
-    private int reportId;
-    private String reportNo;
-    private int status;
+    public int companyId;
+    public String companyName;
+    public long createTime;
+    public int handoutId;
+    public int isDelete;
+    public int reportId;
+    public String reportNo;
+    public int status;
 
     public int getCompanyId() {
         return companyId;
