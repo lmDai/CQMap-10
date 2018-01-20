@@ -58,6 +58,8 @@ import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.SimpleFillSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
+import com.esri.core.symbol.SimpleMarkerSymbol;
+import com.esri.core.symbol.Symbol;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.yibogame.util.DateUtil;
 import com.yibogame.util.LogUtil;
@@ -108,6 +110,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     private List<ReportHandoutListModel> mHandoutList = new ArrayList<>();
     //
     private ClassifyBody classifyBody = new ClassifyBody();
+    private static final String FRUITID = "FRUITID";
 
     public DispatchFragment() {
         Bundle args = new Bundle();
@@ -203,11 +206,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 ((MainActivity) getActivity()).openDrawer();
                 break;
             case R.id.tv_search:
-                String searchStr = mEtSearch.getText().toString();
-                if (TextUtils.isEmpty(searchStr)) {
-                    setSearhText("全部");
-                }
-                getReportHandoutList(mBody);
+                searchBtnClick();
                 break;
             case R.id.cv_classifySearch://分类查询
                 showClassifyDialog(v);
@@ -217,6 +216,14 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 showSearchTextView();
                 break;
         }
+    }
+
+    private void searchBtnClick() {
+        String searchStr = mEtSearch.getText().toString();
+        if (TextUtils.isEmpty(searchStr)) {
+            setSearhText("全部");
+        }
+        getReportHandoutList(mBody);
     }
 
     private void onSpaceClick(View v) {
@@ -466,7 +473,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         mHandoutList.clear();
                         mHandoutList.addAll(response);
                         if (mMapView.getCurrentDrawSpace() != BaseMapView.SPACE_NONE) {
-                            queryGeometry();
+                            queryGeometry(mHandoutList);
                         } else {
                             searchMapService(mHandoutList);
                         }
@@ -532,11 +539,13 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             if (object instanceof Feature) {
                                 Feature feature = (Feature) object;
 
-                                SimpleFillSymbol symbol =
-                                        new SimpleFillSymbol(Color.parseColor("#8855ef"),
-                                                SimpleFillSymbol.STYLE.SOLID);
-                                symbol.setAlpha(180);
-                                symbol.setOutline(new SimpleLineSymbol(Color.WHITE, 2));
+                                Symbol symbol = null;
+                                if (mapType == 1) {
+                                    symbol = new SimpleMarkerSymbol(Color.RED, 20,
+                                            SimpleMarkerSymbol.STYLE.CIRCLE);
+                                } else {
+                                    symbol = createSimpleFillSymbol();
+                                }
                                 Graphic graphic = new Graphic(feature.getGeometry(),
                                         symbol, feature.getAttributes());
                                 mMapView.addDrawLayerGraphic(graphic);
@@ -574,6 +583,16 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     }
                 });
         dismissLoading();
+    }
+
+    @NonNull
+    private SimpleFillSymbol createSimpleFillSymbol() {
+        SimpleFillSymbol symbol =
+                new SimpleFillSymbol(Color.parseColor("#8855ef"),
+                        SimpleFillSymbol.STYLE.SOLID);
+        symbol.setAlpha(180);
+        symbol.setOutline(new SimpleLineSymbol(Color.WHITE, 2));
+        return symbol;
     }
 
     //切换地图底图类型
@@ -1140,16 +1159,41 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mMapView.addDrawLayerGraphic(graphic);
     }
 
-    private void queryGeometry() {
+    private void queryGeometry(List<ReportHandoutListModel> handoutList) {
         showLoading();
-//        restoreSpaceStatus();
-        mMapView.queryGeometry(getActivity(),
-                getString(R.string.feature_server_url),
+        String url = getString(R.string.polygon_feature_server_url);
+        mMapView.queryGeometry(getActivity(), url,
                 new BaseMapView.MainThreadCallback<FeatureResult>() {
                     @Override
                     public void onCallback(FeatureResult objects) {
                         dismissLoading();
-//                        showCompanyMarker(objects);
+                        if (objects.featureCount() == 0) {
+                            ToastUtil.showShort("未查询到相关信息");
+                            return;
+                        }
+                        List<ReportHandoutListModel> selectHandoutList = new ArrayList<>();
+                        for (Object object : objects) {
+                            if (object instanceof Feature) {
+                                Feature feature = (Feature) object;
+                                String FRUIT_ID = String.valueOf(feature.getAttributeValue(FRUITID));
+
+//                                SimpleFillSymbol simpleFillSymbol = createSimpleFillSymbol();
+//                                Graphic graphic = new Graphic(feature.getGeometry(),simpleFillSymbol);
+//                                mMapView.addDrawLayerGraphic(graphic);
+                                for (ReportHandoutListModel model : handoutList) {
+                                    for (ReportHandoutListModel.FruitCategoryList fruitCategory
+                                            : model.fruitCategoryList) {
+                                        for (ReportHandoutListModel.FruitCategoryList.FruitList fruit
+                                                : fruitCategory.fruitList) {
+                                            if (FRUIT_ID.contains(fruit.fruitId)) {
+                                                selectHandoutList.add(model);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        searchMapService(selectHandoutList);
                     }
 
                     @Override
