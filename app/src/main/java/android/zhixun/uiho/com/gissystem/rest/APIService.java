@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.zhixun.uiho.com.gissystem.app.ServerHttpException;
 import android.zhixun.uiho.com.gissystem.flux.body.ReportHandoutListBody;
 import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
+import android.zhixun.uiho.com.gissystem.flux.models.HandoutFruitModel;
 import android.zhixun.uiho.com.gissystem.flux.models.RXProgress;
 import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AchievementModel;
@@ -626,6 +627,17 @@ public class APIService {
                 .compose(applySchedulers())
                 .doOnSubscribe(subscriber::doOnSubscriber)
                 .compose(handleResponseList())
+                .subscribe(subscriber);
+    }
+
+    /**
+     * 成果详情（分发）
+     */
+    public void getHandoutFruit(String fruitId, DoOnSubscriber<HandoutFruitModel> subscriber) {
+        api.getHandoutFruit(buildParams(fruitId, "getHandoutFruit", "fruit"))
+                .compose(applySchedulers())
+                .doOnSubscribe(subscriber::doOnSubscriber)
+                .compose(handleResponse())
                 .subscribe(subscriber);
     }
 

@@ -2,6 +2,7 @@ package android.zhixun.uiho.com.gissystem.rest;
 
 
 import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
+import android.zhixun.uiho.com.gissystem.flux.models.HandoutFruitModel;
 import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AchievementModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AchievementTypeAndCountModel;
@@ -209,6 +210,13 @@ public interface API {
     @POST(BASE_URL)
     @FormUrlEncoded
     Observable<BaseListResultModel<ReportHandoutListModel>> getReportHandoutList(@Field("data") String data);
+
+    /**
+     * 成果详情（分发）
+     */
+    @POST(BASE_URL)
+    @FormUrlEncoded
+    Observable<BaseResultModel<HandoutFruitModel>> getHandoutFruit(@Field("data") String data);
 
 //    /***
 //     * 登录

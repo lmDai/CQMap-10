@@ -33,6 +33,7 @@ import android.zhixun.uiho.com.gissystem.flux.body.ClassifyBody;
 import android.zhixun.uiho.com.gissystem.flux.body.OrderBody;
 import android.zhixun.uiho.com.gissystem.flux.body.ReportHandoutListBody;
 import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
+import android.zhixun.uiho.com.gissystem.flux.models.HandoutFruitModel;
 import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.FruitCategoryListModel;
@@ -46,6 +47,7 @@ import android.zhixun.uiho.com.gissystem.ui.widget.DialogUtil;
 import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
+import android.zhixun.uiho.com.gissystem.util.DensityUtils;
 import android.zhixun.uiho.com.gissystem.util.OnItemClickListener;
 import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
 
@@ -864,7 +866,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 ll_row.addView(tv_info);
                 tv_info.setOnClickListener(v -> {
                     ToastUtil.showShort("详情");
-                    showInfoDialog();
+                    showHandoutInfoDialog(fruitList.fruitId);
                 });
                 //行的点击事件
                 ll_row.setOnClickListener(new View.OnClickListener() {
@@ -899,6 +901,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         textView.setLayoutParams(params);
         textView.setGravity(Gravity.CENTER);
         textView.setMaxLines(1);
+        textView.setSingleLine();
         textView.setTextSize(13);
         textView.setEllipsize(TextUtils.TruncateAt.END);
         return textView;
@@ -917,8 +920,55 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     //显示详情dialog
-    private void showInfoDialog() {
+    private void showHandoutInfoDialog(String fruitId) {
+        showLoading();
+        APIService.getInstance()
+                .getHandoutFruit(fruitId, new SimpleSubscriber<HandoutFruitModel>() {
+                    @Override
+                    public void onResponse(HandoutFruitModel response) {
+                        dismissLoading();
+                        List<HandoutFruitModel.FruitAttrList> fruitAttrList = response.fruitAttrList;
+                        if (fruitAttrList == null || fruitAttrList.isEmpty()) {
+                            ToastUtil.showShort("未查询到相关信息");
+                            return;
+                        }
+                        AppCompatDialog dialog = new AppCompatDialog(getActivity());
+                        View dialogView = View.inflate(getActivity(), R.layout.dialog_handout_info,
+                                null);
+                        LinearLayout ll_content = dialogView.findViewById(R.id.ll_content);
+                        LinearLayout ll_title = createRowLL();
+                        ll_title.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.c55f3f));
+                        LinearLayout ll_data = createRowLL();
+                        ll_data.setPadding(0, DensityUtils.dp2px(getActivity(),1),0,0);
+                        for (HandoutFruitModel.FruitAttrList attrModel : fruitAttrList) {
+                            if (!attrModel.isListShow) {
+                                continue;
+                            }
+                            TextView tv_title = createRowText();
+                            tv_title.setTextColor(Color.WHITE);
+                            TextView tv_data = createRowText();
+                            tv_data.setBackgroundColor(ContextCompat.getColor(getActivity(),
+                                    R.color.color_454344));
+                            tv_data.setTextColor(Color.WHITE);
 
+                            tv_title.setText(attrModel.attrName);
+                            tv_data.setText(attrModel.attrValue);
+
+                            ll_title.addView(tv_title);
+                            ll_data.addView(tv_data);
+                        }
+                        ll_content.addView(ll_title);
+                        ll_content.addView(ll_data);
+                        dialog.setContentView(dialogView);
+                        dialog.show();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                    }
+                });
     }
 
     private void hideBottomLayout() {
