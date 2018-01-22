@@ -89,7 +89,8 @@ import static android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView.DEM_LAYER;
  */
 
 @Keep
-public class DispatchFragment extends BaseFragment implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class DispatchFragment extends BaseFragment implements View.OnClickListener,
+        DatePickerDialog.OnDateSetListener {
 
     private BaseMapView mMapView;
     private View mCVLayer, mCVSift, mCVLocation, mZoomIn, mZoomOut, mCVSpace, mCVClear,
@@ -490,7 +491,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     private void searchMapService(List<ReportHandoutListModel> handoutListModels) {
-        if (this.mHandoutList.isEmpty()) return;
+        if (handoutListModels.isEmpty()) return;
         StringBuilder sb = new StringBuilder();
         sb.append("FRUITID");
         sb.append(" in ");
@@ -1223,6 +1224,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     @Override
                     public void onCallback(FeatureResult objects) {
                         dismissLoading();
+                        restoreSpaceStatus();
                         if (objects.featureCount() == 0) {
                             ToastUtil.showShort("未查询到相关信息");
                             return;
@@ -1255,6 +1257,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     @Override
                     public void onError(Throwable throwable) {
                         dismissLoading();
+                        restoreSpaceStatus();
                     }
                 });
     }

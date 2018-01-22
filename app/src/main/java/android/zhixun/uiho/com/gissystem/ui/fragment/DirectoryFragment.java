@@ -1,6 +1,74 @@
 package android.zhixun.uiho.com.gissystem.ui.fragment;
 
+import android.graphics.Color;
+import android.os.Bundle;
 import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatDialog;
+import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.zhixun.uiho.com.gissystem.R;
+import android.zhixun.uiho.com.gissystem.drawtool.DrawTool;
+import android.zhixun.uiho.com.gissystem.flux.body.ReportHandoutListBody;
+import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
+import android.zhixun.uiho.com.gissystem.flux.models.HandoutFruitModel;
+import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
+import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
+import android.zhixun.uiho.com.gissystem.flux.models.api.FruitCategoryListModel;
+import android.zhixun.uiho.com.gissystem.rest.APIService;
+import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
+import android.zhixun.uiho.com.gissystem.ui.activity.MainActivity;
+import android.zhixun.uiho.com.gissystem.ui.adapter.AdminRegionAdapter;
+import android.zhixun.uiho.com.gissystem.ui.adapter.ClassifyFlowTypeAttrValAdapter;
+import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
+import android.zhixun.uiho.com.gissystem.ui.widget.DialogUtil;
+import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
+import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
+import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
+import android.zhixun.uiho.com.gissystem.util.DensityUtils;
+import android.zhixun.uiho.com.gissystem.util.OnItemClickListener;
+import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
+
+import com.esri.android.map.GraphicsLayer;
+import com.esri.android.map.event.OnSingleTapListener;
+import com.esri.core.geometry.Geometry;
+import com.esri.core.map.Feature;
+import com.esri.core.map.FeatureResult;
+import com.esri.core.map.Graphic;
+import com.esri.core.symbol.SimpleFillSymbol;
+import com.esri.core.symbol.SimpleLineSymbol;
+import com.esri.core.symbol.SimpleMarkerSymbol;
+import com.esri.core.symbol.Symbol;
+import com.yibogame.util.LogUtil;
+import com.yibogame.util.ToastUtil;
+import com.zhy.adapter.recyclerview.CommonAdapter;
+import com.zhy.adapter.recyclerview.MultiItemTypeAdapter;
+import com.zhy.adapter.recyclerview.base.ViewHolder;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static android.widget.LinearLayout.SHOW_DIVIDER_MIDDLE;
+import static android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView.DEM_LAYER;
 
 /**
  * Created by parcool on 2016/9/2.
@@ -8,1599 +76,1076 @@ import android.support.annotation.Keep;
  */
 
 @Keep
-public class DirectoryFragment extends BaseFragment{
+public class DirectoryFragment extends BaseFragment implements View.OnClickListener{
+
+
+    private BaseMapView mMapView;
+    private View mCVLayer, mCVSift, mCVLocation, mZoomIn, mZoomOut, mCVSpace, mCVClear,
+            mCvClassifySearch;
+    private ImageView mIvUser, mIvSearchClear;
+    private TextView mTvSearch;
+    private EditText mEtSearch;
+    private DragLayout mDragLayout;
+    private RecyclerView mContentRv;
+    private View dragView;
+    //
+    //分类信息集合-成果类型那一坨
+    private List<FruitCategoryListModel> mClassifyList = new ArrayList<>();
+    //分类信息集合-成果类型下面的集合
+    private List<GethandoutConditionByFCModel> mClassifyTypeList = new ArrayList<>();
+    //分发信息集合
+    private List<ReportHandoutListModel> mHandoutList = new ArrayList<>();
+    //
+    private static final String FRUITID = "FRUITID";
+
+    public DirectoryFragment() {
+        Bundle args = new Bundle();
+        args.putString("name", this.getClass().getSimpleName());
+        setArguments(args);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_directory, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initView(view);
+        initBottomDragView(view);
+        initEvent();
+        initData();
+    }
+
+    private void initView(View view) {
+        mMapView = view.findViewById(R.id.mapView);
+        mCVLayer = view.findViewById(R.id.cv_layer);
+        mCVSift = view.findViewById(R.id.cv_sift);
+        mCVLocation = view.findViewById(R.id.cv_my_location);
+        mZoomIn = view.findViewById(R.id.aiv_zoom_in);
+        mZoomOut = view.findViewById(R.id.aiv_zoom_out);
+        mCVSpace = view.findViewById(R.id.cv_space);
+        mCVClear = view.findViewById(R.id.cv_clear);
+        mIvUser = view.findViewById(R.id.iv_user);
+        mTvSearch = view.findViewById(R.id.tv_search);
+        mEtSearch = view.findViewById(R.id.et_search);
+        mCvClassifySearch = view.findViewById(R.id.cv_classifySearch);
+        mIvSearchClear = view.findViewById(R.id.aciv_clear);
+
+        mEtSearch.setEnabled(false);
+        mEtSearch.setHint("请选择分类或空间");
+    }
+
+    private void initEvent() {
+        mCVLayer.setOnClickListener(this);
+        mCVSift.setOnClickListener(this);
+        mCVLocation.setOnClickListener(this);
+        mZoomIn.setOnClickListener(this);
+        mZoomOut.setOnClickListener(this);
+        mCVSpace.setOnClickListener(this);
+        mCVClear.setOnClickListener(this);
+        mIvUser.setOnClickListener(this);
+        mTvSearch.setOnClickListener(this);
+        mCvClassifySearch.setOnClickListener(this);
+        mIvSearchClear.setOnClickListener(this);
+    }
+
+    private void initData() {
+        getClassifyData();
+    }
+
+    private void initBottomDragView(View view) {
+        mDragLayout = view.findViewById(R.id.dragLayout);
+        mContentRv = view.findViewById(R.id.content_rv);
+        dragView = view.findViewById(R.id.bottom_drag_view);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.cv_layer://切换地图样式
+                showSwitchLayerDialog(v);
+                break;
+            case R.id.cv_my_location://我的位置
+                mMapView.location();
+                break;
+            case R.id.aiv_zoom_in://
+                mMapView.zoomin();
+                break;
+            case R.id.aiv_zoom_out://
+                mMapView.zoomout();
+                break;
+            case R.id.cv_space://空间查询
+                onSpaceClick(v);
+                break;
+            case R.id.cv_clear:
+                setSearhText("");
+                restoreSpaceStatus();
+                break;
+            case R.id.iv_user:
+                ((MainActivity) getActivity()).openDrawer();
+                break;
+            case R.id.tv_search:
+                searchBtnClick();
+                break;
+            case R.id.cv_classifySearch://分类查询
+                showClassifyDialog(v);
+                break;
+            case R.id.aciv_clear:
+                restoreAll();
+                showSearchTextView();
+                break;
+        }
+    }
+
+    private void searchBtnClick() {
+        String searchStr = mEtSearch.getText().toString();
+        if (TextUtils.isEmpty(searchStr)) {
+            setSearhText("全部");
+        }
+        getReportHandoutList(mBody);
+    }
+
+    private void onSpaceClick(View v) {
+        switch (mMapView.getCurrentDrawSpace()) {
+            case BaseMapView.SPACE_NONE:
+                showSpaceDialog(v);
+                break;
+            case BaseMapView.SPACE_RECT:
+                if (mMapView.getCurrentDrawGraphic() == null) {
+                    ToastUtil.showShort("请滑动屏幕框选查询区域");
+                    return;
+                }
+                setSearhText(mEtSearch.getText().toString() + "矩形框选");
+                break;
+            case BaseMapView.SPACE_BUFFER:
+                showBufferInputDialog(v);
+                break;
+            case BaseMapView.SPACE_POLYGON:
+                setPolygon();
+                if (mMapView.getCurrentDrawGraphic().getGeometry().isEmpty()) {
+                    ToastUtil.showShort("请多次点击屏幕选择多边形查询的范围");
+                    return;
+                }
+                setSearhText(mEtSearch.getText().toString() + "多边形框选");
+                break;
+            case BaseMapView.SPACE_BUFFER_SET_FINISH:
+                if (mMapView.getCurrentDrawGraphic() == null) {
+                    ToastUtil.showShort("请滑动屏幕框并输入缓冲区的范围");
+                    return;
+                }
+                setSearhText(mEtSearch.getText().toString() + "缓冲区查询");
+                break;
+            case BaseMapView.SPACE_MAP_NUMBER:
+                setSearhText(mEtSearch.getText().toString() + "图幅号查询");
+                break;
+            case BaseMapView.SPACE_ADMIN_REGION:
+                if (mMapView.getCurrentDrawGraphic() == null) {
+                    ToastUtil.showShort("请选择行政区域");
+                    return;
+                }
+                setSearhText(mEtSearch.getText().toString() + "行政区域查询");
+                break;
+        }
+    }
+
+    private void setPolygon() {
+        mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
+    }
+
+    private void showSearchTextView() {
+        mTvSearch.setVisibility(View.VISIBLE);
+        mIvSearchClear.setVisibility(View.GONE);
+        mEtSearch.setText("");
+        mMapView.clearAll();
+    }
+
+    private void showSearchClearView() {
+        mIvSearchClear.setVisibility(View.VISIBLE);
+        mTvSearch.setVisibility(View.GONE);
+    }
+
+    private ReportHandoutListBody mBody;
+
+    private void showClassifyDialog(View view) {
+        showLoading();
+        if (!mClassifyList.isEmpty()) {
+            bindViewClassify(view, mClassifyList);
+        } else {
+            APIService.getInstance().getfruitCategoryList(
+                    new SimpleSubscriber<List<FruitCategoryListModel>>() {
+                        @Override
+                        public void onResponse(List<FruitCategoryListModel> response) {
+                            dismissLoading();
+                            if (response == null || response.isEmpty()) {
+                                ToastUtil.showShort("未获取到信息");
+                                return;
+                            }
+                            mClassifyList.clear();
+                            mClassifyList.addAll(response);
+                            bindViewClassify(view, mClassifyList);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            super.onError(e);
+                            dismissLoading();
+                        }
+                    });
+        }
+    }
+
+    private void bindViewClassify(View view, List<FruitCategoryListModel> response) {
+        View dialogRoot = LayoutInflater.from(getActivity())
+                .inflate(R.layout.dialog_classify_search, ((ViewGroup) getView()),
+                        false);
+
+        response.get(0).selected = true;
+        RecyclerView rv_flowType = dialogRoot.findViewById(R.id.rv_flow_type);
+        rv_flowType.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        CommonAdapter flowTypeAdapter = new CommonAdapter<FruitCategoryListModel>(getActivity(),
+                R.layout.item_flow_type, response) {
+            @Override
+            protected void convert(ViewHolder holder, FruitCategoryListModel item,
+                                   int position) {
+                if (item.selected) {
+                    switchType(item, dialogRoot);
+                }
+                holder.itemView.setSelected(item.selected);
+                TextView tvType = holder.getView(R.id.tv_text);
+                tvType.setText(item.categoryName);
+            }
+        };
+        rv_flowType.setAdapter(flowTypeAdapter);
+        flowTypeAdapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+                response.get(position).selected = true;
+                for (FruitCategoryListModel model : response) {
+                    model.selected = response.indexOf(model) == position;
+                }
+                flowTypeAdapter.notifyDataSetChanged();
+            }
+        });
+        Button btnSearch = dialogRoot.findViewById(R.id.btn_search);
+        btnSearch.setOnClickListener(v -> {
+
+            if (mClassifyList.isEmpty()) return;
+            mBody = new ReportHandoutListBody();
+            StringBuilder sb = new StringBuilder();
+            for (FruitCategoryListModel model : mClassifyList) {
+                if (model.selected) {
+                    sb.append(model.categoryName);
+                    sb.append(",");
+                    mBody.fruitCategoryId = model.fruitCategoryId;
+                }
+            }
+            if (!mClassifyTypeList.isEmpty()) {
+
+                for (GethandoutConditionByFCModel gethandoutConditionByFCModel : mClassifyTypeList) {
+                    if (gethandoutConditionByFCModel.fruitCateGoryAttrVal == null ||
+                            gethandoutConditionByFCModel.fruitCateGoryAttrVal.isEmpty()) {
+                        continue;
+                    }
+                    for (GethandoutConditionByFCModel.FruitCateGoryAttrVal attrVal :
+                            gethandoutConditionByFCModel.fruitCateGoryAttrVal) {
+                        if (attrVal.selected && !TextUtils.equals(attrVal.attrValue, "全部")) {
+                            sb.append(attrVal.attrValue);
+                            sb.append(",");
+                            mBody.attrValueList
+                                    .add(new ReportHandoutListBody
+                                            .AttrValueList(gethandoutConditionByFCModel.fruitCategoryAttrId,
+                                            attrVal.attrValue));
+                        }
+                    }
+                }
+            }
+            DialogUtil.getInstance().dismiss();
+            setSearhText(sb.toString());
+        });
+        DialogUtil.getInstance().showAnchorDialog(dialogRoot, view);
+    }
+
+    //设置搜索框的文字
+    private void setSearhText(String text) {
+        mEtSearch.setText("");
+        mEtSearch.setText(text);
+    }
+
+    //切换成果类型
+    private void switchType(FruitCategoryListModel model, View dialogRoot) {
+        showLoading();
+        APIService.getInstance()
+                .gethandoutConditionByFCList(model.fruitCategoryId,
+                        new SimpleSubscriber<List<GethandoutConditionByFCModel>>() {
+                            @Override
+                            public void onResponse(List<GethandoutConditionByFCModel> response) {
+                                dismissLoading();
+                                if (response == null || response.isEmpty()) {
+                                    return;
+                                }
+                                mClassifyTypeList.clear();
+                                mClassifyTypeList.addAll(response);
+                                bindViewClassifyType(dialogRoot, mClassifyTypeList);
+                            }
+                        });
+    }
+
+    private void bindViewClassifyType(View dialogRoot, List<GethandoutConditionByFCModel> response) {
+        LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
+        llContainer.removeAllViews();
+        for (GethandoutConditionByFCModel gcbfModel : response) {
+            View itemView = LayoutInflater.from(dialogRoot.getContext())
+                    .inflate(R.layout.dispatch_dialog_item, llContainer,
+                            false);
+            TextView tv_attrName = itemView.findViewById(R.id.tv_attrName);
+            tv_attrName.setText(gcbfModel.attrName);
+            llContainer.addView(itemView);
+
+            List<GethandoutConditionByFCModel.FruitCateGoryAttrVal> attrVals =
+                    gcbfModel.fruitCateGoryAttrVal;
+            if (attrVals == null || attrVals.isEmpty()) {
+                return;
+            }
+            if (response.indexOf(gcbfModel) != 0) {
+                attrVals.add(0, new GethandoutConditionByFCModel.FruitCateGoryAttrVal("全部"));
+            }
+            attrVals.get(0).selected = true;
+            RecyclerView recyclerView = itemView.findViewById(R.id.recycler_view);
+            recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+            ClassifyFlowTypeAttrValAdapter typeAdapter = new ClassifyFlowTypeAttrValAdapter(getActivity(), attrVals);
+            recyclerView.setAdapter(typeAdapter);
+            typeAdapter.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+                    for (GethandoutConditionByFCModel.FruitCateGoryAttrVal attrVal : attrVals) {
+                        attrVal.selected = attrVals.indexOf(attrVal) == position;
+                    }
+                    attrVals.get(position).selected = true;
+                    typeAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+    }
+
+    //查询分发的集合
+    private void getReportHandoutList(ReportHandoutListBody body) {
+        if (body == null) {
+            body = new ReportHandoutListBody();
+        }
+        showSearchClearView();
+        showLoading();
+        APIService.getInstance().getReportHandoutList(body,
+                new SimpleSubscriber<List<ReportHandoutListModel>>() {
+                    @Override
+                    public void onResponse(List<ReportHandoutListModel> response) {
+                        dismissLoading();
+                        if (response == null || response.isEmpty()) return;
+                        mHandoutList.clear();
+                        mHandoutList.addAll(response);
+                        if (mMapView.getCurrentDrawSpace() != BaseMapView.SPACE_NONE) {
+                            queryGeometry(mHandoutList);
+                        } else {
+                            searchMapService(mHandoutList);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                        ToastUtil.showShort(e.getMessage());
+                    }
+                });
+    }
+
+    private void searchMapService(List<ReportHandoutListModel> handoutListModels) {
+        if (handoutListModels.isEmpty()) return;
+        StringBuilder sb = new StringBuilder();
+        sb.append("FRUITID");
+        sb.append(" in ");
+        sb.append("(");
+        int mapType = 0;
+        for (ReportHandoutListModel reportHandoutListModel : handoutListModels) {
+
+            for (ReportHandoutListModel.FruitCategoryList fruitCategoryList :
+                    reportHandoutListModel.fruitCategoryList) {
+
+                mapType = fruitCategoryList.mapType;
+                for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
+                        fruitCategoryList.fruitList) {
+
+                    String fruitId = fruitList.fruitId;
+                    sb.append(fruitId);
+                    sb.append(",");
+                }
+            }
+        }
+
+        String whereClause = sb.substring(0, sb.lastIndexOf(",")) + ")";
+        LogUtil.i("whereClause == " + whereClause);
+
+        searchType(mapType, whereClause);
+    }
+
+    private void searchType(int mapType, String whereClause) {
+        if (mapType == 0) return;
+        String url;
+        if (mapType == 1) {//点查询
+            url = getString(R.string.point_feature_server_url);
+        } else {//面查询
+            url = getString(R.string.polygon_feature_server_url);
+        }
+        mMapView.querySQL(getActivity(), url, whereClause,
+                new BaseMapView.MainThreadCallback<FeatureResult>() {
+                    @Override
+                    public void onCallback(FeatureResult result) {
+                        if (result.featureCount() == 0) {
+                            ToastUtil.showShort("未获取信息,请重试");
+                            restoreAll();
+                            return;
+                        }
+
+                        for (Object object : result) {
+                            if (object instanceof Feature) {
+                                Feature feature = (Feature) object;
+
+                                Symbol symbol = null;
+                                if (mapType == 1) {
+                                    symbol = new SimpleMarkerSymbol(Color.RED, 20,
+                                            SimpleMarkerSymbol.STYLE.CIRCLE);
+                                } else {
+                                    symbol = createSimpleFillSymbol();
+                                }
+                                Graphic graphic = new Graphic(feature.getGeometry(),
+                                        symbol, feature.getAttributes());
+                                mMapView.addDrawLayerGraphic(graphic);
+                            }
+                        }
+                        //地图单击事件
+                        mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
+                            int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
+                                    1, 1);
+                            if (ids.length == 0) return;
+                            GraphicsLayer drawLayer = mMapView.getDrawLayer();
+                            Graphic graphic = drawLayer.getGraphic(ids[0]);
+                            if (graphic == null) return;
+                            drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
+                            String FRUIT_ID = String.valueOf(graphic.getAttributeValue("FRUITID"));
+                            List<ReportHandoutListModel> handoutList = new ArrayList<>();
+                            for (ReportHandoutListModel handout : mHandoutList) {
+                                for (ReportHandoutListModel.FruitCategoryList fruitCategory :
+                                        handout.fruitCategoryList) {
+                                    for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList
+                                            : fruitCategory.fruitList) {
+                                        if (!FRUIT_ID.contains(fruitList.fruitId))
+                                            continue;
+                                        handoutList.add(handout);
+                                    }
+                                }
+                            }
+                            showBottomLayout(handoutList);
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtil.showShort("未获取信息,请重试");
+                    }
+                });
+        dismissLoading();
+    }
+
+    @NonNull
+    private SimpleFillSymbol createSimpleFillSymbol() {
+        SimpleFillSymbol symbol =
+                new SimpleFillSymbol(Color.parseColor("#8855ef"),
+                        SimpleFillSymbol.STYLE.SOLID);
+        symbol.setAlpha(180);
+        symbol.setOutline(new SimpleLineSymbol(Color.WHITE, 2));
+        return symbol;
+    }
+
+    //切换地图底图类型
+    private void showSwitchLayerDialog(View view) {
+        View contentView = LayoutInflater
+                .from(getActivity())
+                .inflate(R.layout.layout_map_switch, (ViewGroup) getView(),
+                        false);
+        DialogUtil.getInstance().showAnchorDialog(contentView, view);
+        RadioGroup rgLayerSwitch = contentView.findViewById(R.id.rg_layer_switch);
+        switch (mMapView.getCurrentMapLayer()) {
+            case BaseMapView.DEM_LAYER:
+                ((RadioButton) rgLayerSwitch.findViewById(R.id.rb_topographic)).setChecked(true);
+                break;
+            case BaseMapView.VEC_LAYER:
+                ((RadioButton) rgLayerSwitch.findViewById(R.id.rb_vector)).setChecked(true);
+                break;
+            case BaseMapView.IMG_LAYER:
+                ((RadioButton) rgLayerSwitch.findViewById(R.id.rb_image)).setChecked(true);
+                break;
+
+        }
+        rgLayerSwitch.setOnCheckedChangeListener((group, checkedId) -> {
+            switch (checkedId) {
+                case R.id.rb_topographic:
+                    mMapView.setCurrentMapLayer(DEM_LAYER);
+                    break;
+                case R.id.rb_vector:
+                    mMapView.setCurrentMapLayer(BaseMapView.VEC_LAYER);
+                    break;
+                case R.id.rb_image:
+                    mMapView.setCurrentMapLayer(BaseMapView.IMG_LAYER);
+                    break;
+            }
+            DialogUtil.getInstance().dismiss();
+        });
+    }
+
+    private void showBottomLayout(List<ReportHandoutListModel> handoutList) {
+        if (handoutList == null || handoutList.isEmpty()) {
+            return;
+        }
+
+        ((MainActivity) getActivity()).hideBottomNav();
+        CommonAdapter<ReportHandoutListModel> bottomAdapter =
+                new CommonAdapter<ReportHandoutListModel>(getActivity(), R.layout.item_dispatch_bottom,
+                        handoutList) {
+                    @Override
+                    protected void convert(ViewHolder holder, ReportHandoutListModel item, int position) {
+                        holder.setText(R.id.tv_companyName, item.companyName)
+                                .setText(R.id.tv_reportNo, item.reportNo);
+                        View rl_handoutConntent = holder.getView(R.id.rl_handoutContent);
+                        TextView text_handoutContent = holder.getView(R.id.text_handoutContent);
+                        ImageView iv_arrow = holder.getView(R.id.iv_arrow);
+                        LinearLayout ll_content = holder.getView(R.id.ll_content);
+                        //分发内容的点击事件
+                        rl_handoutConntent.setOnClickListener(v -> {
+                            ll_content.setVisibility(ll_content.getVisibility() == View.VISIBLE
+                                    ? View.GONE : View.VISIBLE);
+                            iv_arrow.animate()
+                                    .rotationBy(180)
+                                    .start();
+                        });
+                        if (item.fruitCategoryList == null || item.fruitCategoryList.isEmpty()) {
+                            return;
+                        }
+                        bindViewHandoutContent(item, ll_content);
+                    }
+                };
+        mContentRv.setAdapter(bottomAdapter);
+        mDragLayout.animaToCenter();
+        dragView.setVisibility(View.VISIBLE);
+
+//        bottomAdapter.setOnItemClickListener((view, position) -> {
+//            int companyId = response.get(position).getCompanyId();
+//            for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
+//                Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
+//                int unit_id = (int) graphic.getAttributeValue("UNITID");
+//                if (companyId == unit_id) {
+//                    if (graphic.getGeometry() instanceof Point) {
+//                        Point point = (Point) graphic.getGeometry();
+//                        mMapView.centerAt(point, true);
+//                    }
+//                }
+//            }
+//        });
+    }
+
+    //设置弹出框分发内容的view
+    private void bindViewHandoutContent(ReportHandoutListModel item, LinearLayout ll_content) {
+        for (ReportHandoutListModel.FruitCategoryList fruitCategory : item.fruitCategoryList) {
+            View contentView = View.inflate(getActivity(),
+                    R.layout.item_dispatch_bottom_content, null);
+            ll_content.addView(contentView);
+
+            View rl_content = contentView.findViewById(R.id.rl_content);
+            TextView tvContent = contentView.findViewById(R.id.tv_content);
+            LinearLayout ll_data = contentView.findViewById(R.id.ll_data);
+            LinearLayout ll_data_parent = contentView.findViewById(R.id.ll_data_parent);
+            TextView tvCount = contentView.findViewById(R.id.tv_count);
+            ImageView iv_arrow = contentView.findViewById(R.id.iv_contentArrow);
+            rl_content.setOnClickListener(v -> {
+                int visible = ll_data_parent.getVisibility() == View.VISIBLE ? GONE : VISIBLE;
+                ll_data_parent.setVisibility(visible);
+                iv_arrow.animate()
+                        .rotationBy(180)
+                        .start();
+            });
+            //设置content item的名字
+            tvContent.setText(fruitCategory.categoryName);
+            //设置content 的 列表
+            tvCount.setText(String.format("共%s条数据", fruitCategory.fruitList.size()));
+            //设置行的数据
+            if (fruitCategory.fruitList.isEmpty()) continue;
+            //需要显示的数据的集合
+            List<ReportHandoutListModel.FruitCategoryList.FruitList.FruitAttrList> isShowList =
+                    new ArrayList<>();
+            for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList : fruitCategory.fruitList) {
+                LinearLayout ll_row = createRowLL();
+                isShowList.clear();
+                for (ReportHandoutListModel.FruitCategoryList.FruitList.FruitAttrList fruitAttrList
+                        : fruitList.fruitAttrList) {
+                    if (!fruitAttrList.isListShow) continue;
+                    isShowList.add(fruitAttrList);
+                }
+                //设置表格的数据
+                for (ReportHandoutListModel.FruitCategoryList.
+                        FruitList.FruitAttrList fruitAttrList : isShowList) {
+                    TextView textView = createRowText();
+                    textView.setText(fruitAttrList.attrValue);
+                    ll_row.addView(textView);
+                }
+                //详情按钮
+                TextView tv_info = createRowText();
+                tv_info.setTextColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+                tv_info.setText("详情");
+                ll_row.addView(tv_info);
+                tv_info.setOnClickListener(v -> {
+                    ToastUtil.showShort("详情");
+                    showHandoutInfoDialog(fruitList.fruitId);
+                });
+                //行的点击事件
+                ll_row.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ToastUtil.showShort("行的点击事件");
+                    }
+                });
+                ll_data.addView(ll_row);
+            }
+            //设置表格的标题
+            LinearLayout ll_title = createRowLL();
+            for (ReportHandoutListModel.FruitCategoryList.
+                    FruitList.FruitAttrList fruitAttrList : isShowList) {
+                TextView tv_title = createRowText();
+                tv_title.setText(fruitAttrList.attrName);
+                ll_title.addView(tv_title);
+            }
+            TextView tv_option = createRowText();
+            tv_option.setText("操作");
+            ll_title.addView(tv_option);
+            ll_data.addView(ll_title, 0);
+        }
+    }
+
+    @NonNull
+    private TextView createRowText() {
+        TextView textView = new TextView(getActivity());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.weight = 1;
+        textView.setLayoutParams(params);
+        textView.setGravity(Gravity.CENTER);
+        textView.setMaxLines(1);
+        textView.setSingleLine();
+        textView.setTextSize(13);
+        textView.setEllipsize(TextUtils.TruncateAt.END);
+        return textView;
+    }
+
+    @NonNull
+    private LinearLayout createRowLL() {
+        LinearLayout ll_row = new LinearLayout(getActivity());
+        ll_row.setPadding(0, ScreenUtil.dip2px(getActivity(), 5),
+                0, ScreenUtil.dip2px(getActivity(), 5));
+        ll_row.setOrientation(LinearLayout.HORIZONTAL);
+        ll_row.setDividerDrawable(ContextCompat.getDrawable(getActivity(),
+                R.drawable.horizontal_divider));
+        ll_row.setShowDividers(SHOW_DIVIDER_MIDDLE);
+        return ll_row;
+    }
+
+    //显示详情dialog
+    private void showHandoutInfoDialog(String fruitId) {
+        showLoading();
+        APIService.getInstance()
+                .getHandoutFruit(fruitId, new SimpleSubscriber<HandoutFruitModel>() {
+                    @Override
+                    public void onResponse(HandoutFruitModel response) {
+                        dismissLoading();
+                        List<HandoutFruitModel.FruitAttrList> fruitAttrList = response.fruitAttrList;
+                        if (fruitAttrList == null || fruitAttrList.isEmpty()) {
+                            ToastUtil.showShort("未查询到相关信息");
+                            return;
+                        }
+                        AppCompatDialog dialog = new AppCompatDialog(getActivity());
+                        View dialogView = View.inflate(getActivity(), R.layout.dialog_handout_info,
+                                null);
+                        LinearLayout ll_content = dialogView.findViewById(R.id.ll_content);
+                        LinearLayout ll_title = createRowLL();
+                        ll_title.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.c55f3f));
+                        LinearLayout ll_data = createRowLL();
+                        ll_data.setPadding(0, DensityUtils.dp2px(getActivity(),1),0,0);
+                        for (HandoutFruitModel.FruitAttrList attrModel : fruitAttrList) {
+                            if (!attrModel.isListShow) {
+                                continue;
+                            }
+                            TextView tv_title = createRowText();
+                            tv_title.setTextColor(Color.WHITE);
+                            TextView tv_data = createRowText();
+                            tv_data.setBackgroundColor(ContextCompat.getColor(getActivity(),
+                                    R.color.color_454344));
+                            tv_data.setTextColor(Color.WHITE);
+
+                            tv_title.setText(attrModel.attrName);
+                            tv_data.setText(attrModel.attrValue);
+
+                            ll_title.addView(tv_title);
+                            ll_data.addView(tv_data);
+                        }
+                        ll_content.addView(ll_title);
+                        ll_content.addView(ll_data);
+                        dialog.setContentView(dialogView);
+                        dialog.show();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                    }
+                });
+    }
+
+    private void hideBottomLayout() {
+        mCVClear.setVisibility(View.GONE);
+        mDragLayout.exit();
+        dragView.setVisibility(View.GONE);
+        ((MainActivity) getActivity()).showBottomNav();
+    }
+
+    //显示空间查询dialog
+    private void showSpaceDialog(View view) {
+        int[] resIds = {R.mipmap.ic_add, R.mipmap.ic_add, R.mipmap.ic_add
+                , R.mipmap.ic_add, R.mipmap.ic_add};
+        String[] texts = {"矩形框选", "多边形框选", "缓冲区查询", "图幅号查询", "行政区域查询"};
+        new SpaceDialog(getActivity(), (ViewGroup) getView())
+                .setData(resIds, texts)
+                .show(view)
+                .setOnItemClickListener((view1, position) -> {
+                    switch (position) {
+                        case 0://矩形
+                            mMapView.getDrawTool().activate(DrawTool.ENVELOPE);
+                            mMapView.setCurrentDrawSpace(BaseMapView.SPACE_RECT);
+                            break;
+                        case 1://多边形
+                            mMapView.getDrawTool().activate(DrawTool.POLYGON);
+                            mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON);
+                            break;
+                        case 2://缓冲区查询
+                            mMapView.getDrawTool().activate(DrawTool.FREEHAND_POLYLINE);
+                            mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER);
+                            break;
+                        case 3://图幅号查询
+                            mMapView.setCurrentDrawSpace(BaseMapView.SPACE_MAP_NUMBER);
+                            showMapNumberDialog();
+                            break;
+                        case 4://行政区域查询
+                            mMapView.setCurrentDrawSpace(BaseMapView.SPACE_ADMIN_REGION);
+                            showAdminRegionDialog();
+                            break;
+                    }
+                    AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
+                    ivSpace.setImageResource(R.mipmap.ic_sure_modifi);
+                    showClearBtn();
+                });
+    }
+
+    private void showBufferInputDialog(View view) {
+        if (mMapView.getDrawLayer().getExtent() == null) {
+            ToastUtil.showShort(" 请多次点击地图");
+            return;
+        }
+        new SimpleAlertDialog(getActivity())
+                .title("缓冲区查询")
+                .message("请输入范围(0-100公里)")
+                .setOkOnClickListener(R.string.alert_ok, (dialog1, v) -> {
+                    String text = dialog1.getEditText().getText().toString();
+                    if (TextUtils.isEmpty(text)) {
+                        ToastUtil.showShort("不能为空");
+                        return;
+                    }
+                    int distance = Integer.parseInt(text);
+                    setBufferGeometry(distance);
+                    mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_SET_FINISH);
+                })
+                .visiableEditText()
+                .setCancelOnClickListener(R.string.alert_cancel, null)
+                .alert();
+    }
+
+    private void showMapNumberDialog() {
+        new SimpleAlertDialog(getActivity())
+                .title("图幅号查询")
+                .message("可输入多个图幅号，图幅号直接用空格或逗号分隔如\n'G49E005001 G49E005002'\n或\n'G49E005001,G49E005002'")
+                .setOkOnClickListener(R.string.alert_ok, (dialog1, view) -> {
+                    String text = dialog1.getEditText().getText().toString();
+                    if (TextUtils.isEmpty(text)) {
+                        ToastUtil.showShort("不能为空");
+                        return;
+                    }
+                    dialog1.dismiss();
+                    searchMapNumber(text);
+                })
+                .visiableEditText()
+                .setCancelOnClickListener(R.string.alert_cancel, null)
+                .alert();
+    }
+
+    private void searchMapNumber(String text) {
+        if (text.contains(",")) {
+            String[] split = text.split(",");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < split.length; i++) {
+                sb.append(String.format("'%s',", split[i]));
+            }
+            text = sb.substring(0, sb.lastIndexOf(","));
+        }
+        if (text.contains(" ")) {
+            String[] split = text.split(" ");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < split.length; i++) {
+                sb.append(String.format("'%s',", split[i]));
+            }
+            text = sb.substring(0, sb.lastIndexOf(","));
+        }
+        for (int i = 0; i < 7; i++) {
+            String url = String.format("http://ddk.digitalcq.com:6080/arcgis/rest/" +
+                    "services/CQGRID_2000/Mapserver/%s", i);
+            String where = String.format("1=1 and 新图号 in (%s)", text);
+            showLoading();
+            mMapView.querySQL(getActivity(), url, where,
+                    new BaseMapView.MainThreadCallback<FeatureResult>() {
+                        @Override
+                        public void onCallback(FeatureResult result) {
+                            dismissLoading();
+                            if (result.featureCount() == 0) {
+                                return;
+                            }
+                            SimpleLineSymbol symbol =
+                                    new SimpleLineSymbol(Color.RED, 2,
+                                            SimpleLineSymbol.STYLE.SOLID);
+                            for (Object o : result) {
+                                if (o instanceof Feature) {
+                                    Feature feature = (Feature) o;
+                                    Graphic graphic = new Graphic(feature.getGeometry(), symbol);
+                                    mMapView.addDrawLayerGraphic(graphic);
+                                }
+                            }
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            dismissLoading();
+                        }
+                    });
+        }
+    }
+
+    private int lastPosition = -1;
+
+    //行政区域查询show dialog
+    private void showAdminRegionDialog() {
+        showLoading();
+        lastPosition = -1;
+        Map<Object, Object> map = new HashMap<>();
+        APIService.getInstance()
+                .getAreaList(map, new SimpleSubscriber<List<AreaModel>>() {
+                    @Override
+                    public void onResponse(List<AreaModel> response) {
+                        dismissLoading();
+                        View dialogView = View.inflate(getActivity(), R.layout.dialog_admin_region,
+                                null);
+                        RecyclerView rv = dialogView.findViewById(R.id.recycler_view);
+                        Button btn_ok = dialogView.findViewById(R.id.btn_ok);
+                        rv.setLayoutManager(new GridLayoutManager(getActivity(), 4));
+                        AdminRegionAdapter adapter = new AdminRegionAdapter(getActivity(), response);
+                        adapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+                                if (position == lastPosition) return;
+                                if (response.get(position).isChecked()) {
+                                    response.get(position).setChecked(false);
+                                } else {
+                                    response.get(position).setChecked(true);
+                                    if (lastPosition != -1) {
+                                        response.get(lastPosition).setChecked(false);
+                                    }
+                                }
+                                adapter.notifyDataSetChanged();
+                                lastPosition = position;
+                            }
+
+                            @Override
+                            public boolean onItemLongClick(View view, RecyclerView.ViewHolder holder,
+                                                           int position) {
+                                return false;
+                            }
+                        });
+                        rv.setAdapter(adapter);
+                        AppCompatDialog dialog = new AppCompatDialog(getActivity());
+                        dialog.setContentView(dialogView);
+                        dialog.show();
+                        //确定，但是不查询
+                        btn_ok.setOnClickListener(v -> {
+                            if (lastPosition == -1) {
+                                ToastUtil.showShort("请选择一个区域");
+                                return;
+                            }
+                            dialog.dismiss();
+                            searchAdminRegion(response.get(lastPosition).getAreaName());
+                        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                    }
+                });
+    }
+
+    //查询行政区域
+    private void searchAdminRegion(String searchText) {
+        showLoading();
+        String url = getString(R.string.query_admin_region);
+        String where = String.format("1=1 and MC='%s'", searchText);
+        mMapView.querySQL(getActivity(), url, where,
+                new BaseMapView.MainThreadCallback<FeatureResult>() {
+                    @Override
+                    public void onCallback(FeatureResult result) {
+                        dismissLoading();
+                        if (result.featureCount() == 0) {
+                            ToastUtil.showShort(" 未获取到相关信息");
+                            return;
+                        }
+
+                        for (Object o : result) {
+                            if (o instanceof Feature) {
+                                Feature feature = (Feature) o;
+                                SimpleLineSymbol symbol =
+                                        new SimpleLineSymbol(Color.RED, 2,
+                                                SimpleLineSymbol.STYLE.SOLID);
+                                Graphic graphic = new Graphic(feature.getGeometry(), symbol);
+                                mMapView.addDrawLayerGraphic(graphic);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        dismissLoading();
+                    }
+                });
+    }
+
+    //设置缓冲区的图形
+    private void setBufferGeometry(int distance) {
+        SimpleLineSymbol lineSymbol = new SimpleLineSymbol(Color.RED,
+                distance,
+                SimpleLineSymbol.STYLE.SOLID
+        );
+        Geometry geometry = mMapView.getCurrentDrawGraphic().getGeometry();
+        Graphic graphic = new Graphic(geometry, lineSymbol);
+        mMapView.addDrawLayerGraphic(graphic);
+    }
+
+    private void queryGeometry(List<ReportHandoutListModel> handoutList) {
+        showLoading();
+        String url = getString(R.string.polygon_feature_server_url);
+        mMapView.queryGeometry(getActivity(), url,
+                new BaseMapView.MainThreadCallback<FeatureResult>() {
+                    @Override
+                    public void onCallback(FeatureResult objects) {
+                        dismissLoading();
+                        restoreSpaceStatus();
+                        if (objects.featureCount() == 0) {
+                            ToastUtil.showShort("未查询到相关信息");
+                            return;
+                        }
+                        List<ReportHandoutListModel> selectHandoutList = new ArrayList<>();
+                        for (Object object : objects) {
+                            if (object instanceof Feature) {
+                                Feature feature = (Feature) object;
+                                String FRUIT_ID = String.valueOf(feature.getAttributeValue(FRUITID));
+
+//                                SimpleFillSymbol simpleFillSymbol = createSimpleFillSymbol();
+//                                Graphic graphic = new Graphic(feature.getGeometry(),simpleFillSymbol);
+//                                mMapView.addDrawLayerGraphic(graphic);
+                                for (ReportHandoutListModel model : handoutList) {
+                                    for (ReportHandoutListModel.FruitCategoryList fruitCategory
+                                            : model.fruitCategoryList) {
+                                        for (ReportHandoutListModel.FruitCategoryList.FruitList fruit
+                                                : fruitCategory.fruitList) {
+                                            if (FRUIT_ID.contains(fruit.fruitId)) {
+                                                selectHandoutList.add(model);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        searchMapService(selectHandoutList);
+                    }
+
+                    @Override
+                    public void onError(Throwable throwable) {
+                        dismissLoading();
+                        restoreSpaceStatus();
+                    }
+                });
+    }
+
+    private void restoreSpaceStatus() {
+        mMapView.setCurrentDrawSpace(BaseMapView.SPACE_NONE);
+        AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
+        ivSpace.setImageResource(R.mipmap.ic_kongjian);
+        mMapView.clearAll();
+        hideClearBtn();
+    }
+
+    private void restoreAll() {
+        restoreSpaceStatus();
+        hideBottomLayout();
+        hideClearBtn();
+        mMapView.clearAll();
+    }
+
+    private void showClearBtn() {
+        mCVClear.setVisibility(View.VISIBLE);
+    }
+
+    private void hideClearBtn() {
+        mCVClear.setVisibility(View.GONE);
+    }
+
+    //获取分类信息，成果类型那一坨
+    private void getClassifyData() {
+        showLoading();
+        APIService.getInstance()
+                .getfruitCategoryList(new SimpleSubscriber<List<FruitCategoryListModel>>() {
+                    @Override
+                    public void onResponse(List<FruitCategoryListModel> response) {
+                        dismissLoading();
+                        if (response == null || response.isEmpty()) {
+                            return;
+                        }
+                        mClassifyList.clear();
+                        mClassifyList.addAll(response);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                    }
+                });
+    }
+
 
 }
-//public class DirectoryFragment extends MyBaseFragment implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
-//    String[] reqPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission
-//            .ACCESS_COARSE_LOCATION};
-//    private int requestCode = 2;
-//    private View mView;
-//    private Basemap basemap;
-//    private ArcGISMap arcGISMap;
-//    private MapView mMapView;
-//    private ServiceFeatureTable mServiceFeatureTable;
-//    private FeatureLayer mFeaturelayer;
-//    private LocationDisplay mLocationDisplay;
-//    private GraphicsOverlay graphicsOverlay;
-//    private FeatureQueryResult mAllFeatureQueryResult = null;
-//    private AppCompatImageView acivClear, acivSearch;
-//    private EditText etSearch;
-//    private String etString = "";
-//    private CardView cvSearch, cvStatistics;
-//    private ProgressDialog mProgressDialog;
-//    private int currBaseMapType = vector;
-//    private static final int topographic = 0, vector = 1, image = 2;
-//    private CardView cvCancle, cvClear;
-//    private AppCompatImageView calendar1, calendar2;
-//    private TextView calendar1Content, calendar2Content;
-//    private boolean isFirst;
-//    private String CGFFDate, CGFTDate;
-//    private EditText etSearchDialog, etCaseCode, etDataCode;
-//    private TextView calendar1_content, calendar2_content;
-//    private RelativeLayout relativeLayoutLeft, relativeLayoutRight;
-//    private SketchGraphicsOverlay mSketchGraphicsOverlay;
-//    protected Subscription mSubscriptionAction;
-//    private LinearLayout linearLayout1, linearLayout2;
-//
-//    private CardView cvDetail, cvCloseDetail;
-//    private LinearLayout llOne, llTwo;
-//    private TextView tvCode, tvDate, tvBase, tvFormat;
-//    private TextView tvCall, tvDig, tvRank, tvHCJZ;
-//    private RecyclerView rvOne, rvTwo;
-//    private List<String> listToy = new ArrayList<>();
-//    private ToyAdapter toyAdapterOne, toyAdapterTwo;
-//    //
-//    private View mConditionSearch, mSpaceSearch, mClassifySearch;
-//    private ImageView mIvUser;
-//    private ReportHandoutListBody mBody;
-//    //
-//    private int currDrawType = DRAWTYPE_NONE;
-//    private static final int DRAWTYPE_NONE = -1,
-//            DRAWTYPE_RECTANGLE = 0,
-//            DRAWTYPE_CIRCLE = 1,
-//            DRAWTYPE_POLYGON = 2,
-//            DRAWTYPE_SEARCHING = 3,
-//            DRAWTYPE_FINISH = 4,
-//            DRAWTYPE_FLASH = 5,
-//            DRAWTYPE_SYMBOL = 6,
-//            DRAWTYPE_ADMIN_REGION = 7;
-//    int km;
-//
-//
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setRetainInstance(true);
-//        mProgressDialog = new ProgressDialog(mContext == null ? getActivity() : mContext);
-//        mProgressDialog.setTitle("提示");
-//    }
-//
-//    public DirectoryFragment() {
-//        Bundle args = new Bundle();
-//        args.putString("name", DispatchFragment.class.getSimpleName());
-//        setArguments(args);
-//    }
-//
-//    @Nullable
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-//                             @Nullable Bundle savedInstanceState) {
-//        if (mView == null) {
-//            mView = inflater.inflate(R.layout.fragment_dispatch, container, false);
-//            DaoSession mDaoSession = ((MyBaseApplication) ((Activity) mContext).getApplication()).getDaoSession();
-//            mDispatchFragmentStore.setDaoSession(mDaoSession);
-//            mSubscriptionAction = RxBus.getInstance().toObservable(DispatchFragmentActionTemp.class).subscribe(new Action1<DispatchFragmentActionTemp>() {
-//                @Override
-//                public void call(DispatchFragmentActionTemp dispatchFragmentActionTemp) {
-//                    switch (dispatchFragmentActionTemp.getAction()) {
-//                        case DispatchFragmentActionTemp.ACTION_SHOW:
-//                            cvDetail.setVisibility(View.VISIBLE);
-//                            llOne.setVisibility(View.VISIBLE);
-//                            llTwo.setVisibility(View.GONE);
-//                            listToy.clear();
-//                            TempSortItemModel tempSortItemModel = (TempSortItemModel) dispatchFragmentActionTemp.getT();
-//                            int i0 = 0;
-//                            for (Map<String, String> stringStringMap : tempSortItemModel.getMapList()) {
-//                                for (Map.Entry<String, String> stringStringEntry : stringStringMap.entrySet()) {
-//                                    LogUtil.d(stringStringEntry.getKey() + ":" + stringStringEntry.getValue());
-//                                    i0++;
-//                                    if (i0 <= 4) {
-//                                        continue;
-//                                    }
-//                                    listToy.add(stringStringEntry.getKey() + ":" + stringStringEntry.getValue());
-//                                }
-//                            }
-//                            //添加标题
-//                            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
-//                            int i = 0;
-//                            linearLayout1.removeAllViews();
-//                            linearLayout2.removeAllViews();
-//                            for (Map<String, String> stringStringMap : tempSortItemModel.getMapList()) {
-//                                for (Map.Entry<String, String> stringStringEntry : stringStringMap.entrySet()) {
-//                                    if (i >= 4) {
-//                                        break;
-//                                    }
-//                                    i++;
-//                                    TextView textView = new TextView(linearLayout1.getContext());
-//                                    textView.setLayoutParams(layoutParams);
-//                                    textView.setGravity(Gravity.CENTER);
-//                                    textView.setTextColor(getResources().getColor(R.color.colorWhite));
-//                                    textView.setSingleLine();
-//                                    textView.setEllipsize(TextUtils.TruncateAt.END);
-//                                    textView.setText(stringStringEntry.getKey());
-//                                    linearLayout1.addView(textView);
-//                                }
-//                            }
-//                            //添加标题对应的内容
-//                            int i2 = 0;
-//                            for (Map<String, String> stringStringMap : tempSortItemModel.getMapList()) {
-//                                for (Map.Entry<String, String> stringStringEntry : stringStringMap.entrySet()) {
-//                                    if (i2 >= 4) {
-//                                        break;
-//                                    }
-//                                    i2++;
-//                                    TextView textView = new TextView(linearLayout2.getContext());
-//                                    textView.setLayoutParams(layoutParams);
-//                                    textView.setGravity(Gravity.CENTER);
-//                                    textView.setTextColor(getResources().getColor(R.color.colorWhite));
-//                                    textView.setSingleLine();
-//                                    textView.setEllipsize(TextUtils.TruncateAt.END);
-//                                    textView.setText(stringStringEntry.getValue());
-//                                    linearLayout2.addView(textView);
-//                                }
-//                            }
-//
-////                            if (dispatchFragmentActionTemp.getWhat() == 0) {
-//                            toyAdapterOne.notifyDataSetChanged();
-////                            } else if (dispatchFragmentActionTemp.getWhat() == 1) {
-////                                toyAdapterTwo.notifyDataSetChanged();
-////                            }
-//                            break;
-//                        case DispatchFragmentActionTemp.ACTION_SHOW_ONE:
-//                            break;
-//                        case DispatchFragmentActionTemp.ACTION_SHOW_TWO:
-//                            break;
-//                        case DispatchFragmentActionTemp.ACTION_HIDE_DETAIL:
-//                            cvDetail.setVisibility(View.GONE);
-//                            break;
-//                        case DispatchFragmentActionTemp.ACTION_GET_ITEM_DATA_BY_POSITION:
-//                            //这里已经不再发送RxBus来跳转Activity了，所以下面的代码已经没用了。
-////                            int position = (int) dispatchFragmentActionTemp.getT();
-////                            long unitID = mDispatchFragmentStore.getOwnSMCHResultItemList().get(position).getUnitKey();
-//                            long unitID = (long) dispatchFragmentActionTemp.getT();
-//                            MainActivityAction activityAction = new MainActivityAction(MainActivityAction.ACTION_GET_UNIT_ID);
-//                            activityAction.setUnitId(unitID);
-//                            RxBus.getInstance().send(activityAction);
-//                            break;
-//                    }
-//
-//                }
-//            });
-//            initViews();
-//            initMap();
-//        }
-//        return mView;
-//    }
-//
-//    /***
-//     * 初始化Views
-//     */
-//    private void initViews() {
-//        //放大
-//        mView.findViewById(R.id.aiv_zoom_in).setOnClickListener(view -> {
-//            mMapView.setViewpointScaleAsync((mMapView.getMapScale() / 2) > 2000 ? mMapView.getMapScale() / 2 : 2000);
-//            Log.d("tag", mMapView.getMapScale() + "");
-//        });
-//        //缩小
-//        mView.findViewById(R.id.aiv_zoom_out).setOnClickListener(view -> {
-//            Log.d("tag", mMapView.getMapScale() + "");
-//            mMapView.setViewpointScaleAsync(mMapView.getMapScale() * 2 > 1200000 ? 1200000 : mMapView.getMapScale() * 2);//缩小不会导致崩溃
-//        });
-//        //为筛选添加点击事件,条件查询
-//        mView.findViewById(R.id.cv_sift).setOnClickListener(this::siftSearch);
-//        //我的位置
-//        mView.findViewById(R.id.cv_my_location).setOnClickListener(view -> {
-////            Intent intent = new Intent(mContext, TestTitleActivity.class);
-////            startActivity(intent);
-//            mLocationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
-//            if (!mLocationDisplay.isStarted()) {
-//                mLocationDisplay.startAsync();
-//            }
-//        });
-//        //搜索框里的放大镜按钮
-//        acivSearch = (AppCompatImageView) mView.findViewById(R.id.aciv_search);
-//        //搜索框里的X按钮
-//        acivClear = (AppCompatImageView) mView.findViewById(R.id.aciv_clear);
-//        //搜索框里的输入框
-//        etSearch = (EditText) mView.findViewById(R.id.et_search);
-//        etSearch.setImeActionLabel("搜索", EditorInfo.IME_ACTION_DONE);
-//        etSearch.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-//            @Override
-//            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-//                if (i == EditorInfo.IME_ACTION_DONE) {
-//                    acivSearch.performClick();
-//                }
-//                return false;
-//            }
-//        });
-//        etSearch.addTextChangedListener(new TextWatcher() {
-//
-//            VectorDrawableCompat a = VectorDrawableCompat.create(getResources(), R.drawable.ic_search_black_24dp, mContext.getTheme());
-//
-//            @Override
-//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable editable) {
-////                LogUtil.e("------>"+charSequence.toString());
-//                if (!editable.toString().equals("")) {
-//                    acivClear.setVisibility(View.VISIBLE);
-//                    assert a != null;
-//                    a.setTint(mContext.getResources().getColor(R.color.colorPrimary)); //设置单一的颜色
-//                    acivSearch.setImageDrawable(a);
-//                } else {
-//                    acivClear.setVisibility(View.GONE);
-//                    assert a != null;
-//                    a.setTint(mContext.getResources().getColor(R.color.secondaryText)); //设置单一的颜色
-//                    acivSearch.setImageDrawable(a);
-//                }
-//                etString = editable.toString();
-//            }
-//        });
-//        acivClear.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                etSearch.setText("");
-//            }
-//        });
-//        //点击搜索按钮
-//        acivSearch.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                initEtSearch();
-//            }
-//        });
-//        //整个搜索框
-//        cvSearch = (CardView) mView.findViewById(R.id.cv_search);
-//        //为切换地图添加点击事件
-//        mView.findViewById(R.id.cv_layer).setOnClickListener(view -> {
-//            View contentView = LayoutInflater.from(mContext).inflate(R.layout.layout_map_switch, (ViewGroup) mView, false);//layout_switch_layer //layout_result_dispatch_filter
-//            RadioGroup rgLayerSwitch = (RadioGroup) contentView.findViewById(R.id.rg_layer_switch);
-//            switch (currBaseMapType) {
-//                case topographic:
-//                    ((RadioButton) rgLayerSwitch.findViewById(R.id.rb_topographic)).setChecked(true);
-//                    break;
-//                case vector:
-//                    ((RadioButton) rgLayerSwitch.findViewById(R.id.rb_vector)).setChecked(true);
-//                    break;
-//                case image:
-//                    ((RadioButton) rgLayerSwitch.findViewById(R.id.rb_image)).setChecked(true);
-//                    break;
-//            }
-//            rgLayerSwitch.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-//                ArcGISTiledLayer arcGISTiledLayer;
-//                //                Basemap basemap;
-////                ArcGISMap arcGISMap;
-//
-//                @Override
-//                public void onCheckedChanged(RadioGroup radioGroup, int i) {
-//                    switch (i) {
-//                        case R.id.rb_topographic:
-//                            //地形图
-////                            RxBus.getInstance().send(new MainActivityAction(MainActivityAction.SWITCH_TO_TOPOGRAPHIC));
-//                            arcGISTiledLayer = new ArcGISTiledLayer(getString(R.string.tdt_dem_base_map_url));
-////                            basemap = new Basemap(arcGISTiledLayer);
-//                            basemap.getBaseLayers().clear();
-//                            basemap.getBaseLayers().add(arcGISTiledLayer);
-////                            arcGISMap = new ArcGISMap(basemap);
-//                            arcGISMap.setInitialViewpoint(new Viewpoint(29.55, 106.55, 100000));
-//                            arcGISMap.setMaxScale(1);
-//                            arcGISMap.setMinScale(5000000);
-//                            currBaseMapType = topographic;
-//                            break;
-//                        case R.id.rb_vector:
-//                            //矢量图
-////                            RxBus.getInstance().send(new MainActivityAction(MainActivityAction.SWITCH_TO_VECTOR));
-////                            arcGISTiledLayer = new ArcGISTiledLayer("http://www.digitalcq.com/RemoteRest/services/CQMap_VEC/MapServer");
-//                            arcGISTiledLayer = new ArcGISTiledLayer(getString(R.string.tdt_vec_base_map_url));
-////                            basemap = new Basemap(arcGISTiledLayer);
-////                            arcGISMap = new ArcGISMap(basemap);
-//                            basemap.getBaseLayers().clear();
-//                            basemap.getBaseLayers().add(arcGISTiledLayer);
-//                            arcGISMap.setInitialViewpoint(new Viewpoint(29.55, 106.55, 100000));
-//                            arcGISMap.setMaxScale(1);
-//                            arcGISMap.setMinScale(5000000);
-//                            currBaseMapType = vector;
-//                            break;
-//                        case R.id.rb_image:
-//                            //影像图(卫星图)
-////                            RxBus.getInstance().send(new MainActivityAction(MainActivityAction.SWITCH_TO_IMAGE));
-//                            arcGISTiledLayer = new ArcGISTiledLayer(getString(R.string.tdt_img_base_map_url));
-////                            basemap = new Basemap(arcGISTiledLayer);
-////                            arcGISMap = new ArcGISMap(basemap);
-//                            basemap.getBaseLayers().clear();
-//                            basemap.getBaseLayers().add(arcGISTiledLayer);
-//                            arcGISMap.setInitialViewpoint(new Viewpoint(29.55, 106.55, 100000));
-//                            arcGISMap.setMaxScale(1);
-//                            arcGISMap.setMinScale(5000000);
-//                            currBaseMapType = image;
-//                            break;
-//                    }
-//                    if (arcGISMap != null) {
-//                        mMapView.setMap(arcGISMap);
-//                    }
-//                    DialogUtil.getInstance().dismiss();
-//                }
-//            });
-//            DialogUtil.getInstance().showAnchorDialog(contentView, view);
-//        });
-//        ///////////////////////////////////////////
-//        cvDetail = (CardView) mView.findViewById(R.id.cv_detail);//整个大容器
-//        cvCloseDetail = (CardView) mView.findViewById(R.id.cv_close_detail);//关闭按钮
-//        cvCloseDetail.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                cvDetail.setVisibility(View.GONE);
-//            }
-//        });
-//        llOne = (LinearLayout) mView.findViewById(R.id.ll_one);//第一个小层
-//        llTwo = (LinearLayout) mView.findViewById(R.id.ll_two);//第二个小层
-//        //第一个里的需要填充的TextViews
-//        tvCode = (TextView) mView.findViewById(R.id.tv_code);
-//        tvDate = (TextView) mView.findViewById(R.id.tv_date);
-//        tvBase = (TextView) mView.findViewById(R.id.tv_base);
-//        tvFormat = (TextView) mView.findViewById(R.id.tv_format);
-//        //第二个里的需要填充的TextViews
-//        tvCall = (TextView) mView.findViewById(R.id.tv_call);
-//        tvDig = (TextView) mView.findViewById(R.id.tv_dig);
-//        tvRank = (TextView) mView.findViewById(R.id.tv_rank);
-//        tvHCJZ = (TextView) mView.findViewById(R.id.tv_HCJZ);
-//        rvOne = (RecyclerView) mView.findViewById(R.id.rv_one);
-//        rvTwo = (RecyclerView) mView.findViewById(R.id.rv_two);
-//        GridLayoutManager gridLayoutManagerOne = new GridLayoutManager(mContext, 2);
-//        GridLayoutManager gridLayoutManagerTwo = new GridLayoutManager(mContext, 2);
-//        rvOne.setLayoutManager(gridLayoutManagerOne);
-//        rvTwo.setLayoutManager(gridLayoutManagerTwo);
-//        toyAdapterOne = new ToyAdapter(mContext);
-//        toyAdapterTwo = new ToyAdapter(mContext);
-//        toyAdapterOne.setData(listToy);
-//        toyAdapterTwo.setData(listToy);
-//        linearLayout1 = (LinearLayout) mView.findViewById(R.id.linearLayout1);
-//        linearLayout2 = (LinearLayout) mView.findViewById(R.id.linearLayout2);
-//        rvOne.setAdapter(toyAdapterOne);
-//        rvTwo.setAdapter(toyAdapterTwo);
-//        //
-//        mSpaceSearch = mView.findViewById(R.id.cv_spaceSearch);
-//        mClassifySearch = mView.findViewById(R.id.cv_classifySearch);
-//        mSpaceSearch.setOnClickListener(this::onSpaceSearchClick);
-//        mClassifySearch.setOnClickListener(this::onClassifySearch);
-//        cvCancle = (CardView) mView.findViewById(R.id.cv_cancel);
-//        cvCancle.setOnClickListener(this::onCancelClick);
-//        mIvUser = mView.findViewById(R.id.iv_user);
-//        mIvUser.setOnClickListener(v -> ((MainActivity) getActivity()).openDrawer());
-//    }
-//
-//    private void onCancelClick(View view) {
-//        restoreDrawQuery();
-//    }
-//
-//    //条件查询
-//    private void siftSearch(View view) {
-//        View contentView = LayoutInflater
-//                .from(mContext)
-//                .inflate(R.layout.layout_result_dispatch_filter,
-//                        (ViewGroup) ((Activity) mContext).getWindow().getDecorView().getRootView(),
-//                        false);
-////                RecyclerView recyclerView1 = (RecyclerView) contentView.findViewById(R.id.recyclerView1);
-//        calendar1 = (AppCompatImageView) contentView.findViewById(R.id.calendar1);
-//        calendar2 = (AppCompatImageView) contentView.findViewById(R.id.calendar2);
-//        relativeLayoutLeft = (RelativeLayout) contentView.findViewById(R.id.relativeLayoutLeft);
-//        relativeLayoutRight = (RelativeLayout) contentView.findViewById(R.id.relativeLayoutRight);
-//
-//        calendar1Content = (TextView) contentView.findViewById(R.id.calendar1_content);
-//        calendar2Content = (TextView) contentView.findViewById(R.id.calendar2_content);
-//
-////            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");//设置日期格式
-//        calendar2Content.setText("结束时间");
-//        Calendar calendar = Calendar.getInstance();
-//        int year = calendar.get(Calendar.YEAR);
-//        int month = calendar.get(Calendar.MONTH);
-//        int day = calendar.get(Calendar.DAY_OF_MONTH);
-////            String dateString = year + "-" + month + "-" + day;
-//        calendar1Content.setText("开始时间");
-//
-//        relativeLayoutLeft.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                isFirst = true;
-//                Calendar now = Calendar.getInstance();
-//                DatePickerDialog dpd1 = DatePickerDialog.newInstance(DirectoryFragment.this,
-//                        now.get(Calendar.YEAR),
-//                        now.get(Calendar.MONTH) - 1,
-//                        now.get(Calendar.DAY_OF_MONTH)
-//                );
-//                dpd1.setVersion(DatePickerDialog.Version.VERSION_2);
-//                dpd1.show(getFragmentManager(), "Datepickerdialog");
-//            }
-//        });
-//        relativeLayoutRight.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                isFirst = false;
-//                Calendar now = Calendar.getInstance();
-//                DatePickerDialog dpd2 = DatePickerDialog.newInstance(
-//                        DirectoryFragment.this,
-//                        now.get(Calendar.YEAR),
-//                        now.get(Calendar.MONTH),
-//                        now.get(Calendar.DAY_OF_MONTH)
-//                );
-//                dpd2.setVersion(DatePickerDialog.Version.VERSION_2);
-//                dpd2.show(getFragmentManager(), "Datepickerdialog");
-//            }
-//        });
-//        AppCompatButton acbQuery = (AppCompatButton) contentView.findViewById(R.id.acb_query);
-//        initEtSearchForDialog(contentView);
-//        initAcbSearchForDialog(acbQuery);
-//        DialogUtil.getInstance().showAnchorDialog(contentView, view);
-//    }
-//
-//    /**
-//     * 空间查询
-//     */
-//    public void onSpaceSearchClick(View view) {
-//        //画完，或者没画
-//        if (currDrawType == DRAWTYPE_NONE || currDrawType == DRAWTYPE_FINISH) {
-//            View contentView = LayoutInflater
-//                    .from(mContext)
-//                    .inflate(R.layout.dialog_dispatch_draw_type, (ViewGroup) mView,
-//                            false);//layout_switch_layer //layout_result_dispatch_filter
-//            for (int i = 0; i < ((ViewGroup) contentView).getChildCount(); i++) {
-//                ((ViewGroup) contentView).getChildAt(i).setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        mSketchGraphicsOverlay.clear();
-//                        switch (view.getId()) {
-//                            case R.id.tv_circle://画圆
-//                                if (currDrawType != DRAWTYPE_CIRCLE) {
-//                                    ToastUtil.showShort("画圆暂未实现！");
-//                                    return;
-//                                }
-//                                currDrawType = DRAWTYPE_CIRCLE;
-//                                mSketchGraphicsOverlay.setDrawingMode(SketchGraphicsOverlay.DrawingMode.CIRCLE);
-//                                break;
-//                            case R.id.tv_rectangle://矩形选择
-//                                currDrawType = DRAWTYPE_RECTANGLE;
-//                                mSketchGraphicsOverlay.setDrawingMode(SketchGraphicsOverlay.DrawingMode.RECTANGLE);
-//                                showCancelButton();
-//                                break;
-//                            case R.id.tv_polygon://多边形
-//                                currDrawType = DRAWTYPE_POLYGON;
-//                                mSketchGraphicsOverlay.setDrawingMode(SketchGraphicsOverlay.DrawingMode.POLYGON);
-//                                showCancelButton();
-//                                break;
-//                            case R.id.tv_flash://缓冲区
-//                                currDrawType = DRAWTYPE_FLASH;
-//                                mSketchGraphicsOverlay.setDrawingMode(SketchGraphicsOverlay.DrawingMode.POLYLINE);
-//                                showCancelButton();
-//                                break;
-//                            case R.id.tv_symbol:
-//                                showSymbolDialog();
-//                                break;
-//                            case R.id.tv_adminRegion:
-////                                ToastUtil.showShort("tv_adminRegion");
-//                                showAdminRegion();
-//                                break;
-//                        }
-//                    }
-//                });
-//            }
-//            DialogUtil.getInstance().showAnchorDialog(contentView, view);
-//        } else if (currDrawType == DRAWTYPE_SEARCHING) {//正在搜索
-//            mProgressDialog.setMessage("搜索中！");
-//            mProgressDialog.show();
-//
-//            //画形状
-//        } else if (currDrawType == DRAWTYPE_CIRCLE || currDrawType == DRAWTYPE_RECTANGLE ||
-//                currDrawType == DRAWTYPE_POLYGON) {
-//            searchPolygonToData();
-//        } else if (currDrawType == DRAWTYPE_FLASH) {//缓冲区查询
-//            if (mSketchGraphicsOverlay.getCurrentPolygon() == null) {
-//                ToastUtil.showShort("请多次点击地图圈选出需要查询的区域后再搜索");
-//                return;
-//            }
-//            if (km != 0) {
-////                    ToastUtil.showShort("查询数据");
-//                searchPolygonToData();
-//                km = 0;
-//                return;
-//            }
-//            QMUIDialog.EditTextDialogBuilder builder = new QMUIDialog.EditTextDialogBuilder(getActivity());
-//            builder.setTitle(R.string.alert_title)
-//                    .setInputType(InputType.TYPE_CLASS_NUMBER)
-//                    .addAction(R.string.alert_ok, (qmuiDialog, i) -> {
-//                        String numText = builder.getEditText().getText().toString();
-//                        if (TextUtils.isEmpty(numText)) {
-//                            ToastUtil.showShort("范围不能为空");
-//                            return;
-//                        }
-//                        km = Integer.parseInt(numText);
-//                        if (km > 0 && km < 100) {
-//                            qmuiDialog.dismiss();
-////                                ToastUtil.showShort("画缓冲区的形状");
-//                            mSketchGraphicsOverlay.setBufferGeometry(km);
-//                        } else {
-//                            ToastUtil.showShort("范围为0-100公里");
-//                        }
-//
-//                    })
-//                    .addAction(R.string.alert_cancel, (qmuiDialog, i) -> {
-//                        qmuiDialog.dismiss();
-//                    })
-//                    .setPlaceholder("请输入范围(0-100公里)")
-//                    .show();
-//        } else if (currDrawType == DRAWTYPE_SYMBOL) {//图幅号查询
-//            ToastUtil.showShort("图幅号查询");
-//            searchPolygonToData();
-////            searchGeometryOrSql(null);
-//        } else if (currDrawType == DRAWTYPE_ADMIN_REGION) {//行政区域查询
-////            searchGeometryOrSql(null);
-//            searchPolygonToData();
-//        }
-//    }
-//
-//    private void showCancelButton() {
-//        cvCancle.setVisibility(View.VISIBLE);
-//        DialogUtil.getInstance().dismiss();
-////                        ((TextView) mSpaceSearch.findViewById(R.id.tv_space)).setText("搜索");
-//        ((AppCompatImageView) mSpaceSearch.findViewById(R.id.aci_space))
-//                .setImageResource(R.mipmap.ic_sure_modifi);
-//    }
-//
-//    private void showSymbolDialog() {
-//        new SimpleAlertDialog(getActivity())
-//                .title("图幅号查询")
-//                .message("可输入多个图幅号，图幅号直接用空格或逗号分隔如\n'G49E005001 G49E005002'\n或\n'G49E005001,G49E005002'")
-//                .setOkOnClickListener(R.string.alert_ok, (dialog1, view) -> {
-//                    String text = dialog1.getEditText().getText().toString();
-//                    if (TextUtils.isEmpty(text)) {
-//                        ToastUtil.showShort("不能为空");
-//                        return;
-//                    }
-//                    currDrawType = DRAWTYPE_SYMBOL;
-//                    showCancelButton();
-//                    searchSymbol(text);
-//                })
-//                .visiableEditText()
-//                .setCancelOnClickListener(R.string.alert_cancel, null)
-//                .alert();
-//    }
-//
-//    private int lastPosition = -1;
-//
-//    //行政区域查询show dialog
-//    private void showAdminRegion() {
-//        Map<Object, Object> map = new HashMap<>();
-//        APIService.getInstance()
-//                .getAreaList(map, new SimpleSubscriber<List<AreaModel>>() {
-//                    @Override
-//                    public void onResponse(List<AreaModel> response) {
-//                        View dialogView = View.inflate(getActivity(), R.layout.dialog_admin_region,
-//                                null);
-//                        RecyclerView rv = dialogView.findViewById(R.id.recycler_view);
-//                        Button btn_ok = dialogView.findViewById(R.id.btn_ok);
-//                        rv.setLayoutManager(new GridLayoutManager(getActivity(), 4));
-//                        AdminRegionAdapter adapter = new AdminRegionAdapter(getActivity(), response);
-//                        adapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener() {
-//                            @Override
-//                            public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
-////                                ToastUtil.showShort("onItemClick");
-////                                TextView textView = view.findViewById(R.id.tv_title);
-//                                if (position == lastPosition) return;
-//                                if (response.get(position).isChecked()) {
-//                                    response.get(position).setChecked(false);
-////                                    textView.setSelected(false);
-//                                } else {
-//                                    response.get(position).setChecked(true);
-//                                    if (lastPosition != -1) {
-//                                        response.get(lastPosition).setChecked(false);
-//                                    }
-////                                    textView.setSelected(true);
-//                                }
-//                                adapter.notifyDataSetChanged();
-//                                lastPosition = position;
-//                            }
-//
-//                            @Override
-//                            public boolean onItemLongClick(View view, RecyclerView.ViewHolder holder, int position) {
-//                                return false;
-//                            }
-//                        });
-//                        rv.setAdapter(adapter);
-//                        AppCompatDialog dialog = new AppCompatDialog(getActivity());
-//                        dialog.setContentView(dialogView);
-//                        dialog.show();
-//                        btn_ok.setOnClickListener(v -> {
-//                            if (lastPosition == -1) {
-//                                ToastUtil.showShort("请选择一个区域");
-//                                return;
-//                            }
-//                            dialog.dismiss();
-//                            currDrawType = DRAWTYPE_ADMIN_REGION;
-//                            showCancelButton();
-//                            searchAdminRegion(response.get(lastPosition).getAreaName());
-//                        });
-//                    }
-//                });
-//    }
-//
-//    //行政区域查询
-//    private void searchAdminRegion(String areaStr) {
-//        String urlStr = getString(R.string.query_admin_region);
-//        QueryParameters query = new QueryParameters();
-//        String where = String.format("1=1 and MC='%s'", areaStr);
-////        String where = "1=1";
-//        query.setWhereClause(where);
-//        query.setReturnGeometry(true);
-//        query.setOutSpatialReference(mMapView.getSpatialReference());
-//
-//        ServiceFeatureTable sft = new ServiceFeatureTable(urlStr);
-//        final ListenableFuture<FeatureQueryResult> future = sft.queryFeaturesAsync(query);
-//        future.addDoneListener(() -> {
-//            try {
-//                FeatureQueryResult features = future.get();
-//                if (features == null || !features.iterator().hasNext()) {
-//                    ToastUtil.showShort("未查询到数据");
-////                    LogUtil.i("未查询到数据");
-//                    return;
-//                }
-//                LogUtil.i("查询到数据");
-//                SimpleLineSymbol symbol =
-//                        new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID,
-//                                Color.RED, 2);
-//                for (Feature feature : features) {
-//                    Graphic graphic = new Graphic(feature.getGeometry(), symbol);
-//                    mSketchGraphicsOverlay.setCurrentPolygon(graphic);
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        });
-//    }
-//
-//    //图幅号查询
-//    private void searchSymbol(String text) {
-//        if (text.contains(",")) {
-//            String[] split = text.split(",");
-//            StringBuilder sb = new StringBuilder();
-//            for (int i = 0; i < split.length; i++) {
-//                sb.append(String.format("'%s',", split[i]));
-//            }
-//            text = sb.substring(0, sb.lastIndexOf(","));
-//        }
-//        if (text.contains(" ")) {
-//            String[] split = text.split(" ");
-//            StringBuilder sb = new StringBuilder();
-//            for (int i = 0; i < split.length; i++) {
-//                sb.append(String.format("'%s',", split[i]));
-//            }
-//            text = sb.substring(0, sb.lastIndexOf(","));
-//        }
-//        for (int i = 0; i < 7; i++) {
-//            QueryParameters query = new QueryParameters();
-////            query.setWhereClause("1=1");
-//            String where = String.format("1=1 and 新图号 in (%s)", text);
-//            query.setWhereClause(where);
-////            LogUtil.i("where = " + where);
-//            query.setReturnGeometry(true);
-//            query.setOutSpatialReference(mMapView.getSpatialReference());
-//            String urlStr = String.format("http://ddk.digitalcq.com:6080/arcgis/rest/" +
-//                    "services/CQGRID_2000/Mapserver/%s", i);
-////            String urlStr = getString(R.string.feature_server_url);
-////            LogUtil.i("urlStr == " + urlStr);
-////            ServiceFeatureTable.QueryFeatureFields featureFields
-////                    = ServiceFeatureTable.QueryFeatureFields.LOAD_ALL;
-//            ServiceFeatureTable sft = new ServiceFeatureTable(urlStr);
-//            final ListenableFuture<FeatureQueryResult> future = sft.queryFeaturesAsync(query);
-//            future.addDoneListener(() -> {
-////                LogUtil.i("回调成功");
-//                try {
-//                    FeatureQueryResult features = future.get();
-//                    if (features == null || !features.iterator().hasNext()) {
-////                        ToastUtil.showShort("未查询到数据");
-//                        return;
-//                    }
-//                    SimpleLineSymbol symbol =
-//                            new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID,
-//                                    Color.RED, 2);
-//                    for (Feature feature : features) {
-//                        Graphic graphic = new Graphic(feature.getGeometry(), symbol);
-//                        mSketchGraphicsOverlay.setCurrentPolygon(graphic);
-//                    }
-////                    for (Feature feature : features) {
-////                        String json = feature.getGeometry().toJson();
-////                        LogUtil.i("json = " + json);
-////                        RingModel ringModel = new Gson().fromJson(json, RingModel.class);
-////                        PointCollection points = new PointCollection(mMapView.getSpatialReference());
-////                        if (ringModel.rings != null && !ringModel.rings.isEmpty()) {
-////                            List<List<Double>> ringList = ringModel.rings.get(0);
-////                            if (ringList != null && !ringList.isEmpty()) {
-////                                for (List<Double> point : ringList) {
-////                                    Double x = point.get(0);
-////                                    Double y = point.get(1);
-////                                    points.add(new Point(x, y));
-////                                }
-////                            }
-////                        }
-////                        SimpleLineSymbol symbol =
-////                                new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID,
-////                                        Color.RED, 2);
-////                        Polygon polygon = new Polygon(points);
-////                        Graphic graphic = new Graphic(polygon, symbol);
-//////                        graphicsOverlay.getGraphics().add(graphic);
-////
-//////                        Geometry geometry = Geometry.fromJson(json);
-//////                        mSketchGraphicsOverlay.getCurrentPolygon().setGeometry(geometry);
-//////                        mSketchGraphicsOverlay.getCurrentPolygon().setGeometry(polygon);
-//////                        mSketchGraphicsOverlay.getCurrentPolygon().setSymbol(symbol);
-////                        mSketchGraphicsOverlay.setCurrentPolygon(graphic);
-//////                        mSketchGraphicsOverlay.mGraphics.add(graphic);
-////                        LogUtil.i("add graphic");
-////                    }
-////                    ToastUtil.showShort("查询到数据");
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-////                    ToastUtil.showShort("Exception");
-//                }
-//            });
-//
-//        }
-//    }
-//
-//    private void restoreDrawQuery() {
-////        ((TextView) mSpaceSearch.findViewById(R.id.tv_space)).setText("空间");
-//        ((AppCompatImageView) mSpaceSearch.findViewById(R.id.aci_space))
-//                .setImageResource(R.mipmap.ic_kongjian);
-//        currDrawType = DRAWTYPE_NONE;
-//        mSketchGraphicsOverlay.clear();
-//        cvCancle.setVisibility(View.GONE);
-//    }
-//
-//    //用polygon搜索数据
-//    private void searchPolygonToData() {
-//        Observable.create((Observable.OnSubscribe<String>) subscriber -> {
-//            if (mSketchGraphicsOverlay.getCurrentPolygon() == null) {
-//                if (currDrawType == DRAWTYPE_CIRCLE) {
-//                    subscriber.onError(new Throwable("请滑动手指画出需要查询区域的圆形后再搜索"));
-//                } else if (currDrawType == DRAWTYPE_RECTANGLE) {
-//                    subscriber.onError(new Throwable("请滑动手指画出需要查询区域的矩形后再搜索"));
-//                } else if (currDrawType == DRAWTYPE_POLYGON) {
-//                    subscriber.onError(new Throwable("请多次点击地图圈选出需要查询的区域后再搜索！"));
-//                } else if (currDrawType == DRAWTYPE_FLASH) {
-//                    subscriber.onError(new Throwable("请多次点击地图圈选出需要查询的区域后再搜索！"));
-//                } else if (currDrawType == DRAWTYPE_SYMBOL) {
-//                    subscriber.onError(new Throwable("请输入图幅号后再搜索！"));
-//                    restoreDrawQuery();
-//                } else if (currDrawType == DRAWTYPE_ADMIN_REGION) {
-//                    subscriber.onError(new Throwable("请选择区域后再搜索！"));
-//                    restoreDrawQuery();
-//                }
-//
-//            } else {
-//                subscriber.onNext("START");
-//            }
-//        }).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .doOnSubscribe(() -> {
-////                            mMySketchGraphicsOverlayEventListener.onDrawingFinished();
-//                    mProgressDialog.setMessage("搜索中……");
-//                    mProgressDialog.show();
-//                }).observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Subscriber<String>() {
-//                    @Override
-//                    public void onCompleted() {
-//                        ToastUtil.showShort("搜索完成！");
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        dismissProgressDialog();
-//                        ToastUtil.showLong(e.getMessage());
-//                    }
-//
-//                    @Override
-//                    public void onNext(String s) {
-//                        searchGeometryOrSql(null);
-//                    }
-//                });
-//    }
-//
-//    /**
-//     * 分类查询
-//     */
-//    public void onClassifySearch(View view) {
-////        ToastUtil.showShort("分类查询");
-//
-//        View dialogRoot = LayoutInflater.from(getActivity())
-//                .inflate(R.layout.dialog_classify_search, ((ViewGroup) mView), false);
-//        TagFlowLayout typeFlowLayout = dialogRoot.findViewById(R.id.flow_type);
-////        RecyclerView rvType = dialogRoot.findViewById(R.id.rv_type);
-//
-//        APIService.getInstance().getfruitCategoryList(
-//                new SimpleSubscriber<List<FruitCategoryListModel>>() {
-//                    @Override
-//                    public void onResponse(List<FruitCategoryListModel> response) {
-//
-//                        TagAdapter<FruitCategoryListModel> flowTypeAdapter = new TagAdapter<FruitCategoryListModel>(response) {
-//                            @Override
-//                            public View getView(FlowLayout flowLayout, int i, FruitCategoryListModel o) {
-//                                TextView textView = (TextView) View.inflate(getActivity(), R.layout.item_flow_type, null);
-//                                textView.setText(o.categoryName);
-//                                return textView;
-//                            }
-//
-//                            @Override
-//                            public void onSelected(int position, View view) {
-//                                super.onSelected(position, view);
-//                                mBody = new ReportHandoutListBody();
-//                                if (response == null) {
-//                                    return;
-//                                }
-//                                FruitCategoryListModel model = response.get(position);
-//                                if (model == null) {
-//                                    return;
-//                                }
-//                                mBody.setFruitCategoryId(model.fruitCategoryId);
-//                                switchType(model, dialogRoot);
-//                            }
-//                        };
-//                        typeFlowLayout.setAdapter(flowTypeAdapter);
-////                        flowTypeAdapter.onSelected(0, null);
-//                        flowTypeAdapter.setSelectedList(0);
-////                        FruitCategoryAdapter fcAdapter = new FruitCategoryAdapter(getActivity(), response);
-////                        GridLayoutManager lm = new GridLayoutManager(getActivity(), 3);
-////                        rvType.setLayoutManager(lm);
-////                        rvType.setAdapter(fcAdapter);
-//                    }
-//                });
-//
-//
-//        DialogUtil.getInstance().showAnchorDialog(dialogRoot, view);
-//    }
-//
-//    private void switchType(FruitCategoryListModel model, View dialogRoot) {
-//        APIService.getInstance().gethandoutConditionByFCList(model.fruitCategoryId,
-//                new SimpleSubscriber<List<GethandoutConditionByFCModel>>() {
-//                    @Override
-//                    public void onResponse(List<GethandoutConditionByFCModel> response) {
-//                        if (response == null || response.isEmpty()) {
-//                            return;
-//                        }
-//
-//                        LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
-//                        llContainer.removeAllViews();
-//                        mBody.attrValueList.clear();
-//
-//                        for (GethandoutConditionByFCModel gethandoutConditionByFCModel : response) {
-//                            View item = LayoutInflater.from(dialogRoot.getContext()).inflate(R.layout.dispatch_dialog_item, llContainer, false);
-//                            TagFlowLayout tagFlowLayout = (TagFlowLayout) LayoutInflater.from(dialogRoot.getContext()).inflate(R.layout.dispatch_dialog_item_tag_flow_layout, llContainer, false);
-//
-//                            TextView tv1 = item.findViewById(R.id.tv_attrName);
-//                            tv1.setText(gethandoutConditionByFCModel.attrName);
-//
-//                            TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal> ta1
-//                                    = new TagAdapter<GethandoutConditionByFCModel.FruitCateGoryAttrVal>(gethandoutConditionByFCModel.fruitCateGoryAttrVal) {
-//                                @Override
-//                                public View getView(FlowLayout flowLayout, int i,
-//                                                    GethandoutConditionByFCModel.FruitCateGoryAttrVal o) {
-//                                    TextView textView = (TextView) View.inflate(getActivity(),
-//                                            R.layout.item_flow_type, null);
-//                                    textView.setText(o.attrValue);
-//                                    return textView;
-//                                }
-//
-//                                @Override
-//                                public void onSelected(int position, View view) {
-//                                    super.onSelected(position, view);
-//                                    long fruitCategoryAttrId = gethandoutConditionByFCModel.fruitCategoryAttrId;
-//                                    String attrValue = gethandoutConditionByFCModel.fruitCateGoryAttrVal.get(position).attrValue;
-//                                    mBody.attrValueList
-//                                            .add(new ReportHandoutListBody
-//                                                    .AttrValueList(fruitCategoryAttrId, attrValue));
-//                                }
-//                            };
-//                            tagFlowLayout.setAdapter(ta1);
-//                            ta1.setSelectedList(0);
-//
-//                            llContainer.addView(item);
-//                            llContainer.addView(tagFlowLayout);
-//                        }
-//
-//                        Button btn_search = dialogRoot.findViewById(R.id.btn_search);
-//                        btn_search.setOnClickListener(v -> {
-////                                ToastUtil.showShort("btn_search");
-//                            reportHandoutList();
-//                        });
-//                    }
-//                });
-//    }
-//
-//    private void reportHandoutList() {
-//        APIService.getInstance().getReportHandoutList(mBody, new SimpleSubscriber<List<ReportHandoutListModel>>() {
-//            @Override
-//            public void onResponse(List<ReportHandoutListModel> response) {
-//
-//                if (response == null || response.isEmpty()) return;
-//                StringBuilder sb = new StringBuilder();
-//                sb.append("FRUIT");
-//                sb.append(" IN ");
-//                sb.append("(");
-//                int mapType = 0;
-//                for (ReportHandoutListModel reportHandoutListModel : response) {
-//
-//                    for (ReportHandoutListModel.FruitCategoryList fruitCategoryList :
-//                            reportHandoutListModel.fruitCategoryList) {
-//
-//                        mapType = fruitCategoryList.mapType;
-//                        for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
-//                                fruitCategoryList.fruitList) {
-//
-//                            long fruitId = fruitList.fruitId;
-//                            sb.append(String.valueOf(fruitId));
-//                            sb.append(",");
-//                        }
-//
-//                    }
-//
-//                }
-//
-//                String whereClause = sb.substring(0, sb.lastIndexOf(",")) + ")";
-//                LogUtil.i("whereClause == " + whereClause);
-//
-////                searchGeometryOrSql(whereClause);
-//                searchType(mapType, whereClause);
-//                DialogUtil.getInstance().dismiss();
-//
-//            }
-//
-//            @Override
-//            public void onError(Throwable e) {
-//                super.onError(e);
-//                ToastUtil.showShort(e.getMessage());
-//                DialogUtil.getInstance().dismiss();
-//            }
-//        });
-//    }
-//
-//    /***
-//     * 初始化地图
-//     */
-//    private void initMap() {
-//        mMapView = (MapView) mView.findViewById(R.id.mapView2);
-////        ArcGISVectorTiledLayer arcGISVectorTiledLayer = new ArcGISVectorTiledLayer("http://www.digitalcq.com/RemoteRest/services/CQMap_VEC/MapServer");
-//        ArcGISTiledLayer arcGISTiledLayer = new ArcGISTiledLayer(getString(R.string.tdt_vec_base_map_url));
-////        ArcGISMapImageLayer arcGISMapImageLayer = new ArcGISMapImageLayer("http://www.digitalcq.com/RemoteRest/services/CQMap_VEC/MapServer");
-//        basemap = new Basemap(arcGISTiledLayer);
-//        arcGISMap = new ArcGISMap(basemap);
-//        mMapView.setAttributionTextVisible(false);
-//        arcGISMap.setInitialViewpoint(new Viewpoint(29.55, 106.55, 100000));
-//        arcGISMap.setMaxScale(1);
-//        arcGISMap.setMinScale(5000000);
-//        mMapView.setMap(arcGISMap);
-//        mServiceFeatureTable = new ServiceFeatureTable(getString(R.string.feature_server_url));
-//        mFeaturelayer = new FeatureLayer(mServiceFeatureTable);
-//        mFeaturelayer.setOpacity(0.8f);
-////        mFeaturelayer.setLabelsEnabled(true);
-//
-//        mFeaturelayer.setSelectionColor(Color.argb(220, 255, 0, 0));
-//        mFeaturelayer.setSelectionWidth(5);
-//        SimpleMarkerSymbol simpleMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, mContext.getResources().getColor(R.color.colorPrimary), 10);
-//        mFeaturelayer.setRenderer(new SimpleRenderer(simpleMarkerSymbol));//new UniqueValueRenderer()
-//        arcGISMap.getOperationalLayers().add(mFeaturelayer);
-//        mLocationDisplay = mMapView.getLocationDisplay();
-//        mLocationDisplay.addDataSourceStatusChangedListener(new LocationDisplay.DataSourceStatusChangedListener() {
-//            @Override
-//            public void onStatusChanged(LocationDisplay.DataSourceStatusChangedEvent dataSourceStatusChangedEvent) {
-//                if (dataSourceStatusChangedEvent.isStarted())
-//                    return;
-//                if (dataSourceStatusChangedEvent.getError() == null)
-//                    return;
-//                boolean permissionCheck1 = ContextCompat.checkSelfPermission(mContext, reqPermissions[0]) ==
-//                        PackageManager.PERMISSION_GRANTED;
-//                boolean permissionCheck2 = ContextCompat.checkSelfPermission(mContext, reqPermissions[1]) ==
-//                        PackageManager.PERMISSION_GRANTED;
-//                if (!(permissionCheck1 && permissionCheck2)) {
-//                    ActivityCompat.requestPermissions((Activity) mContext, reqPermissions, requestCode);
-//                } else {
-//                    String message = String.format("Error in DataSourceStatusChangedListener: %s", dataSourceStatusChangedEvent
-//                            .getSource().getLocationDataSource().getError().getMessage());
-//                    Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        });
-//        graphicsOverlay = addGraphicsOverlay(mMapView);
-//        initAllFeatureQueryResult();
-//        cvClear = (CardView) mView.findViewById(R.id.cv_clear);
-//        cvClear.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                mDispatchFragmentStore.getListHYLB_CODE().clear();
-//                mDispatchFragmentStore.getListZCD_CODE().clear();
-//                etSearch.setText("");
-//                cvClear.setVisibility(View.GONE);
-//                RxBus.getInstance().send(new MainActivityAction(MainActivityAction.CLEAR_TEXT));
-//                showAll();
-//            }
-//        });
-//
-//        MySketchGraphicsOverlayEventListener mMySketchGraphicsOverlayEventListener = new MySketchGraphicsOverlayEventListener();
-//        mSketchGraphicsOverlay = new SketchGraphicsOverlay(mMapView, mMySketchGraphicsOverlayEventListener);
-//        //设置地图上的marker点击事件（只有当处于不是polygon画图且空白区域里才触发事件）
-//        mSketchGraphicsOverlay.setIOnEmptyClickListener(new SketchGraphicsOverlay.IOnEmptyClickListener() {
-//            @Override
-//            public void onEmptyClick(MotionEvent event) {
-////                ToastUtil.showShort("onEmptyClick");
-//                // get the point that was clicked and convert it to a point in map coordinates
-//                final Point clickPoint = mMapView.screenToLocation(new android.graphics.Point(Math.round(event.getX()), Math.round(event.getY())));
-//                // create a selection tolerance
-//                int tolerance = 10;
-//                double mapTolerance = tolerance * mMapView.getUnitsPerDensityIndependentPixel();
-//                // use tolerance to create an envelope to querySearch
-//                Envelope envelope = new Envelope(clickPoint.getX() - mapTolerance, clickPoint.getY() - mapTolerance, clickPoint.getX() + mapTolerance, clickPoint.getY() + mapTolerance, arcGISMap.getSpatialReference());
-//                QueryParameters query = new QueryParameters();
-//                query.setGeometry(envelope);
-//                // request all available attribute fields
-//                final ListenableFuture<FeatureQueryResult> future = mServiceFeatureTable.queryFeaturesAsync(query, ServiceFeatureTable.QueryFeatureFields.LOAD_ALL);
-//                // add done loading listener to fire when the selection returns
-//                future.addDoneListener(() -> {
-//                    //call get on the future to get the result
-//                    FeatureQueryResult result = null;
-//                    try {
-//                        result = future.get();
-//                        Iterator<Feature> iterator = result.iterator();
-//                        Feature feature;
-//                        if (iterator.hasNext()) {
-//                            //如果已经点到Symbol，那么清空之前已选中的
-//                            mFeaturelayer.clearSelection();
-//                        }
-//                        if (iterator.hasNext()) {
-//                            feature = iterator.next();
-////                                Envelope envelope = feature.getGeometry().getExtent();
-//                            //发送到MainActivity，然后让MainActivity来选中recyclerView的某项item
-//                            MainActivityAction<OwnSMCHResultItem> mainActivityAction =
-//                                    new MainActivityAction<>(MainActivityAction.ACTION_SELECT_ITEM,
-//                                            mDispatchFragmentStore.getOwnSMCHResultItemList());
-//                            mainActivityAction.setFeature(feature);
-//                            mFeaturelayer.selectFeature(feature);
-//                            RxBus.getInstance().send(mainActivityAction);
-//                        }
-//                    } catch (InterruptedException | ExecutionException e1) {
-//                        e1.printStackTrace();
-//                    }
-//                    // create an Iterator
-//
-//                });
-//            }
-//        });
-//
-//    }
-//
-//
-//    /***
-//     * 初始化顶部全局搜索框
-//     */
-//    private void initEtSearch() {
-//        if (etSearch.getText().toString().equals("")) {
-//            ToastUtil.showShort("请输入单位名称或组织机构代码后再搜索");
-//            return;
-//        }
-////        Map<Object, Object> map = new HashMap<>();
-////        if (!TextUtils.isEmpty(etSearch.getText().toString())) {
-////            map.put("key", etSearch.getText().toString());
-////        }
-////        APIService.getInstance().getOrderList(map, new DoOnSubscriber<List<OrderModel>>() {
-////            @Override
-////            public void doOnSubscriber() {
-////
-////            }
-////
-////            @Override
-////            public void onCompleted() {
-////
-////            }
-////
-////            @Override
-////            public void onNext(List<OrderModel> orderModelList) {
-////                StringBuilder stringBuilder = new StringBuilder();
-////                for (int i = 0; i < orderModelList.size(); i++) {
-//////                    LogUtil.i(companyModels.get(i).getCompanyName()+","+companyModels.get(i).getOrganizationCode());
-////                    stringBuilder.append(Config.ARCGIS_UNITID);
-////                    stringBuilder.append(" = ");
-////                    stringBuilder.append(orderModelList.get(i).getCompanyId());
-////                    if (i != orderModelList.size() - 1) {
-////                        stringBuilder.append(" or ");
-////                    }
-////                }
-////                searchGeometryOrSql(stringBuilder.toString());
-////                try {
-////                    DeviceUtil.closeKeyboard(etSearch, mContext);
-////                } catch (Exception e) {
-////                    LogUtil.e("关闭输入法失败！错误信息：" + e.getMessage());
-////                }
-////            }
-////
-////            @Override
-////            public void onError(Throwable e) {
-////                super.onError(e);
-////                ToastUtil.showShort(e.getMessage());
-////            }
-////        });
-//
-//
-////
-////        aaaString sql = "name like '%" + etSearch.getText().toString() + "%' or qydm like '%" + etString + "%'";
-////        searchGeometryOrSql(sql);
-//
-////        RxBus.getInstance().send(new MainActivityAction(MainActivityAction.CLEAR_TEXT));
-//        mProgressDialog.setMessage("搜索中……");
-//        mProgressDialog.show();
-//        mDispatchFragmentActionsCreator.buildSql(etSearch.getText().toString(), "", "", 0, 0);
-//        try {
-//            DeviceUtil.closeKeyboard(etSearch, mContext);
-//        } catch (Exception e) {
-//            LogUtil.e("关闭输入法失败！错误信息：" + e.getMessage());
-//        }
-//    }
-//
-//    private void initEtSearchForDialog(View contentView) {
-//        etCaseCode = (EditText) contentView.findViewById(R.id.et_case_code);//报件编号
-//        etDataCode = (EditText) contentView.findViewById(R.id.et_data_code);//图幅数/数据编号
-//        etSearchDialog = (EditText) contentView.findViewById(R.id.et_search);
-//        calendar1_content = (TextView) contentView.findViewById(R.id.calendar1_content);
-//        calendar2_content = (TextView) contentView.findViewById(R.id.calendar2_content);
-//
-//        etSearchDialog.setImeActionLabel("确定", EditorInfo.IME_ACTION_DONE);
-//        if (!TextUtils.isEmpty(etString)) {
-//            etSearchDialog.setText(etString);
-//            etSearchDialog.setSelection(etString.length());
-//        }
-//        etSearchDialog.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable editable) {
-//                etString = editable.toString();
-//                etSearch.setText(etString);
-//                etSearch.setSelection(etString.length());
-//            }
-//        });
-//    }
-//
-//    //条件查询确定按钮点击事件
-//    private void initAcbSearchForDialog(AppCompatButton acbQuery) {
-//        //设置'查询'按钮功能
-//        acbQuery.setOnClickListener(view -> {
-//            long data1 = 0, data2 = 0;
-//            try {
-//                data1 = DateUtil.stringToLong("yyyy-MM-dd", calendar1_content.getText().toString());
-//            } catch (Exception e) {
-////                    e.printStackTrace();
-//            }
-//            try {
-//                data2 = DateUtil.stringToLong("yyyy-MM-dd", calendar2_content.getText().toString());
-//            } catch (Exception e) {
-////                    e.printStackTrace();
-//            }
-//            if (data1 != 0 && data2 == 0) {
-//                ToastUtil.showShort("请选择结束时间");
-//                return;
-//            }
-//            if (data1 == 0 && data2 != 0) {
-//                ToastUtil.showShort("请选择开始时间");
-//                return;
-//            }
-//            RxBus.getInstance()
-//                    .send(new MainActivityAction(MainActivityAction.CLEAR_TEXT));
-//            mProgressDialog.setMessage("搜索中……");
-//            mProgressDialog.show();
-//            mDispatchFragmentActionsCreator
-//                    .buildSql(
-//                            etSearchDialog.getText().toString(),
-//                            etCaseCode.getText().toString(),
-//                            etDataCode.getText().toString(),
-//                            data1,
-//                            data2);
-//        });
-//    }
-//
-//    /***
-//     * 搜索。如果sql为空那么就搜索多边形，否则搜索sql
-//     */
-//    private void searchGeometryOrSql(String sql) {
-//        currDrawType = DRAWTYPE_SEARCHING;
-//        mFeaturelayer.clearSelection();
-//        cvClear.setVisibility(View.VISIBLE);
-//        QueryParameters query;
-//        if (TextUtils.isEmpty(sql)) {
-//            query = new QueryParameters();
-//            query.setGeometry(mSketchGraphicsOverlay.getCurrentPolygon().getGeometry());
-//        } else {
-//            query = new QueryParameters();
-//            query.setWhereClause(sql);
-//        }
-//        //如果query不为空
-//        querySearch(query);
-//        mProgressDialog.dismiss();
-//    }
-//
-//    private void searchType(int mapType, String whereClause) {
-//        if (mapType == 0) return;
-//        mFeaturelayer.clearSelection();
-//        QueryParameters query = new QueryParameters();
-//        query.setWhereClause(whereClause);
-//
-//        if (mapType == 1) {//点查询
-//            mServiceFeatureTable = new ServiceFeatureTable(getString(R.string.point_feature_server_url));
-//        } else {//面查询
-//            mServiceFeatureTable = new ServiceFeatureTable(getString(R.string.polygon_feature_server_url));
-//        }
-//        mFeaturelayer = new FeatureLayer(mServiceFeatureTable);
-//        querySearch(query);
-//        mProgressDialog.dismiss();
-//    }
-//
-//    private void querySearch(QueryParameters query) {
-//        //已经隐藏所有，接下来再按条件查询，然后显示出来。
-//        // call select features
-//        ServiceFeatureTable.QueryFeatureFields queryFeatureFields
-//                = ServiceFeatureTable.QueryFeatureFields.LOAD_ALL;
-//        final ListenableFuture<FeatureQueryResult> future
-//                = mServiceFeatureTable.queryFeaturesAsync(query, queryFeatureFields);
-////        final ListenableFuture<FeatureQueryResult> future = mServiceFeatureTable.queryFeaturesAsync(query);
-//        // add done loading listener to fire when the selection returns
-//        future.addDoneListener(() -> {
-//            try {
-//                // call get on the future to get the result
-////                ToastUtil.showShort("try");
-//                FeatureQueryResult result = future.get();
-//                if (result == null || !result.iterator().hasNext()) {
-//                    ToastUtil.showShort("未查询到任何信息");
-//                    dismissProgressDialog();
-//                    restoreDrawQuery();
-//                    return;
-//                }
-//                hideAll();
-//                for (Feature feature : result) {
-//                    LogUtil.i("name=" + feature.getAttributes().get("name"));
-//                    Envelope envelope = feature.getGeometry().getExtent();
-//                    mMapView.setViewpointGeometryAsync(envelope, 200);
-//                    mFeaturelayer.setFeatureVisible(feature, true);
-//                    //Select the feature
-//                    mFeaturelayer.selectFeature(feature);
-//                    TextSymbol bassRockSymbol = new TextSymbol(10,
-//                            feature.getAttributes().get("name").toString(),
-//                            mContext.getResources().getColor(R.color.colorPrimary),
-//                            TextSymbol.HorizontalAlignment.CENTER, TextSymbol.VerticalAlignment.BOTTOM);
-//                    Graphic bassRockGraphic = new Graphic(feature.getGeometry(), bassRockSymbol);
-//                    graphicsOverlay.getGraphics().add(bassRockGraphic);
-//                    LogUtil.e("查询到的点：" + feature.getGeometry().toJson());
-//                }
-//                if (query.getWhereClause().equals("")) {
-//                    currDrawType = DRAWTYPE_FINISH;
-//                }
-//                dismissProgressDialog();
-//                LogUtil.d("askldjflasjflasjdfl;asjklfjas;ldfjklaskjf2222");
-//                for (Object object : mDispatchFragmentStore.getOwnSMCHResultItemList()) {
-//                    OwnSMCHResultItem ownSMCHResultItem = (OwnSMCHResultItem) object;
-//                    LogUtil.i("---------->" + ownSMCHResultItem.getData().getCompanyName());
-//                }
-//                RxBus.getInstance()
-//                        .send(new MainActivityAction<>(MainActivityAction.ACTION_REFRESH_DATA_DISPATCH,
-//                                mDispatchFragmentStore.getOwnSMCHResultItemList()));
-//                buildUnitList(result);
-//                restoreDrawQuery();
-////                    RxBus.getInstance().send(new MainActivityAction<>(MainActivityAction.ACTION_REFRESH_DATA_DISPATCH, buildUnitList(result)));
-//            } catch (Exception e) {
-//                restoreDrawQuery();
-//                Log.e(mContext.getResources().getString(R.string.app_name),
-//                        "Feature search failed for: " + ". Error=" + e.getMessage());
-//            }
-//            if (query.getWhereClause().equals("")) {
-//                currDrawType = DRAWTYPE_FINISH;
-//            }
-//        });
-//    }
-//
-//    /***
-//     * 隐藏所有点
-//     */
-//    private void hideAll() {
-//        if (mAllFeatureQueryResult != null) {
-//            for (Feature feature : mAllFeatureQueryResult) {
-//                mFeaturelayer.setFeatureVisible(feature, false);
-//                graphicsOverlay.getGraphics().clear();
-//            }
-//        }
-//    }
-//
-//    /***
-//     * 切换到显示单位图层
-//     */
-//    private void showAll() {
-//        try {
-//            if (mAllFeatureQueryResult != null) {
-//                for (Feature featureAll : mAllFeatureQueryResult) {
-//                    mFeaturelayer.clearSelection();
-//                    mFeaturelayer.setFeatureVisible(featureAll, true);
-//                    TextSymbol bassRockSymbol =
-//                            new TextSymbol(10, featureAll.getAttributes().get("name").toString(),
-//                                    mContext.getResources().getColor(R.color.colorPrimary),
-//                                    TextSymbol.HorizontalAlignment.CENTER, TextSymbol.VerticalAlignment.BOTTOM);
-//                    Graphic bassRockGraphic = new Graphic(featureAll.getGeometry(), bassRockSymbol);
-//                    graphicsOverlay.getGraphics().add(bassRockGraphic);
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-////        unitLayer.setVisible(true);
-//    }
-//
-//    private void buildUnitList(FeatureQueryResult featureQueryResult) {
-//
-//        List<CompanyDetailModel> companyDetailModels = new ArrayList<>();
-//        Iterator<Feature> iterator = featureQueryResult.iterator();
-//        Feature feature;
-//        List<Map<String, Object>> companyIdList = new ArrayList<>();
-//        while (iterator.hasNext()) {
-//            feature = iterator.next();
-//            int arcGis = Integer.parseInt(feature.getAttributes().get("FRUIT").toString());
-//            Map<String, Object> mapTemp = new HashMap<>();
-//            mapTemp.put("unitId", arcGis);
-//            mapTemp.put("geometry", feature.getGeometry());
-//            companyIdList.add(mapTemp);
-//        }
-//
-//        Observable.from(companyIdList)
-//                .flatMap(map -> APIService.getInstance().getCompanyDetailObservable(map.get("unitId").toString()))
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new DoOnSubscriber<CompanyDetailModel>() {
-//                    @Override
-//                    public void doOnSubscriber() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onCompleted() {
-//                        RxBus.getInstance()
-//                                .send(new MainActivityAction<>(MainActivityAction
-//                                        .ACTION_REFRESH_DATA, companyDetailModels));
-//                    }
-//
-//                    @Override
-//                    public void onNext(CompanyDetailModel companyDetailModel) {
-//                        LogUtil.e("--->" + companyDetailModel.toString());
-//                        for (Map<String, Object> stringObjectMap : companyIdList) {
-//                            if (stringObjectMap.get("unitId").equals(companyDetailModel.getCompanyId())) {
-//                                companyDetailModel.setGeometry((Geometry) stringObjectMap.get("geometry"));
-//                                break;
-//                            }
-//                        }
-//                        companyDetailModels.add(companyDetailModel);
-//                    }
-//                });
-//
-//
-////        ToastUtil.showShort("这里还没改！buildUnitList()");
-////        List<UnitModel> unitModelList = new ArrayList<>();
-////        Iterator<Feature> iterator = featureQueryResult.iterator();
-////        Feature feature;
-////        while (iterator.hasNext()) {
-////            feature = iterator.next();
-////            UnitModel unitModel = new UnitModel();
-////            unitModel.setAddress(feature.getAttributes().get("ADDR").toString());
-////            unitModel.setArcGisId(Integer.parseInt(feature.getAttributes().get(Config.ARCGIS_UNITID).toString()));
-//////            unitModel.setCertificateId();
-//////            unitModel.setCheckResultId();//保密检查结果表的外键id
-//////            unitModel.setHolderId();//持证人表的外键id
-////            unitModel.setHYLB_CODE(feature.getAttributes().get("HYLB_CODE").toString());//行业类别_代码
-////            unitModel.setHYLB_NAME(feature.getAttributes().get("HYLB_NAME").toString());//行业类别_名称
-////            unitModel.setLocation(feature.getGeometry().getExtent().getCenter());
-////            unitModel.setLXR(feature.getAttributes().get("LXR").toString());//联系人
-////            unitModel.setLXSJ(feature.getAttributes().get("LXSJ").toString());//联系手机
-////            unitModel.setName(feature.getAttributes().get("NAME").toString());//公司名称
-////            unitModel.setQYDM(feature.getAttributes().get("QYDM").toString());//企业代码
-////            unitModel.setYZBM(feature.getAttributes().get("YZBM").toString());//邮政编码
-////            unitModel.setZCD_CODE(feature.getAttributes().get("ZCD_CODE").toString());//注册地_代码
-////            unitModel.setZCD_NAME(feature.getAttributes().get("ZCD_NAME").toString());//注册地_名称
-////            unitModel.setZJDH(feature.getAttributes().get("ZJDH").toString());//座机电话
-////            unitModel.setGeometry(feature.getGeometry());
-////            unitModelList.add(unitModel);
-////        }
-//
-//    }
-//
-//    private void dismissProgressDialog() {
-//        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-//            mProgressDialog.dismiss();
-//        }
-//    }
-//
-//    private GraphicsOverlay addGraphicsOverlay(MapView mapView) {
-//        //create the graphics overlay
-//        GraphicsOverlay graphicsOverlay = new GraphicsOverlay();
-//        //add the overlay to the map view
-//        mapView.getGraphicsOverlays().add(graphicsOverlay);
-//        return graphicsOverlay;
-//    }
-//
-//    private void initAllFeatureQueryResult() {
-//        if (mAllFeatureQueryResult == null) {
-//            QueryParameters query = new QueryParameters();
-//            query.setWhereClause("1=1");
-//            final ListenableFuture<FeatureQueryResult> future = mServiceFeatureTable.queryFeaturesAsync(query);
-//            // add done loading listener to fire when the selection returns
-//            future.addDoneListener(() -> {
-//                try {
-//                    mAllFeatureQueryResult = future.get();
-//                    for (Feature feature : mAllFeatureQueryResult) {
-//                        if (feature.getAttributes().get("name") == null) {
-//                            LogUtil.d("it's null:" + feature.getAttributes());
-//                            continue;
-//                        }
-//                        TextSymbol bassRockSymbol = new TextSymbol(10, feature.getAttributes().get("name").toString(), mContext.getResources().getColor(R.color.colorPrimary), TextSymbol.HorizontalAlignment.CENTER, TextSymbol.VerticalAlignment.BOTTOM);
-//                        Graphic bassRockGraphic = new Graphic(feature.getGeometry(), bassRockSymbol);
-//                        graphicsOverlay.getGraphics().add(bassRockGraphic);
-//                        LogUtil.e("showAll->" + feature.getAttributes().get("id") + "," + feature.getAttributes().get("name"));
-//                    }
-//                } catch (InterruptedException | ExecutionException e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//
-//        }
-//    }
-//
-//    private DispatchFragmentActionsCreator mDispatchFragmentActionsCreator;
-//    private DispatchFragmentStore mDispatchFragmentStore;
-//
-//    @Override
-//    protected Store initActionsCreatorAndStore() {
-//        mDispatchFragmentActionsCreator = new DispatchFragmentActionsCreator(mDispatcher);
-//        mDispatchFragmentStore = new DispatchFragmentStore(mDispatcher);
-//        return mDispatchFragmentStore;
-//    }
-//
-//    @Override
-//    protected void onStoreCall(Store.StoreChangeEvent storeChangeEvent) {
-//        switch (storeChangeEvent.getAction().getType()) {
-//            case DispatchFragmentAction.GET_SIFT_ZCD_DATA:
-////                unitZCDAdapter.notifyDataSetChanged();
-//                break;
-//            case DispatchFragmentAction.ZCD_ADAPTER_ON_ITEM_CLICK:
-////                unitZCDAdapter.notifyDataSetChanged();
-//                break;
-//            case DispatchFragmentAction.GET_SIFT_LB_DATA:
-////                unitLBAdapter.notifyDataSetChanged();
-//                break;
-//            case DispatchFragmentAction.LB_ADAPTER_ON_ITEM_CLICK:
-////                unitLBAdapter.notifyDataSetChanged();
-//                break;
-//            case DispatchFragmentAction.BUILD_SQL:
-//                //开始搜索
-////                searchGeometryOrSql(mDispatchFragmentStore.getSql());
-////                LogUtil.e("sql--->" + mDispatchFragmentStore.getSql());
-////                dismissProgressDialog();
-////                if (mDispatchFragmentStore.getOwnSMCHResultItemList().size() <= 0) {
-////                    ToastUtil.showLong("未查询到任何信息");
-////                    return;
-////                }
-//                searchGeometryOrSql(mDispatchFragmentStore.getSql());
-//                DialogUtil.getInstance().dismiss();
-//                break;
-//            case DispatchFragmentAction.NO_DATA:
-//                dismissProgressDialog();
-//                break;
-//        }
-//    }
-//
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        if (mSubscriptionAction != null && !mSubscriptionAction.isUnsubscribed()) {
-//            mSubscriptionAction.unsubscribe();
-//        }
-//    }
-//
-//    @Override
-//    public void onHiddenChanged(boolean hidden) {
-//        super.onHiddenChanged(hidden);
-//        LogUtil.e("dispatchFragment->hidden=" + hidden);
-//        if (hidden) {
-////            mMapView.setVisibility(View.GONE);
-//        } else {
-////            mMapView.setVisibility(View.VISIBLE);
-//        }
-//    }
-//
-//    @Override
-//    public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-//        int month = monthOfYear + 1;
-//        if (isFirst) {
-//            CGFFDate = year + "-" + month + "-" + dayOfMonth;
-//            calendar1Content.setText(CGFFDate);
-//        } else {
-//            CGFTDate = year + "-" + month + "-" + dayOfMonth;
-//            String dateTime = CGFTDate;
-//
-//            Calendar c = Calendar.getInstance();
-//
-//            try {
-//                c.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(dateTime));
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//            long DateStringXZ = c.getTimeInMillis();
-//            Date date = new Date();
-//            long DateStringNow = date.getTime();
-//            if (DateStringNow >= DateStringXZ) {
-//                calendar2Content.setText(CGFTDate);
-//            } else {
-//                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-//                String dateString = formatter.format(date);
-//                calendar2Content.setText(dateString);
-//            }
-//        }
-//    }
-//
-//    @Override
-//    public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
-//
-//    }
-//
-//    private class MySketchGraphicsOverlayEventListener implements SketchGraphicsOverlayEventListener {
-//
-//        @Override
-//        public void onUndoStateChanged(boolean undoEnabled) {
-//            // Set the undo button's enabled/disabled state based on the event boolean
-////            mUndoButton.setEnabled(undoEnabled);
-////            mUndoButton.setClickable(undoEnabled);
-//        }
-//
-//        @Override
-//        public void onRedoStateChanged(boolean redoEnabled) {
-//            // Set the redo button's enabled/disabled state based on the event boolean
-////            mRedoButton.setEnabled(redoEnabled);
-////            mRedoButton.setClickable(redoEnabled);
-//        }
-//
-//        @Override
-//        public void onClearStateChanged(boolean clearEnabled) {
-//            // Set the clear button's enabled/disabled state based on the event boolean
-////            mClearButton.setEnabled(clearEnabled);
-////            mClearButton.setClickable(clearEnabled);
-//        }
-//
-//        @Override
-//        public void onDrawingFinished() {
-//            // Reset the selected state of the drawing buttons when a drawing is finished
-//        }
-//    }
-//}
