@@ -937,12 +937,22 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         View dialogView = View.inflate(getActivity(), R.layout.dialog_handout_info,
                                 null);
                         LinearLayout ll_content = dialogView.findViewById(R.id.ll_content);
+                        RecyclerView rv = dialogView.findViewById(R.id.recycler_view);
+                        //标题
                         LinearLayout ll_title = createRowLL();
                         ll_title.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.c55f3f));
+                        //内容
                         LinearLayout ll_data = createRowLL();
-                        ll_data.setPadding(0, DensityUtils.dp2px(getActivity(),1),0,0);
+                        ll_data.setOnClickListener(v -> {
+                            int visible = rv.getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE;
+                            rv.setVisibility(visible);
+                        });
+                        ll_data.setPadding(0, DensityUtils.dp2px(getActivity(), 1), 0, 0);
+
+                        List<HandoutFruitModel.FruitAttrList> notListShowModels = new ArrayList<>();
                         for (HandoutFruitModel.FruitAttrList attrModel : fruitAttrList) {
                             if (!attrModel.isListShow) {
+                                notListShowModels.add(attrModel);
                                 continue;
                             }
                             TextView tv_title = createRowText();
@@ -960,6 +970,19 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         }
                         ll_content.addView(ll_title);
                         ll_content.addView(ll_data);
+                        //不显示在列表的内容
+                        rv.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+                        rv.setAdapter(new CommonAdapter<HandoutFruitModel.FruitAttrList>(getActivity(),
+                                R.layout.item_not_list_show, notListShowModels) {
+                            @Override
+                            protected void convert(ViewHolder holder,
+                                                   HandoutFruitModel.FruitAttrList item,
+                                                   int position) {
+                                String text = item.attrName + ":" + item.attrValue;
+                                holder.setText(R.id.tv_notListShowItem, text);
+                            }
+                        });
+                        //
                         dialog.setContentView(dialogView);
                         dialog.show();
                     }
