@@ -3,6 +3,7 @@ package android.zhixun.uiho.com.gissystem.rest;
 import android.text.TextUtils;
 import android.zhixun.uiho.com.gissystem.app.ServerHttpException;
 import android.zhixun.uiho.com.gissystem.flux.body.ReportHandoutListBody;
+import android.zhixun.uiho.com.gissystem.flux.models.FruitListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
 import android.zhixun.uiho.com.gissystem.flux.models.HandoutFruitModel;
 import android.zhixun.uiho.com.gissystem.flux.models.RXProgress;
@@ -638,6 +639,30 @@ public class APIService {
                 .compose(applySchedulers())
                 .doOnSubscribe(subscriber::doOnSubscriber)
                 .compose(handleResponse())
+                .subscribe(subscriber);
+    }
+
+    /**
+     * 成果目录列表
+     */
+    public void getFruitList(ReportHandoutListBody body, DoOnSubscriber<List<FruitListModel>> subscriber) {
+        Map<Object, Object> map = new HashMap<>();
+        map.put("attrValueList", body.attrValueList);
+        if (body.fruitCategoryId != -1) {
+            map.put("fruitCategoryId", body.fruitCategoryId);
+        }
+        if (!TextUtils.isEmpty(body.fruitIds)) {
+            map.put("attrValueList", body.fruitIds);
+        }
+//        if (body.mapNum != -1) {
+//            map.put("mapNum", body.mapNum);
+//        }
+        map.put("page", -1);
+        map.put("rows", -1);
+        api.getFruitList(buildParams(map, "getFruitList", "fruit"))
+                .compose(applySchedulers())
+                .doOnSubscribe(subscriber::doOnSubscriber)
+                .compose(handleResponseList())
                 .subscribe(subscriber);
     }
 

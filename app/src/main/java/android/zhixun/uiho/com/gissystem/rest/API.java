@@ -1,6 +1,7 @@
 package android.zhixun.uiho.com.gissystem.rest;
 
 
+import android.zhixun.uiho.com.gissystem.flux.models.FruitListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
 import android.zhixun.uiho.com.gissystem.flux.models.HandoutFruitModel;
 import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
@@ -221,6 +222,9 @@ public interface API {
     /**
      * 成果目录列表
      */
+    @POST(BASE_URL)
+    @FormUrlEncoded
+    Observable<BaseListResultModel<FruitListModel>> getFruitList(@Field("data") String data);
 
 //    /***
 //     * 登录

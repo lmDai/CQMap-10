@@ -23,10 +23,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/search_bar"
         android:layout_marginLeft="10dp"
-        android:visibility="gone"
         android:background="@drawable/shadow_rr"
         android:clickable="true"
-        android:foreground="?android:attr/selectableItemBackground">
+        android:foreground="?android:attr/selectableItemBackground"
+        android:visibility="gone">
 
         <android.support.v7.widget.AppCompatImageView
             android:layout_width="wrap_content"
@@ -256,13 +256,20 @@
                 android:background="@drawable/my_divider" />
         </RelativeLayout>
 
-        <android.zhixun.uiho.com.gissystem.ui.widget.SimpleVerRv
-            android:id="@+id/content_rv"
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@android:color/white">
 
-        </android.zhixun.uiho.com.gissystem.ui.widget.SimpleVerRv>
+            <LinearLayout
+                android:id="@+id/ll_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            </LinearLayout>
+
+        </android.support.v4.widget.NestedScrollView>
 
     </android.zhixun.uiho.com.gissystem.ui.widget.DragLayout>
 </RelativeLayout>
