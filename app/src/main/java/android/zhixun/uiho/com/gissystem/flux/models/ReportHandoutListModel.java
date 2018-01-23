@@ -32,7 +32,7 @@ public class ReportHandoutListModel {
             public FruitHandout fruitHandout;
             public long fruitCategoryId;
             public List<FruitAttrList> fruitAttrList;
-            public String fruitId;
+            public long fruitId;
 
             public class FruitHandout {
 

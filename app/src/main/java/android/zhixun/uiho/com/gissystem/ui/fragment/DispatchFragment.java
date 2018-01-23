@@ -506,7 +506,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
                         fruitCategoryList.fruitList) {
 
-                    String fruitId = fruitList.fruitId;
+                    String fruitId = String.valueOf(fruitList.fruitId);
                     sb.append(fruitId);
                     sb.append(",");
                 }
@@ -562,15 +562,15 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             Graphic graphic = drawLayer.getGraphic(ids[0]);
                             if (graphic == null) return;
                             drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
-                            String FRUIT_ID = String.valueOf(graphic.getAttributeValue("FRUITID"));
+                            double FRUIT_ID = (double) graphic.getAttributeValue("FRUITID");
                             List<ReportHandoutListModel> handoutList = new ArrayList<>();
                             for (ReportHandoutListModel handout : mHandoutList) {
                                 for (ReportHandoutListModel.FruitCategoryList fruitCategory :
                                         handout.fruitCategoryList) {
                                     for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList
                                             : fruitCategory.fruitList) {
-                                        if (!FRUIT_ID.contains(fruitList.fruitId))
-                                            continue;
+                                        if (FRUIT_ID != fruitList.fruitId) continue;
+
                                         handoutList.add(handout);
                                     }
                                 }
@@ -801,19 +801,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mDragLayout.animaToCenter();
         dragView.setVisibility(View.VISIBLE);
 
-//        bottomAdapter.setOnItemClickListener((view, position) -> {
-//            int companyId = response.get(position).getCompanyId();
-//            for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
-//                Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
-//                int unit_id = (int) graphic.getAttributeValue("UNITID");
-//                if (companyId == unit_id) {
-//                    if (graphic.getGeometry() instanceof Point) {
-//                        Point point = (Point) graphic.getGeometry();
-//                        mMapView.centerAt(point, true);
-//                    }
-//                }
-//            }
-//        });
     }
 
     //设置弹出框分发内容的view
@@ -867,7 +854,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 ll_row.addView(tv_info);
                 tv_info.setOnClickListener(v -> {
                     ToastUtil.showShort("详情");
-                    showHandoutInfoDialog(fruitList.fruitId);
+                    showHandoutInfoDialog(String.valueOf(fruitList.fruitId));
                 });
                 //行的点击事件
                 ll_row.setOnClickListener(new View.OnClickListener() {
@@ -1256,17 +1243,15 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         for (Object object : objects) {
                             if (object instanceof Feature) {
                                 Feature feature = (Feature) object;
-                                String FRUIT_ID = String.valueOf(feature.getAttributeValue(FRUITID));
+                                double FRUIT_ID = (double) feature.getAttributeValue(FRUITID);
 
-//                                SimpleFillSymbol simpleFillSymbol = createSimpleFillSymbol();
-//                                Graphic graphic = new Graphic(feature.getGeometry(),simpleFillSymbol);
-//                                mMapView.addDrawLayerGraphic(graphic);
                                 for (ReportHandoutListModel model : handoutList) {
                                     for (ReportHandoutListModel.FruitCategoryList fruitCategory
                                             : model.fruitCategoryList) {
                                         for (ReportHandoutListModel.FruitCategoryList.FruitList fruit
                                                 : fruitCategory.fruitList) {
-                                            if (FRUIT_ID.contains(fruit.fruitId)) {
+                                            if (FRUIT_ID == fruit.fruitId
+                                                    && !selectHandoutList.contains(model)) {
                                                 selectHandoutList.add(model);
                                             }
                                         }
@@ -1279,6 +1264,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
                     @Override
                     public void onError(Throwable throwable) {
+                        ToastUtil.showEmpty();
                         dismissLoading();
                         restoreSpaceStatus();
                     }

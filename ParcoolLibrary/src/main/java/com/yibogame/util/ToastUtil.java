@@ -35,19 +35,11 @@ public class ToastUtil {
         }
     }
 
-//    public static void showSuccess(String msg) {
-//        if (toast != null) {
-//            toast.cancel();
-//
-//        }
-//        toast = new Toast(BaseApplication.context);
-//        toast.setGravity(Gravity.FILL, 0, 0);
-//        toast.setDuration(Toast.LENGTH_SHORT);
-//        View toastView = LayoutInflater.from(BaseApplication.context).inflate(R.layout.toast, null);
-////        toastView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-//        TextViewPlus textViewPlus = (TextViewPlus) toastView.findViewById(R.id.tvp_msg);
-//        textViewPlus.setText(msg);
-//        toast.setView(toastView);
-//        toast.show();
-//    }
+    public static void showEmpty() {
+        if (toast != null) {
+            toast.cancel();
+        }
+        toast = Toast.makeText(BaseApplication.context, "暂无数据", Toast.LENGTH_SHORT);
+        toast.show();
+    }
 }
