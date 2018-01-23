@@ -39,6 +39,7 @@ import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
 import android.zhixun.uiho.com.gissystem.ui.widget.DialogUtil;
 import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
+import android.zhixun.uiho.com.gissystem.ui.widget.SimpleVerRv;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 import android.zhixun.uiho.com.gissystem.util.DensityUtils;
 import android.zhixun.uiho.com.gissystem.util.OnItemClickListener;
@@ -48,6 +49,7 @@ import com.alibaba.fastjson.JSON;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Geometry;
+import com.esri.core.geometry.Point;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
@@ -86,7 +88,10 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private EditText mEtSearch;
     private DragLayout mDragLayout;
     private View dragView;
-    private LinearLayout ll_content;
+    private SimpleVerRv mContentRv;
+    private TextView mTvDataCount;
+    private ImageView mIvArrow;
+    private LinearLayout mLLTitle;
     //
     //分类信息集合-成果类型那一坨
     private List<FruitCategoryListModel> mClassifyList = new ArrayList<>();
@@ -159,7 +164,10 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private void initBottomDragView(View view) {
         mDragLayout = view.findViewById(R.id.dragLayout);
         dragView = view.findViewById(R.id.bottom_drag_view);
-        ll_content = view.findViewById(R.id.ll_content);
+        mContentRv = view.findViewById(R.id.recycler_view);
+        mTvDataCount = view.findViewById(R.id.tv_dataCount);
+        mIvArrow = view.findViewById(R.id.iv_arrow);
+        mLLTitle = view.findViewById(R.id.ll_title);
     }
 
     @Override
@@ -503,7 +511,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             restoreAll();
                             return;
                         }
-
+                        showLoading();
                         for (Object object : result) {
                             if (object instanceof Feature) {
                                 Feature feature = (Feature) object;
@@ -520,6 +528,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                                 mMapView.addDrawLayerGraphic(graphic);
                             }
                         }
+                        dismissLoading();
                         //地图单击事件
                         mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
                             int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
@@ -536,7 +545,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                                     fruitList.add(model);
                                 }
                             }
-                            showBottomLayout(fruitList);
+//                            showBottomLayout(fruitList);
                         });
                     }
 
@@ -602,19 +611,73 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         }
         showLoading();
         ((MainActivity) getActivity()).hideBottomNav();
-
-        for (FruitListModel model : fruitList) {
-            LinearLayout ll_row = createRowLL();
-            List<FruitListModel.FruitAttrList> attrLists = JSON.parseArray(model.fruitAttrList,
-                    FruitListModel.FruitAttrList.class);
-            for (FruitListModel.FruitAttrList attr : attrLists) {
-                TextView textView = createRowText();
-                textView.setText(attr.attrValue);
-                ll_row.addView(textView);
-            }
-            ll_content.addView(ll_row);
+        mTvDataCount.setText(String.format("共%s条数据", fruitList.size()));
+        //设置标题
+        mLLTitle.removeAllViews();
+        FruitListModel model = fruitList.get(0);
+        List<FruitListModel.FruitAttrList> attrLists = JSON.parseArray(model.fruitAttrList,
+                FruitListModel.FruitAttrList.class);
+        for (FruitListModel.FruitAttrList attr : attrLists) {
+            TextView textView = createRowText();
+            textView.setText(attr.attrName);
+            mLLTitle.addView(textView);
         }
+        TextView tv_option = createRowText();
+        tv_option.setText("操作");
+        mLLTitle.addView(tv_option);
+        //设置箭头点击事件
+        mIvArrow.setOnClickListener(v -> {
+            v.animate()
+                    .rotationBy(180)
+                    .start();
+            int visible = mContentRv.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE;
+            mContentRv.setVisibility(visible);
+            mLLTitle.setVisibility(visible);
+        });
+        CommonAdapter<FruitListModel> adapter = new CommonAdapter<FruitListModel>(getActivity(),
+                R.layout.item_directory_content, fruitList) {
+            @Override
+            protected void convert(ViewHolder holder, FruitListModel item, int position) {
+                LinearLayout ll_row = holder.getView(R.id.ll_row);
+                ll_row.removeAllViews();
+                List<FruitListModel.FruitAttrList> attrLists = JSON.parseArray(item.fruitAttrList,
+                        FruitListModel.FruitAttrList.class);
+                for (FruitListModel.FruitAttrList attr : attrLists) {
+                    TextView textView = createRowText();
+                    textView.setText(attr.attrValue);
+                    int color = item.selected ? Color.RED : Color.BLACK;
+                    textView.setTextColor(color);
+                    ll_row.addView(textView);
+                }
+                TextView tv_info = createRowText();
+                tv_info.setTextColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+                tv_info.setText("详情");
+                tv_info.setOnClickListener(v -> showFruitInfoDialog(String.valueOf(item.fruitId)));
+                ll_row.addView(tv_info);
+            }
+        };
+        mContentRv.setAdapter(adapter);
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
+                long fruitId = fruitList.get(position).fruitId;
+                int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
+                for (int id : graphicIDs) {
+                    Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
+                    double attributeValue = (double) graphic.getAttributeValue(FRUITID);
+                    if (fruitId != attributeValue) continue;
 
+                    ToastUtil.showShort("" + position);
+                    mMapView.getDrawLayer().updateGraphic(id, new SimpleFillSymbol(Color.RED));
+                    if (graphic.getGeometry() instanceof com.esri.core.geometry.Point) {
+                        Point point = (Point) graphic.getGeometry();
+                        mMapView.centerAt(point, true);
+                    }
+                    fruitList.get(position).selected = true;
+                    adapter.notifyItemChanged(position);
+                }
+            }
+        });
         mDragLayout.animaToCenter();
         dragView.setVisibility(View.VISIBLE);
         dismissLoading();
@@ -649,7 +712,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     }
 
     //显示详情dialog
-    private void showHandoutInfoDialog(String fruitId) {
+    private void showFruitInfoDialog(String fruitId) {
         showLoading();
         APIService.getInstance()
                 .getHandoutFruit(fruitId, new SimpleSubscriber<HandoutFruitModel>() {
@@ -665,12 +728,22 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         View dialogView = View.inflate(getActivity(), R.layout.dialog_handout_info,
                                 null);
                         LinearLayout ll_content = dialogView.findViewById(R.id.ll_content);
+                        RecyclerView rv = dialogView.findViewById(R.id.recycler_view);
+                        //标题
                         LinearLayout ll_title = createRowLL();
                         ll_title.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.c55f3f));
+                        //内容
                         LinearLayout ll_data = createRowLL();
+                        ll_data.setOnClickListener(v -> {
+                            int visible = rv.getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE;
+                            rv.setVisibility(visible);
+                        });
                         ll_data.setPadding(0, DensityUtils.dp2px(getActivity(), 1), 0, 0);
+
+                        List<HandoutFruitModel.FruitAttrList> notListShowModels = new ArrayList<>();
                         for (HandoutFruitModel.FruitAttrList attrModel : fruitAttrList) {
                             if (!attrModel.isListShow) {
+                                notListShowModels.add(attrModel);
                                 continue;
                             }
                             TextView tv_title = createRowText();
@@ -688,6 +761,19 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         }
                         ll_content.addView(ll_title);
                         ll_content.addView(ll_data);
+                        //不显示在列表的内容
+                        rv.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+                        rv.setAdapter(new CommonAdapter<HandoutFruitModel.FruitAttrList>(getActivity(),
+                                R.layout.item_not_list_show, notListShowModels) {
+                            @Override
+                            protected void convert(ViewHolder holder,
+                                                   HandoutFruitModel.FruitAttrList item,
+                                                   int position) {
+                                String text = item.attrName + ":" + item.attrValue;
+                                holder.setText(R.id.tv_notListShowItem, text);
+                            }
+                        });
+                        //
                         dialog.setContentView(dialogView);
                         dialog.show();
                     }

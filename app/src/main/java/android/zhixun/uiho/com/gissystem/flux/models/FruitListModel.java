@@ -10,6 +10,8 @@ public class FruitListModel {
     public String fruitAttrList;
     public long fruitId;
 
+    public boolean selected;
+
     public static class FruitAttrList{
         public long sort;
         public String attrName;

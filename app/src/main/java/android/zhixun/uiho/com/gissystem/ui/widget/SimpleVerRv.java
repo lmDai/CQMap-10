@@ -20,7 +20,7 @@ public class SimpleVerRv extends RecyclerView {
         addItemDecoration(new HorizontalDividerItemDecoration.Builder(context)
                 .color(Color.GRAY)
                 .showLastDivider()
-                .size(2)
+                .size(1)
                 .build());
     }
 

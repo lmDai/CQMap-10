@@ -256,20 +256,55 @@
                 android:background="@drawable/my_divider" />
         </RelativeLayout>
 
-        <android.support.v4.widget.NestedScrollView
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:minHeight="50dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                tools:text="比列尺 2000" />
+
+            <ImageView
+                android:id="@+id/iv_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:padding="20dp"
+                android:src="@mipmap/arrow_down" />
+
+            <TextView
+                android:id="@+id/tv_dataCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/iv_arrow"
+                android:text="共条数据" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_title"
+            android:background="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@drawable/horizontal_divider"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:showDividers="middle">
+
+        </LinearLayout>
+
+        <android.zhixun.uiho.com.gissystem.ui.widget.SimpleVerRv
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/white">
 
-            <LinearLayout
-                android:id="@+id/ll_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-            </LinearLayout>
-
-        </android.support.v4.widget.NestedScrollView>
+        </android.zhixun.uiho.com.gissystem.ui.widget.SimpleVerRv>
 
     </android.zhixun.uiho.com.gissystem.ui.widget.DragLayout>
 </RelativeLayout>
