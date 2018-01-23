@@ -21,6 +21,7 @@ public class DragLayout extends LinearLayout {
     private ViewDragHelper mDragHelper;
     private View mDragView;
     private GestureDetector mGestureDetector;
+    private int mPaddingCenter;
 
     public DragLayout(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -38,6 +39,12 @@ public class DragLayout extends LinearLayout {
             exit();
             setPadding = true;
         }
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mPaddingCenter = getHeight() / 3 * 2;
     }
 
     @Override
@@ -79,7 +86,7 @@ public class DragLayout extends LinearLayout {
         public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
             super.onViewReleased(releasedChild, xvel, yvel);
             Log.d("simple", "onViewReleased");
-            if (getPaddingTop() >= getHeight() / 5 * 4) {//to bottom
+            if (getPaddingTop() >= mPaddingCenter + 30) {//to bottom
 //                Log.d("simple", "to bottom");
                 animaTo(getPaddingTop(), getHeight() - mDragView.getMeasuredHeight());
             } else if (getPaddingTop() <= getHeight() / 2) {//to top
@@ -103,7 +110,7 @@ public class DragLayout extends LinearLayout {
 
     public void animaToCenter() {
         setVisibility(VISIBLE);
-        animaTo(getPaddingTop(), getHeight() / 4 * 3);
+        animaTo(getPaddingTop(), mPaddingCenter);
     }
 
     public void exit() {

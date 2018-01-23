@@ -536,21 +536,32 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         dismissLoading();
                         //地图单击事件
                         mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
+                            if (mFruitList.isEmpty()) {
+                                ToastUtil.showShort("分类信息集合为空，请重新获取");
+                                return;
+                            }
                             int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
                                     1, 1);
-                            if (ids.length == 0) return;
+                            if (ids.length == 0) {
+                                ToastUtil.showShort("图层为空，请再次点击");
+                                return;
+                            }
                             GraphicsLayer drawLayer = mMapView.getDrawLayer();
                             Graphic graphic = drawLayer.getGraphic(ids[0]);
                             if (graphic == null) return;
                             drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
                             double FRUIT_ID = (double) graphic.getAttributeValue("FRUITID");
-                            List<FruitListModel> fruitList = new ArrayList<>();
                             for (FruitListModel model : mFruitList) {
-                                if (FRUIT_ID == model.fruitId) {
-                                    fruitList.add(model);
+                                if (FRUIT_ID != model.fruitId) continue;
+
+                                model.selected = true;
+                                if (mContentRv.getAdapter() != null) {
+                                    int position = mFruitList.indexOf(model);
+                                    mContentRv.getAdapter()
+                                            .notifyItemChanged(position);
+                                    mContentRv.scrollToPosition(position);
                                 }
                             }
-//                            showBottomLayout(fruitList);
                         });
                     }
 
@@ -787,6 +798,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                     public void onError(Throwable e) {
                         super.onError(e);
                         dismissLoading();
+                        ToastUtil.showShort("暂无数据");
                     }
                 });
     }
@@ -1054,9 +1066,8 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                                 Feature feature = (Feature) object;
                                 double FRUIT_ID = (double) feature.getAttributeValue(FRUITID);
                                 for (FruitListModel model : fruitList) {
-                                    if (FRUIT_ID == model.fruitId) {
-                                        selectHandoutList.add(model);
-                                    }
+                                    if (FRUIT_ID != model.fruitId) continue;
+                                    selectHandoutList.add(model);
                                 }
                             }
                         }
@@ -1065,6 +1076,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
 
                     @Override
                     public void onError(Throwable throwable) {
+                        ToastUtil.showShort("暂无数据");
                         dismissLoading();
                         restoreSpaceStatus();
                     }
