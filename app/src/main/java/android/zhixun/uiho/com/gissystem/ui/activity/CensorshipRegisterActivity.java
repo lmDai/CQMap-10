@@ -49,11 +49,13 @@ import android.zhixun.uiho.com.gissystem.greendao_gen.CRImageModelDao;
 import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
+import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
 import android.zhixun.uiho.com.gissystem.ui.adapter.CensorshipRegisterAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.RlCheckPersonAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.ShowSeachAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.FullyGridLayoutManager;
 import android.zhixun.uiho.com.gissystem.ui.widget.MyViewPager;
+import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jph.takephoto.app.TakePhoto;
@@ -77,6 +79,7 @@ import com.yibogame.util.DateUtil;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.SPUtil;
 import com.yibogame.util.ToastUtil;
+import com.yibogame.util.ValidateUtil;
 
 import org.greenrobot.greendao.query.Query;
 
@@ -218,16 +221,11 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
         acbSaveServer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveData(true);
+                saveData(true, false);
             }
         });
         //添加到本地
-        acbSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                saveData(false);
-            }
-        });
+        acbSave.setOnClickListener(view -> saveData(false, false));
 
     }
 
@@ -447,7 +445,7 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
     }
 
 
-    private void saveData(boolean isSaveToServer) {
+    private void saveData(boolean isSaveToServer, boolean export) {
         if (RadioGroup_LI_one.getCheckedRadioButtonId() != R.id.XCheckBox_one_ok && RadioGroup_LI_one.getCheckedRadioButtonId() != R.id.XCheckBox_one_not) {
             ToastUtil.showShort("请选择是否检查通过！");
             return;
@@ -639,13 +637,17 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
 
                 @Override
                 public void onCompleted() {
-                    ToastUtil.showShort("提交成功！");
-                    finish();
+                    if (!export) {
+                        ToastUtil.showShort("提交成功！");
+                    }
+//                    finish();
                 }
 
                 @Override
                 public void onNext(String s) {
-
+                    if (export) {
+                        showExportDialog(s);
+                    }
                 }
             });
 
@@ -656,6 +658,42 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
         } else {
             ToastUtil.showShort("被检查单位不能为空");
         }
+    }
+
+    private void showExportDialog(String secrecyInspectId) {
+        new SimpleAlertDialog(mContext)
+                .visibleEditText()
+                .title("导出")
+                .message("请输入一个您需要导出的邮箱地址")
+                .setOkOnClickListener("确定", (dialog, view) -> {
+                    String email = dialog.getEditText().getText().toString();
+                    if (!ValidateUtil.getInstance().validateEmail(email)) {
+                        ToastUtil.showShort("请输入一个正确的邮箱地址哦！");
+                        return;
+                    }
+                    export(secrecyInspectId, email);
+                }).setCancelOnClickListener("取消", null)
+                .show();
+    }
+
+    private void export(String secrecyInspectId, String email) {
+        Map<Object, Object> map = new HashMap<>();
+        map.put("secrecyInspectId", secrecyInspectId);
+        map.put("toMail", email);
+        APIService.getInstance()
+                .export(map, new SimpleSubscriber<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        ToastUtil.showShort("导出成功！");
+                        finish();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        ToastUtil.showShort(e.getMessage());
+                    }
+                });
     }
 
     private String arcgisid = "";
@@ -768,51 +806,43 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
             }
         });
         //检查登记的公司搜索功能
-        flSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String EditextContent = autoCompleteTextView.getText().toString();
-//                List<CompanyDetailModel> listShow = new ArrayList<>();
-//                List<UnitModel> listCompany = new ArrayList<>();
-                Map<Object, Object> map = new HashMap<>();
-                map.put("key", EditextContent);
-                APIService.getInstance().getCompanyList(map, new DoOnSubscriber<List<CompanyDetailModel>>() {
-                    @Override
-                    public void doOnSubscriber() {
-
+        flSearch.setOnClickListener(view -> {
+            String EditextContent = autoCompleteTextView.getText().toString();
+            Map<Object, Object> map = new HashMap<>();
+            map.put("key", EditextContent);
+            APIService.getInstance().getCompanyList(map, new SimpleSubscriber<List<CompanyDetailModel>>() {
+                @Override
+                public void onResponse(List<CompanyDetailModel> companyDetailModels) {
+                    if (companyDetailModels.size() > 0) {
+                        searchRvTips.setVisibility(View.VISIBLE);
                     }
-
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onNext(List<CompanyDetailModel> companyDetailModels) {
-                        if (companyDetailModels.size() > 0) {
-                            searchRvTips.setVisibility(View.VISIBLE);
+                    //构建Adapter
+                    ShowSeachAdapter showSeachAdapter = new ShowSeachAdapter(companyDetailModels, CensorshipRegisterActivity.this);
+                    searchRvTips.setLayoutManager(new LinearLayoutManager(CensorshipRegisterActivity.this));
+                    searchRvTips.setAdapter(showSeachAdapter);
+                    showSeachAdapter.setOnItemClickListener(new OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            autoCompleteTextView.setText(companyDetailModels.get(position).getCompanyName());
+                            autoCompleteTextView.setSelection(autoCompleteTextView.getText().length());
+                            searchRvTips.setVisibility(View.GONE);
+                            arcgisid = companyDetailModels.get(position).getCompanyId() + "";
+                            addAchievement();
                         }
-                        //构建Adapter
-                        ShowSeachAdapter showSeachAdapter = new ShowSeachAdapter(companyDetailModels, CensorshipRegisterActivity.this);
-                        searchRvTips.setLayoutManager(new LinearLayoutManager(CensorshipRegisterActivity.this));
-                        searchRvTips.setAdapter(showSeachAdapter);
-                        showSeachAdapter.setOnItemClickListener(new OnItemClickListener() {
-                            @Override
-                            public void onItemClick(View view, int position) {
-                                autoCompleteTextView.setText(companyDetailModels.get(position).getCompanyName());
-                                autoCompleteTextView.setSelection(autoCompleteTextView.getText().length());
-                                searchRvTips.setVisibility(View.GONE);
-                                arcgisid = companyDetailModels.get(position).getCompanyId() + "";
-                                addAchievement();
-                            }
-                        });
-                        InputMethodManager imm = (InputMethodManager) getSystemService(
-                                Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(autoCompleteTextView.getWindowToken(), 0);
+                    });
+                    InputMethodManager imm = (InputMethodManager) getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(autoCompleteTextView.getWindowToken(), 0);
 
-                    }
-                });
-            }
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    super.onError(e);
+                    ToastUtil.showShort("未查询到信息，请重试");
+                }
+            });
+
         });
 //        findViewById(R.id.aciv_plus).setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -1054,12 +1084,7 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
         });
         //导出
         mBtnExport = findViewById(R.id.btn_export);
-        mBtnExport.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+        mBtnExport.setOnClickListener(v -> saveData(false, true));
     }
 
 
