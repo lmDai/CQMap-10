@@ -18,8 +18,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <!--登录-->
-        <activity android:name=".ui.activity.LoginActivity"
-            >
+        <activity android:name=".ui.activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,9 +27,9 @@
         </activity>
         <activity android:name=".ui.activity.TestTitleActivity" />
         <!--主页-->
-        <activity android:name=".ui.activity.MainActivity"
-            android:windowSoftInputMode="adjustPan"
-            />
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:windowSoftInputMode="adjustPan" />
         <!--持证人-->
         <activity android:name=".ui.activity.HolderSizeMarkActivity" />
         <!--单位保密检查结果-->
@@ -42,7 +41,9 @@
         <!--总体统计-->
         <activity android:name=".ui.activity.TotalStaticsActivity" />
         <!--保密检查登记-->
-        <activity android:name=".ui.activity.CensorshipRegisterActivity" />
+        <activity
+            android:name=".ui.activity.CensorshipRegisterActivity"
+            android:windowSoftInputMode="adjustPan|adjustResize" />
         <!--提交的保密检查记录-->
         <activity android:name=".ui.activity.SubmitCensorShipRecordActivity" />
         <!--本地文件-->
@@ -50,7 +51,7 @@
         <!--报件详情-->
         <activity android:name=".ui.activity.ResultDispatchDetailActivity" />
         <!--拥有的涉密测绘成果-->
-        <activity android:name=".ui.activity.OwnSecretResultActivity"/>
+        <activity android:name=".ui.activity.OwnSecretResultActivity" />
         <!--使用说明-->
         <activity android:name=".ui.activity.InstructionsActivity" />
         <!--预审消息-->
@@ -64,7 +65,7 @@
         <!--成果申请消息详情-->
         <activity android:name=".ui.activity.ResultDeclareMessageDetailActivity" />
         <!---->
-        <activity android:name=".AppCashActivity"/>
+        <activity android:name=".AppCashActivity" />
     </application>
 
 </manifest>

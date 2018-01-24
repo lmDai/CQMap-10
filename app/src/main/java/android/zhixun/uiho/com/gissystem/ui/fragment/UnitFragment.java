@@ -466,7 +466,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     setBufferGeometry(distance);
                     mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_SET_FINISH);
                 })
-                .visiableEditText()
+                .visibleEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
                 .alert();
     }

@@ -19,7 +19,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -33,7 +33,6 @@ import android.zhixun.uiho.com.gissystem.app.Config;
 import android.zhixun.uiho.com.gissystem.app.MyBaseApplication;
 import android.zhixun.uiho.com.gissystem.flux.models.CRImageModel;
 import android.zhixun.uiho.com.gissystem.flux.models.CRModel;
-//import android.zhixun.uiho.com.gissystem.flux.models.UserModel;
 import android.zhixun.uiho.com.gissystem.flux.models.RXProgress;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AchievementTypeAndCountModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CheckModel;
@@ -98,6 +97,8 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
+//import android.zhixun.uiho.com.gissystem.flux.models.UserModel;
+
 /**
  * 保密检查登记
  */
@@ -111,7 +112,6 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
     private EditText autoCompleteTextView;//被检单位
     private CensorshipRegisterAdapter censorshipRegisterAdapter;
     private AppCompatImageView arrowJCQK;//检查情况的三角
-
 
     //检查情况
     private RadioGroup RadioGroup_JC_one, RadioGroup_JC_three, RadioGroup_JC_four,
@@ -152,6 +152,7 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
     private List<String> mListTPLL = new ArrayList<>();//图片浏览
     private RecyclerView searchRvTips;//将收索的内容展示在该recyclerView里面。
     private EditText etOtherZGIdea;
+    private Button mBtnExport;
 
     @Override
     protected Store initActionsCreatorAndStore() {
@@ -1049,6 +1050,14 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
                 dpd1.setVersion(DatePickerDialog.Version.VERSION_2);
                 dpd1.show(getFragmentManager(), "Datepickerdialog");
 //
+            }
+        });
+        //导出
+        mBtnExport = findViewById(R.id.btn_export);
+        mBtnExport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }

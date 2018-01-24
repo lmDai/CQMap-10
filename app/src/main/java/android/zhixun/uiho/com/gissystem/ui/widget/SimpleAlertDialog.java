@@ -83,8 +83,12 @@ public class SimpleAlertDialog extends AppCompatDialog {
         return this;
     }
 
-    public SimpleAlertDialog visiableEditText() {
+    public SimpleAlertDialog visibleEditText() {
         mEtInput.setVisibility(View.VISIBLE);
+        return this;
+    }
+
+    public SimpleAlertDialog setInputType(){
         return this;
     }
 

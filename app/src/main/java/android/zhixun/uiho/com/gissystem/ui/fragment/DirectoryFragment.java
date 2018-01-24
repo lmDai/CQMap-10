@@ -865,7 +865,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                     setBufferGeometry(distance);
                     mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_SET_FINISH);
                 })
-                .visiableEditText()
+                .visibleEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
                 .alert();
     }
@@ -883,7 +883,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                     dialog1.dismiss();
                     searchMapNumber(text);
                 })
-                .visiableEditText()
+                .visibleEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
                 .alert();
     }

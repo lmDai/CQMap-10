@@ -1044,7 +1044,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     setBufferGeometry(distance);
                     mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_SET_FINISH);
                 })
-                .visiableEditText()
+                .visibleEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
                 .alert();
     }
@@ -1062,7 +1062,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     dialog1.dismiss();
                     searchMapNumber(text);
                 })
-                .visiableEditText()
+                .visibleEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
                 .alert();
     }

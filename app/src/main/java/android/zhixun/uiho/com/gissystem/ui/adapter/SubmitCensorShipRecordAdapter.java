@@ -1,28 +1,18 @@
 package android.zhixun.uiho.com.gissystem.ui.adapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.text.InputType;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
-import android.zhixun.uiho.com.gissystem.flux.models.CRModel;
-import android.zhixun.uiho.com.gissystem.flux.models.SubmitCensorShipRecordModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailByCheckedModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.UserModel;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
+import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
+import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 
-import com.alibaba.fastjson.JSONObject;
-import com.yibogame.app.DoOnSubscriber;
-import com.yibogame.util.SPUtil;
 import com.yibogame.util.ToastUtil;
 import com.yibogame.util.ValidateUtil;
 
@@ -69,7 +59,7 @@ public class SubmitCensorShipRecordAdapter extends RecyclerView.Adapter<SubmitCe
             holder.tvExport.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    export(lists.get(position).getSecrecyInspectId());
+                    showExportDialog(lists.get(position).getSecrecyInspectId());
                 }
             });
         }
@@ -87,51 +77,84 @@ public class SubmitCensorShipRecordAdapter extends RecyclerView.Adapter<SubmitCe
      * 导出
      * @param secrecyInspectId
      */
-    private void export(int secrecyInspectId) {
-        final EditText et = new EditText(context);
-        et.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        new AlertDialog.Builder(context).setTitle("导出")
-                .setMessage("请输入一个您需要导出的邮箱地址")
-//                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(et)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        String input = et.getText().toString();
-                        if (!ValidateUtil.getInstance().validateEmail(input)) {
-                            ToastUtil.showShort("请输入一个正确的邮箱地址哦！");
-                            return;
-                        }
-                        Map<Object, Object> map = new HashMap<>();
-                        map.put("secrecyInspectId", secrecyInspectId);
-                        map.put("toMail", input);
-                        APIService.getInstance().export(map, new DoOnSubscriber<String>() {
-                            @Override
-                            public void doOnSubscriber() {
-
-                            }
-
-                            @Override
-                            public void onCompleted() {
-                                ToastUtil.showShort("导出成功！");
-                            }
-
-                            @Override
-                            public void onNext(String s) {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                super.onError(e);
-                                ToastUtil.showShort(e.getMessage());
-                            }
-                        });
+    private void showExportDialog(int secrecyInspectId) {
+        new SimpleAlertDialog(context)
+                .visibleEditText()
+                .title("导出")
+                .message("请输入一个您需要导出的邮箱地址")
+                .setOkOnClickListener("确定", (dialog, view) -> {
+                    String email = dialog.getEditText().getText().toString();
+                    if (!ValidateUtil.getInstance().validateEmail(email)) {
+                        ToastUtil.showShort("请输入一个正确的邮箱地址哦！");
+                        return;
                     }
-                })
-                .setNegativeButton("取消", null)
+                    export(secrecyInspectId, email);
+                }).setCancelOnClickListener("取消", null)
                 .show();
+//        final EditText et = new EditText(context);
+//        et.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+//        new AlertDialog.Builder(context)
+//                .setTitle("导出")
+//                .setMessage("请输入一个您需要导出的邮箱地址")
+////                .setIcon(android.R.drawable.ic_dialog_info)
+//                .setView(et)
+//                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        String input = et.getText().toString();
+//                        if (!ValidateUtil.getInstance().validateEmail(input)) {
+//                            ToastUtil.showShort("请输入一个正确的邮箱地址哦！");
+//                            return;
+//                        }
+//                        Map<Object, Object> map = new HashMap<>();
+//                        map.put("secrecyInspectId", secrecyInspectId);
+//                        map.put("toMail", input);
+//                        APIService.getInstance().showExportDialog(map, new DoOnSubscriber<String>() {
+//                            @Override
+//                            public void doOnSubscriber() {
+//
+//                            }
+//
+//                            @Override
+//                            public void onCompleted() {
+//                                ToastUtil.showShort("导出成功！");
+//                            }
+//
+//                            @Override
+//                            public void onNext(String s) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//                                super.onError(e);
+//                                ToastUtil.showShort(e.getMessage());
+//                            }
+//                        });
+//                    }
+//                })
+//                .setNegativeButton("取消", null)
+//                .show();
 
 
+    }
+
+    private void export(int secrecyInspectId, String email) {
+        Map<Object, Object> map = new HashMap<>();
+        map.put("secrecyInspectId", secrecyInspectId);
+        map.put("toMail", email);
+        APIService.getInstance()
+                .export(map, new SimpleSubscriber<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        ToastUtil.showShort("导出成功！");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        ToastUtil.showShort(e.getMessage());
+                    }
+                });
     }
 
     @Override

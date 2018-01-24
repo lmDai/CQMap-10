@@ -41,7 +41,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_dialogMessage"
-        android:text="H48B001002 H48B002002 H49B001001"
         tools:visibility="visible" />
 <!-- H48B002002 H49B001001-->
     <TextView

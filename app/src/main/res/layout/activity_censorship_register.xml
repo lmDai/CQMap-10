@@ -49,7 +49,7 @@
             android:paddingLeft="16dp"
             android:text="参检人员"
             android:textColor="#333333"
-            android:textSize="14sp"/>
+            android:textSize="14sp" />
 
         <View
             android:layout_width="match_parent"
@@ -69,6 +69,7 @@
                 android:layout_height="wrap_content">
 
             </android.support.v7.widget.RecyclerView>
+
             <EditText
                 android:id="@+id/et_temp_check_person"
                 android:layout_width="match_parent"
@@ -81,6 +82,7 @@
                 android:paddingRight="16dp"
                 android:textColorHint="#BBBBBB"
                 android:textSize="12sp" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1px"
@@ -88,7 +90,8 @@
         </LinearLayout>
 
 
-     <include  layout="@layout/activity_censorship_register_four"/>
+        <include layout="@layout/activity_censorship_register_four" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"
@@ -216,57 +219,58 @@
                 android:textSize="14sp" />
 
             <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/arrow_JCQK"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                app:srcCompat="@mipmap/arrow_bottom"
-                android:id="@+id/arrow_JCQK"
-                />
+                app:srcCompat="@mipmap/arrow_bottom" />
         </RelativeLayout>
+
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/ll_arrow_JCQK"
-            android:orientation="vertical">
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="@color/colorDivider" />
-
-        <include
-            android:id="@+id/situation_check"
-            layout="@layout/activity_censorship_register_two" />
-
-        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_sixteen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="（十六）"
-                android:textColor="#666666"
-                android:textSize="12sp"
-                android:visibility="gone"/>
-
-
-            <EditText
-                android:id="@+id/et_otherProblems"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:layout_toRightOf="@+id/tv_sixteen"
-                android:background="@null"
-                android:hint="其他问题说明(填写)"
-                android:textColorHint="#BBBBBB"
-                android:textSize="12sp" />
+                android:layout_height="1px"
+                android:background="@color/colorDivider" />
 
-        </RelativeLayout>
+            <include
+                android:id="@+id/situation_check"
+                layout="@layout/activity_censorship_register_two" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/tv_sixteen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="（十六）"
+                    android:textColor="#666666"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+
+                <EditText
+                    android:id="@+id/et_otherProblems"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:layout_toRightOf="@+id/tv_sixteen"
+                    android:background="@null"
+                    android:hint="其他问题说明(填写)"
+                    android:textColorHint="#BBBBBB"
+                    android:textSize="12sp" />
+
+            </RelativeLayout>
         </LinearLayout>
 
         <RelativeLayout
@@ -287,30 +291,31 @@
                 android:textSize="14sp" />
 
             <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/arrow_ZGYJ"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                app:srcCompat="@mipmap/arrow_bottom"
-                android:id="@+id/arrow_ZGYJ"/>
+                app:srcCompat="@mipmap/arrow_bottom" />
         </RelativeLayout>
+
         <LinearLayout
+            android:id="@+id/ll_arrow_ZGYJ"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/ll_arrow_ZGYJ"
             android:orientation="vertical">
 
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/colorDivider" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="@color/colorDivider" />
-
-        <include
-            android:id="@+id/rectification_opinions"
-            layout="@layout/activity_censorship_register_one" />
+            <include
+                android:id="@+id/rectification_opinions"
+                layout="@layout/activity_censorship_register_one" />
         </LinearLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="40dp"
@@ -329,32 +334,36 @@
                 android:textSize="14sp" />
 
             <android.support.v7.widget.AppCompatImageView
+                android:id="@+id/arrow_LDYJ"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                app:srcCompat="@mipmap/arrow_bottom"
-                android:id="@+id/arrow_LDYJ"/>
+                app:srcCompat="@mipmap/arrow_bottom" />
         </RelativeLayout>
+
         <LinearLayout
+            android:id="@+id/ll_arrow_LDYJ"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/ll_arrow_LDYJ"
             android:orientation="vertical">
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="@color/colorDivider" />
 
-        <include
-            android:id="@+id/leader_idea"
-            layout="@layout/activity_censorship_register_three" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/colorDivider" />
+
+            <include
+                android:id="@+id/leader_idea"
+                layout="@layout/activity_censorship_register_three" />
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"
             android:layout_marginLeft="16dp"
             android:background="@color/colorDivider" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="40dp"
@@ -373,10 +382,11 @@
                 android:textSize="14sp" />
 
         </RelativeLayout>
+
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/recyclerView"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp">
 
@@ -385,29 +395,42 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
             android:layout_marginTop="8dp"
+            android:orientation="horizontal"
             android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:layout_marginBottom="16dp">
+            android:paddingRight="16dp">
+
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/btn_export"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/button_censorship_check_selector"
+                android:text="导出"
+                android:textColor="@color/text_censorship_check_selector_right"
+                android:textSize="16sp" />
+
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/acb_save"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/button_censorship_check_selector_left"
                 android:text="保存至本地"
-                android:textSize="16sp"
                 android:textColor="@color/text_censorship_check_selector"
-                android:background="@drawable/button_censorship_check_selector_left"/>
+                android:textSize="16sp" />
+
             <android.support.v7.widget.AppCompatButton
+                android:id="@+id/acb_save_server"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="提交至服务器"
-                android:textSize="16sp"
-                android:textColor="@color/text_censorship_check_selector_right"
+                android:layout_weight="1"
                 android:background="@drawable/button_censorship_check_selector"
-                android:id="@+id/acb_save_server"/>
+                android:text="提交至服务器"
+                android:textColor="@color/text_censorship_check_selector_right"
+                android:textSize="16sp"
+                android:visibility="gone" />
         </LinearLayout>
 
     </LinearLayout>
