@@ -53,7 +53,10 @@ import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
 
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.event.OnSingleTapListener;
+import com.esri.core.geometry.Envelope;
 import com.esri.core.geometry.Geometry;
+import com.esri.core.geometry.Point;
+import com.esri.core.geometry.Polygon;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
@@ -555,6 +558,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         }
                         //地图单击事件
                         mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
+
                             int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
                                     1, 1);
                             if (ids.length == 0) return;
@@ -570,7 +574,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                     for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList
                                             : fruitCategory.fruitList) {
                                         if (FRUIT_ID != fruitList.fruitId) continue;
-
+                                        fruitList.selected = true;
                                         handoutList.add(handout);
                                     }
                                 }
@@ -844,7 +848,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 for (ReportHandoutListModel.FruitCategoryList.
                         FruitList.FruitAttrList fruitAttrList : isShowList) {
                     TextView textView = createRowText();
+                    int color = fruitList.selected ? Color.RED : Color.BLACK;
                     textView.setText(fruitAttrList.attrValue);
+                    textView.setTextColor(color);
                     ll_row.addView(textView);
                 }
                 //详情按钮
@@ -857,10 +863,40 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     showHandoutInfoDialog(String.valueOf(fruitList.fruitId));
                 });
                 //行的点击事件
-                ll_row.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ToastUtil.showShort("行的点击事件");
+                ll_row.setOnClickListener(v -> {
+                    int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
+                    if (graphicIDs.length == 0) {
+                        ToastUtil.showShort("未找到相关信息，请重试");
+                        return;
+                    }
+                    for (int graphicID : graphicIDs) {
+                        Graphic graphic = mMapView.getDrawLayer().getGraphic(graphicID);
+                        if (graphic == null) continue;
+                        double fruitId = (double) graphic.getAttributeValue(FRUITID);
+                        if (fruitId != fruitList.fruitId) continue;
+                        mMapView.getDrawLayer().updateGraphic(graphicID, new SimpleFillSymbol(Color.RED));
+                        if (graphic.getGeometry() == null) continue;
+                        switch (graphic.getGeometry().getType()) {
+                            case ENVELOPE:
+                                Envelope envelope = (Envelope) graphic.getGeometry();
+                                mMapView.centerAt(envelope.getCenter(), true);
+                                break;
+                            case POLYGON:
+                                Polygon polygon = (Polygon) graphic.getGeometry();
+                                int pointCount = polygon.getPointCount();
+                                Point point = polygon.getPoint(1);
+                                mMapView.centerAt(point, true);
+                                break;
+                            case POINT:
+                                Point point1 = (Point) graphic.getGeometry();
+                                mMapView.centerAt(point1,true);
+                                break;
+                        }
+                    }
+                    int childCount = ll_row.getChildCount();
+                    for (int i = 0; i < childCount - 1; i++) {
+                        TextView textView = (TextView) ll_row.getChildAt(i);
+                        textView.setTextColor(Color.RED);
                     }
                 });
                 ll_data.addView(ll_row);

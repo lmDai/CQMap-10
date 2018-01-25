@@ -702,6 +702,10 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             Point point = polygon.getPoint(1);
                             mMapView.centerAt(point, true);
                             break;
+                        case POINT:
+                            Point point1 = (Point) graphic.getGeometry();
+                            mMapView.centerAt(point1,true);
+                            break;
                     }
                     fruitList.get(position).selected = true;
                     adapter.notifyItemChanged(position);

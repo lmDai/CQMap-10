@@ -33,6 +33,7 @@ public class ReportHandoutListModel {
             public long fruitCategoryId;
             public List<FruitAttrList> fruitAttrList;
             public long fruitId;
+            public boolean selected;
 
             public class FruitHandout {
 
