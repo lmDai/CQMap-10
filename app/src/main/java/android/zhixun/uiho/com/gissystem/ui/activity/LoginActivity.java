@@ -53,7 +53,7 @@ public class LoginActivity extends BaseActivity {
         //设置监听
         setListener();
 
-        btLogin.performClick();
+//        btLogin.performClick();
     }
 
 

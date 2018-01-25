@@ -48,8 +48,10 @@ import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
 import com.alibaba.fastjson.JSON;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.event.OnSingleTapListener;
+import com.esri.core.geometry.Envelope;
 import com.esri.core.geometry.Geometry;
 import com.esri.core.geometry.Point;
+import com.esri.core.geometry.Polygon;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
@@ -678,16 +680,28 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
                 long fruitId = fruitList.get(position).fruitId;
                 int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
+                if (graphicIDs.length == 0) {
+                    ToastUtil.showShort("未找到相关信息，请重试");
+                    return;
+                }
                 for (int id : graphicIDs) {
                     Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
+                    if (graphic == null) continue;
                     double attributeValue = (double) graphic.getAttributeValue(FRUITID);
                     if (fruitId != attributeValue) continue;
-
-                    ToastUtil.showShort("" + position);
                     mMapView.getDrawLayer().updateGraphic(id, new SimpleFillSymbol(Color.RED));
-                    if (graphic.getGeometry() instanceof com.esri.core.geometry.Point) {
-                        Point point = (Point) graphic.getGeometry();
-                        mMapView.centerAt(point, true);
+                    if (graphic.getGeometry() == null) continue;
+                    switch (graphic.getGeometry().getType()) {
+                        case ENVELOPE:
+                            Envelope envelope = (Envelope) graphic.getGeometry();
+                            mMapView.centerAt(envelope.getCenter(), true);
+                            break;
+                        case POLYGON:
+                            Polygon polygon = (Polygon) graphic.getGeometry();
+                            int pointCount = polygon.getPointCount();
+                            Point point = polygon.getPoint(1);
+                            mMapView.centerAt(point, true);
+                            break;
                     }
                     fruitList.get(position).selected = true;
                     adapter.notifyItemChanged(position);
@@ -1128,6 +1142,5 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                     }
                 });
     }
-
 
 }
