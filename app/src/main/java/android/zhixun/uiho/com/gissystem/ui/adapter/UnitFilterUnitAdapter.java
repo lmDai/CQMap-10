@@ -50,12 +50,8 @@ public class UnitFilterUnitAdapter extends RecyclerView.Adapter<UnitFilterUnitAd
     public void onBindViewHolder(UnitFilterUnitAdapter.ViewHolder holder, int position) {
         AreaModel unitFilterUnitModel = lists.get(position);
 
-//        if (position == 0) {
-//            holder.tvContentUnit.setText(unitFilterUnitModel.getAll());
-//
-//        } else {
         holder.tvContentUnit.setText(unitFilterUnitModel.getAreaName());
-//        }
+
         if (unitFilterUnitModel.isChecked()) {
             holder.tvContentUnit.setBackgroundColor(context.getResources().getColor(R.color.cardView));
             holder.tvContentUnit.setTextColor(context.getResources().getColor(R.color.cardViewTextColorTrue));

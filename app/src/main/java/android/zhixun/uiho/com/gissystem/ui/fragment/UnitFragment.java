@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,11 +39,12 @@ import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 
 import com.esri.core.geometry.Geometry;
+import com.esri.core.geometry.Point;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
+import com.esri.core.symbol.PictureMarkerSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
-import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
 
@@ -189,7 +191,6 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     private void setPolygon() {
         mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
         searchGeometry();
-//        mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON_SET_FINISH);
     }
 
     private void showSwitchLayerDialog(View view) {
@@ -265,8 +266,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 areaModelList.get(position).setChecked(true);
                 areaModelList.get(zcdLastPosition).setChecked(false);
                 zcdLastPosition = position;
-                ZCD_CODE = areaModelList.get(position).getAreaId();
             }
+            ZCD_CODE = areaModelList.get(position).getAreaId();
             unitZCDAdapter.notifyDataSetChanged();
         });
         //类别
@@ -288,8 +289,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 industryCategoryModelList.get(position).setChecked(true);
                 industryCategoryModelList.get(lbLastPosition).setChecked(false);
                 lbLastPosition = position;
-                HYLB_CODE = industryCategoryModelList.get(position).getIndustryCategoryId();
             }
+            HYLB_CODE = industryCategoryModelList.get(position).getIndustryCategoryId();
             unitLBAdapter.notifyDataSetChanged();
         });
 
@@ -305,7 +306,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         getCompanyList(searchStr, ZCD_CODE, HYLB_CODE);
     }
 
-    private void getCompanyList(String searchStr, long industryCategoryId, long areaId) {
+    private void getCompanyList(String searchStr, long areaId, long industryCategoryId) {
         showLoading();
         Map<Object, Object> map = new HashMap<>();
         if (!TextUtils.isEmpty(searchStr)) {
@@ -357,6 +358,11 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 new BaseMapView.MainThreadCallback<FeatureResult>() {
                     @Override
                     public void onCallback(FeatureResult objects) {
+                        if (objects.featureCount() == 0) {
+                            ToastUtil.showShort("未获取单位信息,请重试");
+                            restoreAll();
+                            return;
+                        }
                         showCompanyMarker(objects);
                     }
 
@@ -368,18 +374,17 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     }
 
     private void showCompanyMarker(FeatureResult objects) {
-        if (objects.featureCount() == 0) {
-            ToastUtil.showShort("未获取单位信息,请重试");
-            restoreAll();
-            return;
-        }
+
         for (Object object : objects) {
             if (object instanceof Feature) {
                 Feature feature = (Feature) object;
-                SimpleMarkerSymbol symbol =
-                        new SimpleMarkerSymbol(Color.RED, 12, SimpleMarkerSymbol.STYLE.CIRCLE);
+
+                PictureMarkerSymbol symbol =
+                        new PictureMarkerSymbol(ContextCompat.getDrawable(getActivity(),
+                                R.drawable.ic_location_green));
                 Graphic graphic = new Graphic(feature.getGeometry(),
                         symbol, feature.getAttributes());
+
                 mMapView.addDrawLayerGraphic(graphic);
 
 //                String UNITID = (String) feature.getAttributeValue("UNITID");
@@ -395,32 +400,33 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 new MainBottomAdapter(getActivity(), response);
         mContentRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mContentRv.setAdapter(bottomAdapter);
-        mDragLayout.animaToCenter();
         dragView.setVisibility(View.VISIBLE);
+        mDragLayout.animaToCenter();
         bottomAdapter.setOnItemClickListener((view, position) -> {
             switch (view.getId()) {
                 case R.id.rl_location:
-                    ToastUtil.showShort("rl_location");
+                    int companyId = response.get(position).getCompanyId();
+                    for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
+                        Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
+                        int unit_id = (int) graphic.getAttributeValue("UNITID");
+                        if (companyId != unit_id) continue;
+                        switch (graphic.getGeometry().getType()) {
+                            case POINT:
+                                Point point = (Point) graphic.getGeometry();
+                                mMapView.centerAt(point, true);
+                                break;
+                        }
+                    }
+
                     break;
                 case R.id.rl_detail:
-                    ToastUtil.showShort("rl_detail");
                     CompanyDetailModel companyDetailModel = response.get(position);
                     Intent intent = new Intent(getActivity(), UnitDetailActivity.class);
-                    intent.putExtra("unitModel",companyDetailModel);
+                    intent.putExtra("unitModel", companyDetailModel);
                     startActivity(intent);
                     break;
             }
-//            int companyId = response.get(position).getCompanyId();
-//            for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
-//                Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
-//                int unit_id = (int) graphic.getAttributeValue("UNITID");
-//                if (companyId == unit_id) {
-//                    if (graphic.getGeometry() instanceof Point) {
-//                        Point point = (Point) graphic.getGeometry();
-//                        mMapView.centerAt(point, true);
-//                    }
-//                }
-//            }
+
         });
     }
 
@@ -492,7 +498,6 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
     private void searchGeometry() {
         showLoading();
-        restoreSpaceStatus();
 
         mMapView.queryGeometry(getActivity(),
                 getString(R.string.feature_server_url),
@@ -500,12 +505,20 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     @Override
                     public void onCallback(FeatureResult objects) {
                         dismissLoading();
+                        restoreSpaceStatus();
+                        if (objects.featureCount() == 0) {
+                            ToastUtil.showShort("未获取单位信息,请重试");
+                            restoreAll();
+                            return;
+                        }
                         showCompanyMarker(objects);
                     }
 
                     @Override
                     public void onError(Throwable throwable) {
                         dismissLoading();
+                        ToastUtil.showEmpty();
+                        restoreSpaceStatus();
                     }
                 });
     }
