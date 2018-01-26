@@ -12,10 +12,6 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
-import android.zhixun.uiho.com.gissystem.app.MyBaseApplication;
-import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyCertificatesLicenseModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyCertificatesQualificationsModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyCertificatesWayModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
 import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
@@ -85,11 +81,11 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
     @Override
     protected void onCreateActivity(@Nullable Bundle savedInstanceState) {
         setTitleText("单位详情");
-//        mCompanyModel = (UnitModel) getIntent().getSerializableExtra("unitModel");
-        MyBaseApplication myBaseApplication = (MyBaseApplication) getApplication();
-        mDaoSession = ((MyBaseApplication) getApplication()).getDaoSession();
+        mCompanyModel = (CompanyDetailModel) getIntent().getSerializableExtra("unitModel");
+//        MyBaseApplication myBaseApplication = (MyBaseApplication) getApplication();
+//        mDaoSession = ((MyBaseApplication) getApplication()).getDaoSession();
 //        mCompanyModel = myBaseApplication.getUnitModel();
-        mCompanyModel = myBaseApplication.getCompanyDetailModel();
+//        mCompanyModel = myBaseApplication.getCompanyDetailModel();
         tvState = (TextView) findViewById(R.id.tv_state);
         //几条报件
         tvState.setText(mCompanyModel.getSecrecyIsPass() == 0 ? "不通过" : "通过");
@@ -145,8 +141,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 
         //
         tvNumber = (TextView) findViewById(R.id.tv_number);
-        tvNumber.setText(mCompanyModel.getHolders().size() + "人");
-
+//        tvNumber.setText(mCompanyModel.getHolders().size() + "人");
 
         tvEnterpriseCodeContent = (TextView) findViewById(R.id.tv_enterprise_code_content);
         tvEnterpriseCodeContent.setText(mCompanyModel.getOrganizationCode());//企业代码
@@ -184,9 +179,9 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        for (CompanyCertificatesWayModel companyCertificatesWayModel : mCompanyModel.getCompanyCertificatesWay()) {
-            companyCertificatesWayImgList.add(companyCertificatesWayModel.getCertificatesUrl());
-        }
+//        for (CompanyCertificatesWayModel companyCertificatesWayModel : mCompanyModel.getCompanyCertificatesWay()) {
+//            companyCertificatesWayImgList.add(companyCertificatesWayModel.getCertificatesUrl());
+//        }
         ImageArrayAdapter imageArrayAdapter = new ImageArrayAdapter(this, companyCertificatesWayImgList);
         //添加adapter动画
         AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(imageArrayAdapter);
@@ -231,9 +226,9 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
                 linearLayoutManager.scrollToPositionWithOffset(n, 0);
             }
         });
-        for (CompanyCertificatesLicenseModel companyCertificatesLicenseModel : mCompanyModel.getCompanyCertificatesLicense()) {
-            companyCertificatesLicenseImgList.add(companyCertificatesLicenseModel.getCertificatesUrl());
-        }
+//        for (CompanyCertificatesLicenseModel companyCertificatesLicenseModel : mCompanyModel.getCompanyCertificatesLicense()) {
+//            companyCertificatesLicenseImgList.add(companyCertificatesLicenseModel.getCertificatesUrl());
+//        }
         ImageArrayAdapter imageArrayAdapterPerson = new ImageArrayAdapter(this, companyCertificatesLicenseImgList);
         AlphaInAnimationAdapter alphaInAnimationAdapterL = new AlphaInAnimationAdapter(imageArrayAdapterPerson);
         //改变持续时长
@@ -271,9 +266,9 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 
             }
         });
-        for (CompanyCertificatesQualificationsModel companyCertificatesQualificationsModel : mCompanyModel.getCompanyCertificatesQualifications()) {
-            companyCertificatesQualificationsImgList.add(companyCertificatesQualificationsModel.getCertificatesUrl());
-        }
+//        for (CompanyCertificatesQualificationsModel companyCertificatesQualificationsModel : mCompanyModel.getCompanyCertificatesQualifications()) {
+//            companyCertificatesQualificationsImgList.add(companyCertificatesQualificationsModel.getCertificatesUrl());
+//        }
         ImageArrayAdapter imageArrayAdapterZZ = new ImageArrayAdapter(this, companyCertificatesQualificationsImgList);
         AlphaInAnimationAdapter alphaInAnimationAdapterZ = new AlphaInAnimationAdapter(imageArrayAdapterZZ);
         //改变持续时长
@@ -370,73 +365,4 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         });
     }
 
-//    private MapView mMapView;
-//    private ServiceFeatureTable mServiceFeatureTable;
-//    private FeatureLayer mFeaturelayer;
-
-//    private void initMap() {
-//        mMapView = (MapView) findViewById(R.id.mapView);
-//        ArcGISTiledLayer arcGISTiledLayer = new ArcGISTiledLayer(getString(R.string.tdt_vec_base_map_url));
-//        Basemap basemap = new Basemap(arcGISTiledLayer);
-//        ArcGISMap arcGISMap = new ArcGISMap(basemap);
-//        mMapView.setAttributionTextVisible(false);
-//        arcGISMap.setInitialViewpoint(new Viewpoint(29.55, 106.55, 100000));
-//        arcGISMap.setMaxScale(1);
-//        arcGISMap.setMinScale(5000000);
-//        mMapView.setMap(arcGISMap);
-//        mServiceFeatureTable = new ServiceFeatureTable(getString(R.string.feature_server_url));
-//        mFeaturelayer = new FeatureLayer(mServiceFeatureTable);
-//        mFeaturelayer.setOpacity(0.8f);
-//        mFeaturelayer.setLabelsEnabled(true);
-//
-//        mFeaturelayer.setSelectionColor(Color.argb(255, 255, 0, 0));
-//        mFeaturelayer.setSelectionWidth(5);
-//
-//        //override the renderer
-////        SimpleLineSymbol lineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLACK, 1);
-////        SimpleFillSymbol fillSymbol = new SimpleFillSymbol(SimpleFillSymbol.Style.SOLID, Color.YELLOW, lineSymbol);
-//        SimpleMarkerSymbol simpleMarkerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.Style.CIRCLE, getResources().getColor(R.color.colorPrimary), 10);
-//        mFeaturelayer.setRenderer(new SimpleRenderer(simpleMarkerSymbol));//new UniqueValueRenderer()
-//        arcGISMap.getOperationalLayers().add(mFeaturelayer);
-//        if (mCompanyModel.getGeometry() == null) {
-//            return;
-//        }
-//        Envelope envelope = mCompanyModel.getGeometry().getExtent();
-//        mMapView.setOnTouchListener(new DefaultMapViewOnTouchListener(this, mMapView) {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent event) {
-//                return false;
-//            }
-//        });
-//        initAllFeatureQueryResult(envelope);
-//    }
-
-//    private FeatureQueryResult mAllFeatureQueryResult = null;
-
-//    private void initAllFeatureQueryResult(Envelope envelope) {
-//        if (mAllFeatureQueryResult == null) {
-//            QueryParameters query = new QueryParameters();
-////            query.setWhereClause("1=1");
-//            query.setGeometry(envelope);
-//            final ListenableFuture<FeatureQueryResult> future = mServiceFeatureTable.queryFeaturesAsync(query);
-//            // add done loading listener to fire when the selection returns
-//            future.addDoneListener(new Runnable() {
-//                @Override
-//                public void run() {
-//                    try {
-//                        mAllFeatureQueryResult = future.get();
-//                        for (Feature feature : mAllFeatureQueryResult) {
-//                            Envelope envelope = feature.getGeometry().getExtent();
-//                            mMapView.setViewpointGeometryAsync(envelope, 200);
-//                            mFeaturelayer.setFeatureVisible(feature, true);
-//                            mFeaturelayer.selectFeature(feature);
-//                        }
-//                    } catch (InterruptedException | ExecutionException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            });
-//
-//        }
-//    }
 }

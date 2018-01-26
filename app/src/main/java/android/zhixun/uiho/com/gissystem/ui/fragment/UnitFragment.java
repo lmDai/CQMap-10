@@ -1,5 +1,6 @@
 package android.zhixun.uiho.com.gissystem.ui.fragment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Keep;
@@ -25,6 +26,7 @@ import android.zhixun.uiho.com.gissystem.flux.models.api.IndustryCategoryModel;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
 import android.zhixun.uiho.com.gissystem.ui.activity.MainActivity;
+import android.zhixun.uiho.com.gissystem.ui.activity.UnitDetailActivity;
 import android.zhixun.uiho.com.gissystem.ui.adapter.MainBottomAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.UnitFilterAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.UnitFilterUnitAdapter;
@@ -36,7 +38,6 @@ import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 
 import com.esri.core.geometry.Geometry;
-import com.esri.core.geometry.Point;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
@@ -397,19 +398,29 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mDragLayout.animaToCenter();
         dragView.setVisibility(View.VISIBLE);
         bottomAdapter.setOnItemClickListener((view, position) -> {
-            int companyId = response.get(position).getCompanyId();
-            for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
-                Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
-                int unit_id = (int) graphic.getAttributeValue("UNITID");
-                if (companyId == unit_id) {
-//                    ToastUtil.showShort("========");
-                    if (graphic.getGeometry() instanceof Point) {
-                        Point point = (Point) graphic.getGeometry();
-                        mMapView.centerAt(point, true);
-                    }
-                }
+            switch (view.getId()) {
+                case R.id.rl_location:
+                    ToastUtil.showShort("rl_location");
+                    break;
+                case R.id.rl_detail:
+                    ToastUtil.showShort("rl_detail");
+                    CompanyDetailModel companyDetailModel = response.get(position);
+                    Intent intent = new Intent(getActivity(), UnitDetailActivity.class);
+                    intent.putExtra("unitModel",companyDetailModel);
+                    startActivity(intent);
+                    break;
             }
-//            ToastUtil.showShort("" + position);
+//            int companyId = response.get(position).getCompanyId();
+//            for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
+//                Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
+//                int unit_id = (int) graphic.getAttributeValue("UNITID");
+//                if (companyId == unit_id) {
+//                    if (graphic.getGeometry() instanceof Point) {
+//                        Point point = (Point) graphic.getGeometry();
+//                        mMapView.centerAt(point, true);
+//                    }
+//                }
+//            }
         });
     }
 

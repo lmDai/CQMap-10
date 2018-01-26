@@ -10,9 +10,9 @@
         android:id="@+id/rl_intro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingBottom="8dp"
         android:paddingTop="10dp">
 
         <TextView
@@ -84,7 +84,7 @@
                 android:layout_height="24dp"
                 android:layout_centerInParent="true"
                 android:layout_marginRight="4dp"
-                app:srcCompat="@mipmap/location" />
+                app:srcCompat="@drawable/ic_location_list" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -92,7 +92,7 @@
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/image1"
                 android:text="定位"
-                android:textColor="#333333"
+                android:textColor="@color/colorAccent"
                 android:textSize="14sp" />
         </RelativeLayout>
 
@@ -113,7 +113,7 @@
                 android:layout_height="24dp"
                 android:layout_centerInParent="true"
                 android:layout_marginRight="4dp"
-                app:srcCompat="@mipmap/detail" />
+                app:srcCompat="@drawable/ic_info_list" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -121,7 +121,7 @@
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/image2"
                 android:text="详情"
-                android:textColor="#333333"
+                android:textColor="@color/colorAccent"
                 android:textSize="14sp" />
         </RelativeLayout>
     </LinearLayout>

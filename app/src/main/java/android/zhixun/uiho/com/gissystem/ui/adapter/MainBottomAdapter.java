@@ -66,14 +66,16 @@ public class MainBottomAdapter extends RecyclerView.Adapter<MainBottomAdapter.Vi
             @Override
             public void onClick(View view) {
                 //暂时与点击intro的执行动作一样
-                viewHolder.rlIntro.performClick();
+                if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onItemClick(view, viewHolder.getAdapterPosition());
+                }
             }
         });
         viewHolder.rlDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mOnItemClickListenerDetail != null) {
-                    mOnItemClickListenerDetail.onItemClick(view, viewHolder.getAdapterPosition());
+                if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onItemClick(view, viewHolder.getAdapterPosition());
                 }
             }
         });

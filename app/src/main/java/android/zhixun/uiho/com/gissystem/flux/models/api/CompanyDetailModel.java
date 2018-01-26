@@ -1,12 +1,10 @@
 package android.zhixun.uiho.com.gissystem.flux.models.api;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.alibaba.fastjson.JSON;
 import com.esri.core.geometry.Geometry;
 import com.esri.core.geometry.Point;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +12,7 @@ import java.util.List;
  * Created by tanyi on 2017/3/21.
  */
 
-public class CompanyDetailModel implements Parcelable{
+public class CompanyDetailModel implements Serializable{
 
     /**
      * areaId : 1
@@ -67,42 +65,6 @@ public class CompanyDetailModel implements Parcelable{
 
     public CompanyDetailModel() {
     }
-
-    protected CompanyDetailModel(Parcel in) {
-        areaId = in.readInt();
-        areaName = in.readString();
-        companyAddre = in.readString();
-        companyEMail = in.readString();
-        companyId = in.readInt();
-        companyName = in.readString();
-        companyStatus = in.readInt();
-        companyTelephone = in.readString();
-        companyType = in.readInt();
-        corporationId = in.readInt();
-        createTime = in.readLong();
-        industryCategoryId = in.readInt();
-        industryCategoryName = in.readString();
-        isDelete = in.readInt();
-        isLocal = in.readInt();
-        organizationCode = in.readString();
-        secrecyPersonPhone = in.readString();
-        zipCode = in.readString();
-        holders = in.createTypedArrayList(HoldersModel.CREATOR);
-        secrecyIsPass = in.readInt();
-        fruitNum = in.readInt();
-    }
-
-    public static final Creator<CompanyDetailModel> CREATOR = new Creator<CompanyDetailModel>() {
-        @Override
-        public CompanyDetailModel createFromParcel(Parcel in) {
-            return new CompanyDetailModel(in);
-        }
-
-        @Override
-        public CompanyDetailModel[] newArray(int size) {
-            return new CompanyDetailModel[size];
-        }
-    };
 
     @Override
     public String toString() {
@@ -326,33 +288,4 @@ public class CompanyDetailModel implements Parcelable{
         this.fruitNum = fruitNum;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(areaId);
-        dest.writeString(areaName);
-        dest.writeString(companyAddre);
-        dest.writeString(companyEMail);
-        dest.writeInt(companyId);
-        dest.writeString(companyName);
-        dest.writeInt(companyStatus);
-        dest.writeString(companyTelephone);
-        dest.writeInt(companyType);
-        dest.writeInt(corporationId);
-        dest.writeLong(createTime);
-        dest.writeInt(industryCategoryId);
-        dest.writeString(industryCategoryName);
-        dest.writeInt(isDelete);
-        dest.writeInt(isLocal);
-        dest.writeString(organizationCode);
-        dest.writeString(secrecyPersonPhone);
-        dest.writeString(zipCode);
-        dest.writeTypedList(holders);
-        dest.writeInt(secrecyIsPass);
-        dest.writeInt(fruitNum);
-    }
 }
