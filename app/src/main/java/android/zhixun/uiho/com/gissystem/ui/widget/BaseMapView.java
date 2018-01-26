@@ -30,6 +30,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
     private ArcGISTiledMapServiceLayer vecLayer, demLayer, imgLayer;
     private TianDiTuLayer vecTTDLayer, demTTDLayer, imgTTDLayer;
+    private TianDiTuLayer vecTextTTDLayer, demTextTTDLayer, imageTextTTDLayer;
     //
     private GraphicsLayer drawLayer;
     private DrawTool drawTool;
@@ -52,6 +53,13 @@ public class BaseMapView extends MapView implements DrawEventListener {
         this.addLayer(vecTTDLayer);
         demTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_2000);
         imgTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_2000);
+        //天地图文字的layer
+        vecTextTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_ANNOTATION_CHINESE_2000);
+        this.addLayer(vecTextTTDLayer);
+        demTextTTDLayer =
+                new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_ANNOTATION_CHINESE_2000);
+        imageTextTTDLayer =
+                new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_ANNOTATION_CHINESE_2000);
         //重庆地图的layer
         vecLayer = new ArcGISTiledMapServiceLayer(context.getString(R.string.tdt_vec_base_map_url));
         this.addLayer(vecLayer);
@@ -100,20 +108,21 @@ public class BaseMapView extends MapView implements DrawEventListener {
     public void setCurrentMapLayer(@CurrentMapLayer int currentMapLayer) {
         this.currentMapLayer = currentMapLayer;
 
-//        removeLayer(0);
-//        removeLayer(1);
         removeAll();
         switch (currentMapLayer) {
             case DEM_LAYER:
                 this.addLayer(demTTDLayer);
+                this.addLayer(demTextTTDLayer);
                 this.addLayer(demLayer);
                 break;
             case VEC_LAYER:
                 this.addLayer(vecTTDLayer);
+                this.addLayer(vecTextTTDLayer);
                 this.addLayer(vecLayer);
                 break;
             case IMG_LAYER:
                 this.addLayer(imgTTDLayer);
+                this.addLayer(imageTextTTDLayer);
                 this.addLayer(imgLayer);
                 break;
         }
