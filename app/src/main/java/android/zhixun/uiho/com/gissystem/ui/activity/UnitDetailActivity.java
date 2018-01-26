@@ -1,5 +1,6 @@
 package android.zhixun.uiho.com.gissystem.ui.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -71,6 +72,12 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
     @Override
     protected void onStoreCall(Store.StoreChangeEvent storeChangeEvent) {
 
+    }
+
+    public static void navWith(Context context, CompanyDetailModel model) {
+        Intent intent = new Intent(context, UnitDetailActivity.class);
+        intent.putExtra("unitModel", model);
+        context.startActivity(intent);
     }
 
     @Override

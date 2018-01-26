@@ -545,7 +545,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
                                     1, 1);
                             if (ids.length == 0) {
-                                ToastUtil.showShort("图层为空，请再次点击");
+//                                ToastUtil.showShort("图层为空，请再次点击");
                                 return;
                             }
                             GraphicsLayer drawLayer = mMapView.getDrawLayer();

@@ -38,6 +38,8 @@ import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 
+import com.esri.android.map.Callout;
+import com.esri.android.map.GraphicsLayer;
 import com.esri.core.geometry.Geometry;
 import com.esri.core.geometry.Point;
 import com.esri.core.map.Feature;
@@ -128,10 +130,11 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mCVClear.setOnClickListener(this);
         mIvUser.setOnClickListener(this);
         mTvSearch.setOnClickListener(this);
-        showLoading();
+        mMapView.setOnSingleTapListener(this::OnMapSingleTap);
     }
 
     private void initData() {
+        showLoading();
         getSiftZCDData();
         getSiftLBData();
     }
@@ -393,6 +396,42 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
+    private void OnMapSingleTap(float x, float y) {
+        GraphicsLayer drawLayer = mMapView.getDrawLayer();
+        int[] ids = drawLayer.getGraphicIDs(x, y,
+                1, 1);
+        if (ids.length == 0)
+            return;
+        Graphic graphic = drawLayer.getGraphic(ids[0]);
+        if (graphic == null)
+            return;
+
+        int unitID = (int) graphic.getAttributeValue("UNITID");
+        for (CompanyDetailModel model : companyList) {
+            if (model.getCompanyId() != unitID) {
+                continue;
+            }
+            showCallout(graphic, model);
+        }
+
+    }
+
+    private void showCallout(Graphic graphic, CompanyDetailModel model) {
+        Callout callout = mMapView.getCallout();
+        View calloutView = View.inflate(getActivity(), R.layout.view_callout, null);
+        TextView tv_companyName = calloutView.findViewById(R.id.tv_companyName);
+        TextView tv_address = calloutView.findViewById(R.id.tv_address);
+        ImageView ivDetail = calloutView.findViewById(R.id.iv_detail);
+
+        tv_companyName.setText(model.getCompanyName());
+        tv_address.setText(model.getCompanyAddre());
+        ivDetail.setOnClickListener(v -> UnitDetailActivity.navWith(getActivity(), model));
+
+        callout.setCoordinates(((Point) graphic.getGeometry()));
+        callout.setContent(calloutView);
+        callout.show();
+    }
+
     private void showBottomLayout(List<CompanyDetailModel> response) {
         mCVClear.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).hideBottomNav();
@@ -414,6 +453,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                             case POINT:
                                 Point point = (Point) graphic.getGeometry();
                                 mMapView.centerAt(point, true);
+                                showCallout(graphic, response.get(position));
                                 break;
                         }
                     }
