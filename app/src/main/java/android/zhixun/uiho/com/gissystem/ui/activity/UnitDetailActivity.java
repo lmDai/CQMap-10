@@ -86,9 +86,6 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 //        mDaoSession = ((MyBaseApplication) getApplication()).getDaoSession();
 //        mCompanyModel = myBaseApplication.getUnitModel();
 //        mCompanyModel = myBaseApplication.getCompanyDetailModel();
-        tvState = (TextView) findViewById(R.id.tv_state);
-        //几条报件
-        tvState.setText(mCompanyModel.getSecrecyIsPass() == 0 ? "不通过" : "通过");
         //初始化
         initViews();
         //设置监听
@@ -139,10 +136,11 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         rlCheckResult = (RelativeLayout) findViewById(R.id.rlCheckResult);//检查结果
         rlCHResult = (RelativeLayout) findViewById(R.id.rlCHResult);//拥有的涉密测绘成果
 
-        //
         tvNumber = (TextView) findViewById(R.id.tv_number);
 //        tvNumber.setText(mCompanyModel.getHolders().size() + "人");
+        tvState = (TextView) findViewById(R.id.tv_state);
 
+        tvState.setText(mCompanyModel.getSecrecyIsPass() == 0 ? "不通过" : "通过");
         tvEnterpriseCodeContent = (TextView) findViewById(R.id.tv_enterprise_code_content);
         tvEnterpriseCodeContent.setText(mCompanyModel.getOrganizationCode());//企业代码
         tvBusinessCategoryContent = (TextView) findViewById(R.id.tv_business_category_content);
@@ -175,7 +173,6 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         recyclerView1 = (RecyclerView) findViewById(R.id.recyclerView1);
         recyclerView2 = (RecyclerView) findViewById(R.id.recyclerView2);
         recyclerView3 = (RecyclerView) findViewById(R.id.recyclerView3);
-
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);

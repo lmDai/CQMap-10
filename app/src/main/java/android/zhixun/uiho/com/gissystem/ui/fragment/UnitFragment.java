@@ -236,6 +236,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 .from(getActivity())
                 .inflate(R.layout.layout_unit_filter, (ViewGroup) getView(),
                         false);
+        DialogUtil.getInstance().showAnchorDialog(contentView, view);
         final EditText etSearch = contentView.findViewById(R.id.et_search);
         //rv填充数据
         RecyclerView zcdRv = contentView.findViewById(R.id.recyclerViewZCD);
@@ -292,7 +293,6 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
             unitLBAdapter.notifyDataSetChanged();
         });
 
-        DialogUtil.getInstance().showAnchorDialog(contentView, view);
         Button btnQuery = contentView.findViewById(R.id.acb_query);
         btnQuery.setOnClickListener(v -> {
             String searchStr = etSearch.getText().toString();
