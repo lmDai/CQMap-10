@@ -15,14 +15,12 @@
         tools:context="android.zhixun.uiho.com.gissystem.ui.activity.MainActivity"
         tools:visibility="visible">
 
-
         <FrameLayout
             android:id="@+id/contentContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/rg_bottom_radio_navigation"
             android:background="@color/colorWhite" />
-
 
         <RadioGroup
             android:id="@+id/rg_bottom_radio_navigation"
