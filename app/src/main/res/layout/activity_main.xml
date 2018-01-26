@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="android.zhixun.uiho.com.gissystem.ui.activity.MainActivity"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
 
         <FrameLayout
@@ -157,7 +157,8 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_main_drawer">
+        app:menu="@menu/activity_main_drawer"
+        tools:visibility="gone">
 
     </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>
