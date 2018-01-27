@@ -242,6 +242,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     return;
                 }
                 setSearhText(mEtSearch.getText().toString() + "矩形框选");
+                showSearchTextViewWithSpace();
                 break;
             case BaseMapView.SPACE_BUFFER:
                 showBufferInputDialog(v);
@@ -253,6 +254,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     return;
                 }
                 setSearhText(mEtSearch.getText().toString() + "多边形框选");
+                showSearchTextViewWithSpace();
                 break;
             case BaseMapView.SPACE_BUFFER_SET_FINISH:
                 if (mMapView.getCurrentDrawGraphic() == null) {
@@ -260,6 +262,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     return;
                 }
                 setSearhText(mEtSearch.getText().toString() + "缓冲区查询");
+                showSearchTextViewWithSpace();
                 break;
             case BaseMapView.SPACE_MAP_NUMBER:
 //                if (mMapView.getCurrentDrawGraphic() == null) {
@@ -267,6 +270,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 //                    return;
 //                }
                 setSearhText(mEtSearch.getText().toString() + "图幅号查询");
+                showSearchTextViewWithSpace();
                 break;
             case BaseMapView.SPACE_ADMIN_REGION:
                 if (mMapView.getCurrentDrawGraphic() == null) {
@@ -274,6 +278,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     return;
                 }
                 setSearhText(mEtSearch.getText().toString() + "行政区域查询");
+                showSearchTextViewWithSpace();
                 break;
         }
     }
@@ -287,6 +292,11 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mIvSearchClear.setVisibility(View.GONE);
         mEtSearch.setText("");
         mMapView.clearAll();
+    }
+
+    private void showSearchTextViewWithSpace() {
+        mTvSearch.setVisibility(View.VISIBLE);
+        mIvSearchClear.setVisibility(View.GONE);
     }
 
     private void showSearchClearView() {
@@ -333,7 +343,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         View dialogRoot = LayoutInflater.from(getActivity())
                 .inflate(R.layout.dialog_classify_search, ((ViewGroup) getView()),
                         false);
-
+        for (FruitCategoryListModel model : response) {
+            model.selected = false;
+        }
         response.get(0).selected = true;
         RecyclerView rv_flowType = dialogRoot.findViewById(R.id.rv_flow_type);
         rv_flowType.setLayoutManager(new GridLayoutManager(getActivity(), 3));
@@ -530,10 +542,12 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         } else {//面查询
             url = getString(R.string.polygon_feature_server_url);
         }
+        showLoading();
         mMapView.querySQL(getActivity(), url, whereClause,
                 new BaseMapView.MainThreadCallback<FeatureResult>() {
                     @Override
                     public void onCallback(FeatureResult result) {
+                        dismissLoading();
                         if (result.featureCount() == 0) {
                             ToastUtil.showShort("未获取信息,请重试");
                             restoreAll();
@@ -585,7 +599,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
                     @Override
                     public void onError(Throwable e) {
-                        ToastUtil.showShort("未获取信息,请重试");
+                        e.printStackTrace();
+                        dismissLoading();
+                        ToastUtil.showShort(e.getMessage());
                     }
                 });
         dismissLoading();
@@ -783,11 +799,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     protected void convert(ViewHolder holder, ReportHandoutListModel item, int position) {
                         holder.setText(R.id.tv_companyName, item.companyName)
                                 .setText(R.id.tv_reportNo, item.reportNo);
-//                        if (!item.fruitCategoryList.isEmpty()) {
-                            String time = DateUtil.longToString(DateUtil.yyyyMMDD,
-                                    item.reportHandout.createTime);
-                            holder.setText(R.id.tv_time, time);
-//                        }
+                        String time = DateUtil.longToString(DateUtil.yyyyMMDD,
+                                item.reportHandout.createTime);
+                        holder.setText(R.id.tv_time, time);
 
                         View rl_handoutConntent = holder.getView(R.id.rl_handoutContent);
                         TextView text_handoutContent = holder.getView(R.id.text_handoutContent);
@@ -1020,6 +1034,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     public void onError(Throwable e) {
                         super.onError(e);
                         dismissLoading();
+                        ToastUtil.showShort(e.getMessage());
                     }
                 });
     }
@@ -1085,6 +1100,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     int distance = Integer.parseInt(text);
                     setBufferGeometry(distance);
                     mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_SET_FINISH);
+                    dialog1.dismiss();
                 })
                 .visibleEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
@@ -1155,6 +1171,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         @Override
                         public void onError(Throwable e) {
                             dismissLoading();
+                            ToastUtil.showShort(e.getMessage());
                         }
                     });
         }
@@ -1219,6 +1236,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     public void onError(Throwable e) {
                         super.onError(e);
                         dismissLoading();
+                        ToastUtil.showShort(e.getMessage());
                     }
                 });
     }
@@ -1253,6 +1271,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     @Override
                     public void onError(Throwable e) {
                         dismissLoading();
+                        ToastUtil.showShort(e.getMessage());
                     }
                 });
     }
@@ -1305,8 +1324,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     }
 
                     @Override
-                    public void onError(Throwable throwable) {
-                        ToastUtil.showEmpty();
+                    public void onError(Throwable e) {
+                        ToastUtil.showShort(e.getMessage());
                         dismissLoading();
                         restoreSpaceStatus();
                     }
@@ -1326,6 +1345,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         hideBottomLayout();
         hideClearBtn();
         mMapView.clearAll();
+        mBody = null;
     }
 
     private void showClearBtn() {
@@ -1388,6 +1408,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
+                        ToastUtil.showShort(e.getMessage());
                         dismissLoading();
                     }
                 });
@@ -1430,6 +1451,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
+                        ToastUtil.showShort(e.getMessage());
                         dismissLoading();
                     }
                 });
