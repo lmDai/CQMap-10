@@ -7,12 +7,13 @@ import com.esri.core.geometry.Point;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by tanyi on 2017/3/21.
  */
 
-public class CompanyDetailModel implements Serializable{
+public class CompanyDetailModel implements Serializable {
 
     /**
      * areaId : 1
@@ -62,6 +63,8 @@ public class CompanyDetailModel implements Serializable{
     private Geometry geometry;//几何形状
     private int secrecyIsPass;//是否通过（0不通过1通过
     private int fruitNum;//成果数量
+
+    public double distance;//距离定位点多少千米
 
     public CompanyDetailModel() {
     }
@@ -288,4 +291,7 @@ public class CompanyDetailModel implements Serializable{
         this.fruitNum = fruitNum;
     }
 
+    public String getDistance() {
+        return String.format(Locale.CHINA, "%.2fkm", distance);
+    }
 }

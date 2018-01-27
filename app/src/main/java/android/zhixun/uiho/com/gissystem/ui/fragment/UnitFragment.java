@@ -42,7 +42,10 @@ import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 import com.esri.android.map.Callout;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.core.geometry.Geometry;
+import com.esri.core.geometry.GeometryEngine;
+import com.esri.core.geometry.LinearUnit;
 import com.esri.core.geometry.Point;
+import com.esri.core.geometry.SpatialReference;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
@@ -132,6 +135,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mIvUser.setOnClickListener(this);
         mTvSearch.setOnClickListener(this);
         mMapView.setOnSingleTapListener(this::OnMapSingleTap);
+//        mMapView.setOnStatusChangedListener(this::OnStatusChange);
     }
 
     private void initData() {
@@ -172,7 +176,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 } else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_POLYGON) {
                     setPolygon();
                 } else {
-                    searchGeometry();
+//                    searchGeometry();
+                    getCompanyList(mEtSearch.getText().toString(), -1, -1);
                 }
                 break;
             case R.id.cv_clear:
@@ -194,7 +199,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
     private void setPolygon() {
         mMapView.setCurrentDrawGraphic(mMapView.getDrawTool().drawGraphic);
-        searchGeometry();
+//        searchGeometry();
+        getCompanyList(mEtSearch.getText().toString(), -1, -1);
     }
 
     private void showSwitchLayerDialog(View view) {
@@ -333,20 +339,24 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                         }
                         companyList.clear();
                         companyList.addAll(response);
-                        showMapSymbol(companyList);
-                        showBottomLayout(companyList);
+                        if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
+                            searchSql(companyList);
+                        } else {
+                            searchGeometry(companyList);
+                        }
+//                        showBottomLayout(companyList);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
                         dismissLoading();
-                        ToastUtil.showShort("未查询到相关信息");
+                        ToastUtil.showShort(e.getMessage());
                     }
                 });
     }
 
-    private void showMapSymbol(List<CompanyDetailModel> response) {
+    private void searchSql(List<CompanyDetailModel> response) {
         if (response == null || response.isEmpty()) return;
         StringBuilder sb = new StringBuilder();
         for (CompanyDetailModel model : response) {
@@ -367,7 +377,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                             restoreAll();
                             return;
                         }
-                        showCompanyMarker(objects);
+                        showCompanyMarker(objects, response);
                     }
 
                     @Override
@@ -377,24 +387,41 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 });
     }
 
-    private void showCompanyMarker(FeatureResult objects) {
-
+    private void showCompanyMarker(FeatureResult objects, List<CompanyDetailModel> companyList) {
+        List<CompanyDetailModel> exitsCompanyList = new ArrayList<>();
         for (Object object : objects) {
-            if (object instanceof Feature) {
-                Feature feature = (Feature) object;
+//            if (object == null) continue;
+            for (CompanyDetailModel companyDetailModel : companyList) {
 
-                PictureMarkerSymbol symbol =
-                        new PictureMarkerSymbol(ContextCompat.getDrawable(getActivity(),
-                                R.drawable.ic_location_green));
-                Graphic graphic = new Graphic(feature.getGeometry(),
-                        symbol, feature.getAttributes());
+                if (object instanceof Feature) {
+                    Feature feature = (Feature) object;
+                    int unitid = (int) feature.getAttributeValue("UNITID");
+                    if (companyDetailModel.getCompanyId() != unitid)
+                        continue;
 
-                mMapView.addDrawLayerGraphic(graphic);
-
-//                String UNITID = (String) feature.getAttributeValue("UNITID");
-
+                    PictureMarkerSymbol symbol =
+                            new PictureMarkerSymbol(ContextCompat.getDrawable(getActivity(),
+                                    R.drawable.ic_location_green));
+                    Graphic graphic = new Graphic(feature.getGeometry(),
+                            symbol, feature.getAttributes());
+                    Location location = mMapView.getLocationDisplayManager().getLocation();
+                    if (location != null) {
+                        Point point1 = new Point(location.getLongitude(), location.getLatitude());
+                        Point point2 = (Point) graphic.getGeometry();
+                        double distance = GeometryEngine.geodesicDistance(point1, point2,
+                                SpatialReference.create(SpatialReference.WKID_WGS84),
+                                new LinearUnit(LinearUnit.Code.KILOMETER));
+                        LogUtil.d("distance == " + distance);
+                        companyDetailModel.distance = distance;
+                    }
+                    mMapView.addDrawLayerGraphic(graphic);
+                    if (!exitsCompanyList.contains(companyDetailModel)) {
+                        exitsCompanyList.add(companyDetailModel);
+                    }
+                }
             }
         }
+        showBottomLayout(exitsCompanyList);
     }
 
     private void OnMapSingleTap(float x, float y) {
@@ -433,11 +460,11 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         callout.show();
     }
 
-    private void showBottomLayout(List<CompanyDetailModel> response) {
+    private void showBottomLayout(List<CompanyDetailModel> companyList) {
         mCVClear.setVisibility(View.VISIBLE);
         ((MainActivity) getActivity()).hideBottomNav();
         MainBottomAdapter bottomAdapter =
-                new MainBottomAdapter(getActivity(), response);
+                new MainBottomAdapter(getActivity(), companyList);
         Location location = mMapView.getLocationDisplayManager().getLocation();
         mContentRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mContentRv.setAdapter(bottomAdapter);
@@ -447,7 +474,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         bottomAdapter.setOnItemClickListener((view, position) -> {
             switch (view.getId()) {
                 case R.id.rl_location:
-                    int companyId = response.get(position).getCompanyId();
+                    int companyId = companyList.get(position).getCompanyId();
                     for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
                         Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
                         int unit_id = (int) graphic.getAttributeValue("UNITID");
@@ -456,14 +483,14 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                             case POINT:
                                 Point point = (Point) graphic.getGeometry();
                                 mMapView.centerAt(point, true);
-                                showCallout(graphic, response.get(position));
+                                showCallout(graphic, companyList.get(position));
                                 break;
                         }
                     }
 
                     break;
                 case R.id.rl_detail:
-                    CompanyDetailModel companyDetailModel = response.get(position);
+                    CompanyDetailModel companyDetailModel = companyList.get(position);
                     Intent intent = new Intent(getActivity(), UnitDetailActivity.class);
                     intent.putExtra("unitModel", companyDetailModel);
                     startActivity(intent);
@@ -539,7 +566,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mMapView.addDrawLayerGraphic(graphic);
     }
 
-    private void searchGeometry() {
+    private void searchGeometry(List<CompanyDetailModel> companyList) {
         showLoading();
 
         mMapView.queryGeometry(getActivity(),
@@ -554,7 +581,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                             restoreAll();
                             return;
                         }
-                        showCompanyMarker(objects);
+                        showCompanyMarker(objects, companyList);
                     }
 
                     @Override

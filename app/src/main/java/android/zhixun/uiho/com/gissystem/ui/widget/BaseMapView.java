@@ -138,6 +138,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
         LocationDisplayManager locationDisplayManager = this.getLocationDisplayManager();
         locationDisplayManager.start();
         locationDisplayManager.setAutoPanMode(LocationDisplayManager.AutoPanMode.LOCATION);
+//        locationDisplayManager.setLocationListener();
     }
 
 //    public void zoomIn() {
@@ -274,9 +275,14 @@ public class BaseMapView extends MapView implements DrawEventListener {
     OnStatusChangedListener onStatusChangedListener = new OnStatusChangedListener() {
         @Override
         public void onStatusChanged(Object o, OnStatusChangedListener.STATUS status) {
-            if (status == STATUS.LAYER_LOADED) {
-                centerAt(29.55, 106.55, true);
-                setScale(100000, true);
+            switch (status) {
+                case INITIALIZED:
+                    location();
+                    break;
+                case LAYER_LOADED:
+                    centerAt(29.55, 106.55, true);
+                    setScale(100000, true);
+                    break;
             }
         }
     };

@@ -89,7 +89,7 @@ public class MainBottomAdapter extends RecyclerView.Adapter<MainBottomAdapter.Vi
         CompanyDetailModel mainBottomModel = lists.get(position);
         holder.tvompany.setText(mainBottomModel.getCompanyName());
         holder.tvAddress.setText(mainBottomModel.getCompanyAddre());
-        holder.tvDistance.setText("1000");
+        holder.tvDistance.setText(mainBottomModel.getDistance());
     }
 
     @Override
