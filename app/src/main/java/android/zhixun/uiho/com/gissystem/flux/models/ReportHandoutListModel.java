@@ -19,6 +19,7 @@ public class ReportHandoutListModel {
 
     public class FruitCategoryList {
 
+        public long createTime;
         public List<FruitList> fruitList;
         public int isDelete;
         public String categoryName;

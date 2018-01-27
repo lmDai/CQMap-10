@@ -783,6 +783,12 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     protected void convert(ViewHolder holder, ReportHandoutListModel item, int position) {
                         holder.setText(R.id.tv_companyName, item.companyName)
                                 .setText(R.id.tv_reportNo, item.reportNo);
+//                        if (!item.fruitCategoryList.isEmpty()) {
+                            String time = DateUtil.longToString(DateUtil.yyyyMMDD,
+                                    item.reportHandout.createTime);
+                            holder.setText(R.id.tv_time, time);
+//                        }
+
                         View rl_handoutConntent = holder.getView(R.id.rl_handoutContent);
                         TextView text_handoutContent = holder.getView(R.id.text_handoutContent);
                         ImageView iv_arrow = holder.getView(R.id.iv_arrow);
@@ -889,7 +895,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 break;
                             case POINT:
                                 Point point1 = (Point) graphic.getGeometry();
-                                mMapView.centerAt(point1,true);
+                                mMapView.centerAt(point1, true);
                                 break;
                         }
                     }
