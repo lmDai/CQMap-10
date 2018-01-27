@@ -1,8 +1,10 @@
 package android.zhixun.uiho.com.gissystem.ui.fragment;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
@@ -41,6 +43,7 @@ import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
 
 import com.esri.android.map.Callout;
 import com.esri.android.map.GraphicsLayer;
+import com.esri.android.map.event.OnStatusChangedListener;
 import com.esri.core.geometry.Geometry;
 import com.esri.core.geometry.GeometryEngine;
 import com.esri.core.geometry.LinearUnit;
@@ -51,6 +54,8 @@ import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.PictureMarkerSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.PermissionListener;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
 
@@ -135,8 +140,67 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mIvUser.setOnClickListener(this);
         mTvSearch.setOnClickListener(this);
         mMapView.setOnSingleTapListener(this::OnMapSingleTap);
-//        mMapView.setOnStatusChangedListener(this::OnStatusChange);
+        mMapView.setOnStatusChangedListener(this::OnStatusChange);
     }
+
+    private void OnStatusChange(Object o, OnStatusChangedListener.STATUS status) {
+        switch (status) {
+            case INITIALIZED:
+                location();
+                break;
+            case LAYER_LOADED:
+
+                break;
+        }
+    }
+
+    private void location() {
+        AndPermission.with(this)
+                .permission(Manifest.permission_group.LOCATION)
+                .callback(listener)
+                .start();
+
+    }
+
+    private PermissionListener listener = new PermissionListener() {
+        @Override
+        public void onSucceed(int requestCode, List<String> grantedPermissions) {
+            mMapView.setScale(100000, true);
+            mMapView.location();
+        }
+
+        @Override
+        public void onFailed(int requestCode, List<String> deniedPermissions) {
+
+        }
+    };
+
+    public boolean isFirstLocation = true;
+
+    private LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            if (isFirstLocation) {
+                mMapView.setScale(100000, true);
+                isFirstLocation = false;
+            }
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
     private void initData() {
         showLoading();

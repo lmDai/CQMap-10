@@ -70,7 +70,6 @@ public class BaseMapView extends MapView implements DrawEventListener {
         imgLayer =
                 new ArcGISTiledMapServiceLayer(context.getString(R.string.tdt_img_base_map_url));
 
-        this.setOnStatusChangedListener(onStatusChangedListener);
         //画图形的layer
         drawLayer = new GraphicsLayer();
         this.addLayer(drawLayer);
@@ -130,7 +129,6 @@ public class BaseMapView extends MapView implements DrawEventListener {
         this.addLayer(drawLayer);
         drawTool = new DrawTool(this);
         drawTool.addEventListener(this);
-        this.setOnStatusChangedListener(onStatusChangedListener);
 //        this.addLayer(graphicsLayer);
     }
 
@@ -141,18 +139,9 @@ public class BaseMapView extends MapView implements DrawEventListener {
 //        locationDisplayManager.setLocationListener();
     }
 
-//    public void zoomIn() {
-//        this.zoomin();
-//    }
-//
-//    public void zoomOut() {
-//        this.zoomout();
-//    }
-
     public static final int SPACE_NONE = 0;
     public static final int SPACE_RECT = 1;
     public static final int SPACE_POLYGON = 2;
-    //    public static final int SPACE_POLYGON_SET_FINISH = 3;
     public static final int SPACE_BUFFER = 4;
     public static final int SPACE_BUFFER_SET_FINISH = 5;
     public static final int SPACE_MAP_NUMBER = 6;// 图符号
@@ -178,23 +167,10 @@ public class BaseMapView extends MapView implements DrawEventListener {
         }
     }
 
-    public void clearDrawLayerGraphics() {
-        drawLayer.removeAll();
-    }
-
-//    public void clearGraphicLayerGraphics() {
-//        graphicsLayer.removeAll();
-//    }
-
     public void clearAll() {
         drawLayer.removeAll();
         currentDrawGraphic = null;
-//        graphicsLayer.removeAll();
     }
-
-//    public void addGraphic(Graphic graphic) {
-//        drawLayer.addGraphic(graphic);
-//    }
 
     public void setCurrentDrawGraphic(Graphic graphic) {
         this.currentDrawGraphic = graphic;
@@ -212,10 +188,6 @@ public class BaseMapView extends MapView implements DrawEventListener {
     public GraphicsLayer getDrawLayer() {
         return drawLayer;
     }
-
-//    public GraphicsLayer getGraphicLayer() {
-//        return graphicsLayer;
-//    }
 
 
     public void queryGeometry(Activity act, String url,
@@ -272,18 +244,25 @@ public class BaseMapView extends MapView implements DrawEventListener {
         void onError(Throwable e);
     }
 
-    OnStatusChangedListener onStatusChangedListener = new OnStatusChangedListener() {
-        @Override
-        public void onStatusChanged(Object o, OnStatusChangedListener.STATUS status) {
-            switch (status) {
-                case INITIALIZED:
-                    location();
-                    break;
-                case LAYER_LOADED:
-                    centerAt(29.55, 106.55, true);
-                    setScale(100000, true);
-                    break;
-            }
-        }
-    };
+    @Override
+    public void setOnStatusChangedListener(OnStatusChangedListener onStatusChangedListener) {
+        super.setOnStatusChangedListener(onStatusChangedListener);
+
+    }
+
+    //    OnStatusChangedListener onStatusChangedListener = new OnStatusChangedListener() {
+//        @Override
+//        public void onStatusChanged(Object o, OnStatusChangedListener.STATUS status) {
+//            switch (status) {
+//                case INITIALIZED:
+////                    location();
+//                    break;
+//                case LAYER_LOADED:
+////                    centerAt(29.55, 106.55, true);
+//                    location();
+//                    setScale(100000, true);
+//                    break;
+//            }
+//        }
+//    };
 }
