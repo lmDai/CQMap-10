@@ -508,7 +508,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     private void searchMapService(List<ReportHandoutListModel> handoutListModels) {
         if (handoutListModels.isEmpty()) return;
         StringBuilder sb = new StringBuilder();
-        sb.append("FRUITID");
+        sb.append(FRUITID);
         sb.append(" in ");
         sb.append("(");
         int mapType = 0;
@@ -879,7 +879,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 tv_info.setText("详情");
                 ll_row.addView(tv_info);
                 tv_info.setOnClickListener(v -> {
-                    ToastUtil.showShort("详情");
                     showHandoutInfoDialog(String.valueOf(fruitList.fruitId));
                 });
                 //行的点击事件
@@ -903,7 +902,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 break;
                             case POLYGON:
                                 Polygon polygon = (Polygon) graphic.getGeometry();
-                                int pointCount = polygon.getPointCount();
+//                                int pointCount = polygon.getPointCount();
                                 Point point = polygon.getPoint(1);
                                 mMapView.centerAt(point, true);
                                 break;

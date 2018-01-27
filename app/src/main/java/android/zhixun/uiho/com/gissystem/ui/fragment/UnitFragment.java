@@ -2,6 +2,7 @@ package android.zhixun.uiho.com.gissystem.ui.fragment;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
@@ -437,10 +438,12 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         ((MainActivity) getActivity()).hideBottomNav();
         MainBottomAdapter bottomAdapter =
                 new MainBottomAdapter(getActivity(), response);
+        Location location = mMapView.getLocationDisplayManager().getLocation();
         mContentRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         mContentRv.setAdapter(bottomAdapter);
         dragView.setVisibility(View.VISIBLE);
         mDragLayout.animaToCenter();
+
         bottomAdapter.setOnItemClickListener((view, position) -> {
             switch (view.getId()) {
                 case R.id.rl_location:

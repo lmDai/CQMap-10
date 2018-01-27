@@ -11,8 +11,6 @@ import android.zhixun.uiho.com.gissystem.R;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 
-import com.yibogame.util.LogUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,9 +83,9 @@ public class MainBottomAdapter extends RecyclerView.Adapter<MainBottomAdapter.Vi
 
     @Override
     public void onBindViewHolder(MainBottomAdapter.ViewHolder holder, int position) {
-        for (CompanyDetailModel list : lists) {
-            LogUtil.e("--->"+list.getCompanyName());
-        }
+//        for (CompanyDetailModel list : lists) {
+//            LogUtil.e("--->"+list.getCompanyName());
+//        }
         CompanyDetailModel mainBottomModel = lists.get(position);
         holder.tvompany.setText(mainBottomModel.getCompanyName());
         holder.tvAddress.setText(mainBottomModel.getCompanyAddre());
