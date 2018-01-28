@@ -20,26 +20,24 @@
         <RelativeLayout
             android:id="@+id/relativeLayout1"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:background="#FFFFFF"
             android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:paddingRight="16dp"
+            android:paddingTop="5dp">
 
             <ImageView
                 android:id="@+id/iv_position"
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:layout_centerVertical="true"
                 android:src="@mipmap/position" />
 
             <TextView
                 android:id="@+id/tv_position_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="4dp"
-                android:layout_toLeftOf="@+id/iv_distance"
                 android:layout_toRightOf="@+id/iv_position"
                 android:ellipsize="end"
                 android:maxLines="2"
@@ -51,20 +49,24 @@
                 android:id="@+id/iv_distance"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
+                android:layout_below="@+id/tv_position_content"
                 android:layout_centerVertical="true"
+                android:layout_marginLeft="30dp"
                 android:layout_marginRight="4dp"
-                android:layout_toLeftOf="@+id/tv_distance"
-                android:src="@mipmap/distance" />
+                android:layout_marginTop="10dp"
+                android:src="@drawable/ic_distance_blue" />
 
             <TextView
                 android:id="@+id/tv_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:text="1000m"
+                android:layout_below="@id/tv_position_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_toRightOf="@id/iv_distance"
                 android:textColor="#999999"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                tools:text="1000m" />
 
         </RelativeLayout>
 

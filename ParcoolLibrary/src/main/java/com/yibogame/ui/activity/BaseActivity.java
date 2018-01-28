@@ -1,19 +1,15 @@
 package com.yibogame.ui.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
-import android.view.WindowManager;
 
 import com.yibogame.app.RxBus;
 import com.yibogame.flux.dispatcher.Dispatcher;
 import com.yibogame.flux.stores.Store;
-
-import java.io.Serializable;
 
 import rx.Subscription;
 import rx.functions.Action1;
@@ -72,6 +68,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    
+
 
 }

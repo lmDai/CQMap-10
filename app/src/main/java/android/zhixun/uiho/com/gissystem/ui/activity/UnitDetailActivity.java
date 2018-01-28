@@ -15,9 +15,14 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
+import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyCertificatesLicenseModel;
+import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyCertificatesQualificationsModel;
+import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyCertificatesWayModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
 import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
+import android.zhixun.uiho.com.gissystem.rest.APIService;
+import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
 import android.zhixun.uiho.com.gissystem.ui.adapter.ImageArrayAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.MyViewPagerAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
@@ -31,7 +36,9 @@ import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.PictureMarkerSymbol;
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.yibogame.flux.stores.Store;
+import com.yibogame.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +47,7 @@ import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 
 public class UnitDetailActivity extends BaseActivityWithTitle {
+
     private TextView tvNumber;//持证人数量
     private TextView tvState;//保密检查结果——通过
     private TextView tvEnterpriseCodeContent;//企业代码
@@ -103,15 +111,33 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
     protected void onCreateActivity(@Nullable Bundle savedInstanceState) {
         setTitleText("单位详情");
         mCompanyModel = (CompanyDetailModel) getIntent().getSerializableExtra("unitModel");
-//        MyBaseApplication myBaseApplication = (MyBaseApplication) getApplication();
-//        mDaoSession = ((MyBaseApplication) getApplication()).getDaoSession();
-//        mCompanyModel = myBaseApplication.getUnitModel();
-//        mCompanyModel = myBaseApplication.getCompanyDetailModel();
-        //初始化
-        initViews();
-        //设置监听
-        setListener();
-        initMap();
+
+        getCompanyDetail(mCompanyModel.getCompanyId());
+    }
+
+    private void getCompanyDetail(int companyId) {
+        showLoading();
+        APIService.getInstance()
+                .getCompanyDetail(String.valueOf(companyId),
+                        new SimpleSubscriber<CompanyDetailModel>() {
+                            @Override
+                            public void onResponse(CompanyDetailModel response) {
+                                hideLoading();
+                                mCompanyModel = response;
+                                //初始化
+                                initViews();
+                                //设置监听
+                                setListener();
+                                initMap();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                super.onError(e);
+                                hideLoading();
+                                ToastUtil.showShort(e.getMessage());
+                            }
+                        });
     }
 
     private void initMap() {
@@ -207,13 +233,17 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
     }
 
     private void initViews() {
+        //距离
+        TextView tvDistance = findViewById(R.id.tv_distance);
+        tvDistance.setText(mCompanyModel.getDistance());
         //图片滑动的ViewPager
         rlHolder = (RelativeLayout) findViewById(R.id.rlHolder);//持证人
         rlCheckResult = (RelativeLayout) findViewById(R.id.rlCheckResult);//检查结果
         rlCHResult = (RelativeLayout) findViewById(R.id.rlCHResult);//拥有的涉密测绘成果
 
         tvNumber = (TextView) findViewById(R.id.tv_number);
-//        tvNumber.setText(mCompanyModel.getHolders().size() + "人");
+        int holderNumber = mCompanyModel.getHolders() == null ? 0 : mCompanyModel.getHolders().size();
+        tvNumber.setText(holderNumber + "人");
         tvState = (TextView) findViewById(R.id.tv_state);
 
         tvState.setText(mCompanyModel.getSecrecyIsPass() == 0 ? "不通过" : "通过");
@@ -252,9 +282,9 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-//        for (CompanyCertificatesWayModel companyCertificatesWayModel : mCompanyModel.getCompanyCertificatesWay()) {
-//            companyCertificatesWayImgList.add(companyCertificatesWayModel.getCertificatesUrl());
-//        }
+        for (CompanyCertificatesWayModel companyCertificatesWayModel : mCompanyModel.getCompanyCertificatesWay()) {
+            companyCertificatesWayImgList.add(companyCertificatesWayModel.getCertificatesUrl());
+        }
         ImageArrayAdapter imageArrayAdapter = new ImageArrayAdapter(this, companyCertificatesWayImgList);
         //添加adapter动画
         AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(imageArrayAdapter);
@@ -299,9 +329,9 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
                 linearLayoutManager.scrollToPositionWithOffset(n, 0);
             }
         });
-//        for (CompanyCertificatesLicenseModel companyCertificatesLicenseModel : mCompanyModel.getCompanyCertificatesLicense()) {
-//            companyCertificatesLicenseImgList.add(companyCertificatesLicenseModel.getCertificatesUrl());
-//        }
+        for (CompanyCertificatesLicenseModel companyCertificatesLicenseModel : mCompanyModel.getCompanyCertificatesLicense()) {
+            companyCertificatesLicenseImgList.add(companyCertificatesLicenseModel.getCertificatesUrl());
+        }
         ImageArrayAdapter imageArrayAdapterPerson = new ImageArrayAdapter(this, companyCertificatesLicenseImgList);
         AlphaInAnimationAdapter alphaInAnimationAdapterL = new AlphaInAnimationAdapter(imageArrayAdapterPerson);
         //改变持续时长
@@ -339,9 +369,9 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 
             }
         });
-//        for (CompanyCertificatesQualificationsModel companyCertificatesQualificationsModel : mCompanyModel.getCompanyCertificatesQualifications()) {
-//            companyCertificatesQualificationsImgList.add(companyCertificatesQualificationsModel.getCertificatesUrl());
-//        }
+        for (CompanyCertificatesQualificationsModel companyCertificatesQualificationsModel : mCompanyModel.getCompanyCertificatesQualifications()) {
+            companyCertificatesQualificationsImgList.add(companyCertificatesQualificationsModel.getCertificatesUrl());
+        }
         ImageArrayAdapter imageArrayAdapterZZ = new ImageArrayAdapter(this, companyCertificatesQualificationsImgList);
         AlphaInAnimationAdapter alphaInAnimationAdapterZ = new AlphaInAnimationAdapter(imageArrayAdapterZZ);
         //改变持续时长
@@ -438,4 +468,19 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         });
     }
 
+    private QMUITipDialog mProgressDialog;
+
+    protected void showLoading() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new QMUITipDialog.Builder(UnitDetailActivity.this)
+                    .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                    .setTipWord("加载中...")
+                    .create();
+        }
+        mProgressDialog.show();
+    }
+
+    protected void hideLoading() {
+        mProgressDialog.dismiss();
+    }
 }

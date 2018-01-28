@@ -668,6 +668,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         hideBottomLayout();
         hideClearBtn();
         mMapView.clearAll();
+        mMapView.getCallout().hide();
     }
 
     //获取重庆各大区县
