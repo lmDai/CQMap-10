@@ -202,7 +202,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:background="#2395fb"
-                android:text="查询"
+                android:text="确定"
                 android:textColor="@android:color/white" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>

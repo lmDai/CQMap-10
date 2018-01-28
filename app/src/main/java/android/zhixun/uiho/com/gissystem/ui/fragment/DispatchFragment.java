@@ -60,9 +60,9 @@ import com.esri.core.geometry.Polygon;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
+import com.esri.core.symbol.PictureMarkerSymbol;
 import com.esri.core.symbol.SimpleFillSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
-import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.esri.core.symbol.Symbol;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.yibogame.util.DateUtil;
@@ -505,19 +505,21 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 });
     }
 
+    int mMapType = 0;
+
     private void searchMapService(List<ReportHandoutListModel> handoutListModels) {
         if (handoutListModels.isEmpty()) return;
         StringBuilder sb = new StringBuilder();
         sb.append(FRUITID);
         sb.append(" in ");
         sb.append("(");
-        int mapType = 0;
+
         for (ReportHandoutListModel reportHandoutListModel : handoutListModels) {
 
             for (ReportHandoutListModel.FruitCategoryList fruitCategoryList :
                     reportHandoutListModel.fruitCategoryList) {
 
-                mapType = fruitCategoryList.mapType;
+                mMapType = fruitCategoryList.mapType;
                 for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
                         fruitCategoryList.fruitList) {
 
@@ -531,7 +533,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         String whereClause = sb.substring(0, sb.lastIndexOf(",")) + ")";
         LogUtil.i("whereClause == " + whereClause);
 
-        searchType(mapType, whereClause);
+        searchType(mMapType, whereClause);
     }
 
     private void searchType(int mapType, String whereClause) {
@@ -559,9 +561,11 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 Feature feature = (Feature) object;
 
                                 Symbol symbol = null;
-                                if (mapType == 1) {
-                                    symbol = new SimpleMarkerSymbol(Color.RED, 20,
-                                            SimpleMarkerSymbol.STYLE.CIRCLE);
+                                if (mapType == 1) {//水准点
+                                    symbol =
+                                            new PictureMarkerSymbol(getActivity(),
+                                                    ContextCompat.getDrawable(getActivity(),
+                                                    R.drawable.ic_location_green));
                                 } else {
                                     symbol = createSimpleFillSymbol();
                                 }
@@ -579,8 +583,17 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             GraphicsLayer drawLayer = mMapView.getDrawLayer();
                             Graphic graphic = drawLayer.getGraphic(ids[0]);
                             if (graphic == null) return;
-                            drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
-                            double FRUIT_ID = (double) graphic.getAttributeValue("FRUITID");
+                            long FRUIT_ID;
+                            if (mapType == 1) {
+
+                                drawLayer.updateGraphic(ids[0], new PictureMarkerSymbol(getActivity(),
+                                        ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red)));
+                                FRUIT_ID = (int) graphic.getAttributeValue("FRUITID");
+                            } else {
+                                drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
+                                FRUIT_ID = ((Double) graphic.getAttributeValue("FRUITID")).longValue();
+                            }
+
                             List<ReportHandoutListModel> handoutList = new ArrayList<>();
                             for (ReportHandoutListModel handout : mHandoutList) {
                                 for (ReportHandoutListModel.FruitCategoryList fruitCategory :
@@ -1343,6 +1356,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         hideClearBtn();
         mMapView.clearAll();
         mBody = null;
+        mMapType = 0;
     }
 
     private void showClearBtn() {

@@ -432,7 +432,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                         continue;
 
                     PictureMarkerSymbol symbol =
-                            new PictureMarkerSymbol(ContextCompat.getDrawable(getActivity(),
+                            new PictureMarkerSymbol(getActivity(),
+                                    ContextCompat.getDrawable(getActivity(),
                                     R.drawable.ic_location_green));
                     Graphic graphic = new Graphic(feature.getGeometry(),
                             symbol, feature.getAttributes());
