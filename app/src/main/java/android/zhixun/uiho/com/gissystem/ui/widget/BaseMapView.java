@@ -94,6 +94,10 @@ public class BaseMapView extends MapView implements DrawEventListener {
         return currentDrawGraphic;
     }
 
+    public void setBasicScale() {
+        this.setScale(100000,true);
+    }
+
 
     @IntDef({DEM_LAYER, VEC_LAYER, IMG_LAYER})
     @Retention(RetentionPolicy.SOURCE)

@@ -2,8 +2,10 @@ package android.zhixun.uiho.com.gissystem.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,8 +20,17 @@ import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 import android.zhixun.uiho.com.gissystem.ui.adapter.ImageArrayAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.MyViewPagerAdapter;
+import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
 import android.zhixun.uiho.com.gissystem.ui.widget.MyViewPager;
+import android.zhixun.uiho.com.gissystem.util.DensityUtils;
 
+import com.esri.android.map.Callout;
+import com.esri.android.map.CalloutStyle;
+import com.esri.core.geometry.Point;
+import com.esri.core.map.Feature;
+import com.esri.core.map.FeatureResult;
+import com.esri.core.map.Graphic;
+import com.esri.core.symbol.PictureMarkerSymbol;
 import com.yibogame.flux.stores.Store;
 
 import java.util.ArrayList;
@@ -64,6 +75,9 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
     private ScaleInAnimationAdapter scaleInAnimationAdapter;
 
     //    private Query<AchievementModel> achievementModelQuery;
+
+    private BaseMapView mMapView;
+
     @Override
     protected Store initActionsCreatorAndStore() {
         return null;
@@ -97,7 +111,62 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         initViews();
         //设置监听
         setListener();
-//        initMap();
+        initMap();
+    }
+
+    private void initMap() {
+        mMapView = findViewById(R.id.mapView);
+        int companyId = mCompanyModel.getCompanyId();
+        String url = getString(R.string.feature_server_url);
+        String where = String.format("UNITID in (%s)", companyId);
+        mMapView.querySQL(this, url, where, new BaseMapView.MainThreadCallback<FeatureResult>() {
+            @Override
+            public void onCallback(FeatureResult result) {
+                if (result.featureCount() == 0) {
+                    return;
+                }
+                for (Object o : result) {
+                    if (o instanceof Feature) {
+                        Feature feature = (Feature) o;
+
+                        PictureMarkerSymbol symbol =
+                                new PictureMarkerSymbol(ContextCompat.getDrawable(UnitDetailActivity.this,
+                                        R.drawable.ic_location_green));
+                        Graphic graphic = new Graphic(feature.getGeometry(),
+                                symbol, feature.getAttributes());
+
+                        mMapView.addDrawLayerGraphic(graphic);
+                        switch (feature.getGeometry().getType()) {
+                            case POINT:
+                                Point point = (Point) feature.getGeometry();
+                                mMapView.centerAt(point, true);
+                                mMapView.setBasicScale();
+
+                                Callout callout = mMapView.getCallout();
+                                CalloutStyle style = new CalloutStyle();
+                                style.setBackgroundColor(Color.parseColor("#50883f"));
+                                style.setFrameColor(Color.parseColor("#50883f"));
+                                callout.setStyle(style);
+                                TextView textView = new TextView(UnitDetailActivity.this);
+                                int padding = DensityUtils.dp2px(mContext, 3);
+                                textView.setPadding(padding, padding, padding, padding);
+                                textView.setTextColor(Color.WHITE);
+                                textView.setText(mCompanyModel.getCompanyName());
+                                callout.setCoordinates(point);
+                                callout.setContent(textView);
+                                callout.show();
+                                break;
+                        }
+
+                    }
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+        });
     }
 
     private void setListener() {
