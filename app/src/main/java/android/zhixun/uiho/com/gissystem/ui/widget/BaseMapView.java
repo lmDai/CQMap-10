@@ -1,5 +1,6 @@
 package android.zhixun.uiho.com.gissystem.ui.widget;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.IntDef;
@@ -21,9 +22,12 @@ import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
 import com.esri.core.tasks.query.QueryParameters;
 import com.esri.core.tasks.query.QueryTask;
+import com.yanzhenjie.permission.AndPermission;
+import com.yanzhenjie.permission.PermissionListener;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 
 
 public class BaseMapView extends MapView implements DrawEventListener {
@@ -75,6 +79,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
         this.addLayer(drawLayer);
         drawTool = new DrawTool(this);
         drawTool.addEventListener(this);
+        this.setOnStatusChangedListener(onStatusChangedListener);
         //添加标注的layer
 //        graphicsLayer = new GraphicsLayer();
 //        this.addLayer(graphicsLayer);
@@ -95,7 +100,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
     }
 
     public void setBasicScale() {
-        this.setScale(100000,true);
+        this.setScale(100000, true);
     }
 
 
@@ -248,25 +253,37 @@ public class BaseMapView extends MapView implements DrawEventListener {
         void onError(Throwable e);
     }
 
-    @Override
-    public void setOnStatusChangedListener(OnStatusChangedListener onStatusChangedListener) {
-        super.setOnStatusChangedListener(onStatusChangedListener);
+    private void requestLocationPermissioon() {
+        AndPermission.with(getContext())
+                .permission(Manifest.permission_group.LOCATION)
+                .callback(listener)
+                .start();
 
     }
 
-    //    OnStatusChangedListener onStatusChangedListener = new OnStatusChangedListener() {
-//        @Override
-//        public void onStatusChanged(Object o, OnStatusChangedListener.STATUS status) {
-//            switch (status) {
-//                case INITIALIZED:
-////                    location();
-//                    break;
-//                case LAYER_LOADED:
-////                    centerAt(29.55, 106.55, true);
-//                    location();
-//                    setScale(100000, true);
-//                    break;
-//            }
-//        }
-//    };
+    private PermissionListener listener = new PermissionListener() {
+        @Override
+        public void onSucceed(int requestCode, List<String> grantedPermissions) {
+            setScale(100000, true);
+            location();
+        }
+
+        @Override
+        public void onFailed(int requestCode, List<String> deniedPermissions) {
+
+        }
+    };
+
+    OnStatusChangedListener onStatusChangedListener = new OnStatusChangedListener() {
+        @Override
+        public void onStatusChanged(Object o, OnStatusChangedListener.STATUS status) {
+            switch (status) {
+                case INITIALIZED:
+                    requestLocationPermissioon();
+                    break;
+                case LAYER_LOADED:
+                    break;
+            }
+        }
+    };
 }

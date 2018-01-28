@@ -88,7 +88,7 @@ public class SubmitCensorShipRecordAdapter extends RecyclerView.Adapter<SubmitCe
                         ToastUtil.showShort("请输入一个正确的邮箱地址哦！");
                         return;
                     }
-                    export(secrecyInspectId, email);
+                    export(dialog,secrecyInspectId, email);
                 }).setCancelOnClickListener("取消", null)
                 .show();
 //        final EditText et = new EditText(context);
@@ -138,7 +138,7 @@ public class SubmitCensorShipRecordAdapter extends RecyclerView.Adapter<SubmitCe
 
     }
 
-    private void export(int secrecyInspectId, String email) {
+    private void export(SimpleAlertDialog dialog, int secrecyInspectId, String email) {
         Map<Object, Object> map = new HashMap<>();
         map.put("secrecyInspectId", secrecyInspectId);
         map.put("toMail", email);
@@ -147,6 +147,7 @@ public class SubmitCensorShipRecordAdapter extends RecyclerView.Adapter<SubmitCe
                     @Override
                     public void onResponse(String response) {
                         ToastUtil.showShort("导出成功！");
+                        dialog.dismiss();
                     }
 
                     @Override

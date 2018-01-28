@@ -7,15 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
-import android.zhixun.uiho.com.gissystem.flux.models.CRModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailByCheckedModel;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 
-import com.yibogame.util.ToastUtil;
-
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +21,8 @@ import java.util.List;
 public class LocalFileAdapter extends RecyclerView.Adapter<LocalFileAdapter.ViewHolder> {
     private Context context;
     private List<CompanyDetailByCheckedModel> lists;
-    private OnItemClickListener mOnItemClickListener, mOnDeleteClickListener, mOnSubmitServerClickListener, mOnEditListener;
+    private OnItemClickListener mOnItemClickListener, mOnDeleteClickListener,
+            mOnSubmitServerClickListener, mOnEditListener, mExportClickListener;
 
     public LocalFileAdapter(Context context, List<CompanyDetailByCheckedModel> lists) {
         this.context = context;
@@ -46,6 +42,10 @@ public class LocalFileAdapter extends RecyclerView.Adapter<LocalFileAdapter.View
         this.mOnSubmitServerClickListener = mOnSubmitServerClickListener;
     }
 
+    public void setOnExportClickListener(OnItemClickListener onExportClickListener) {
+        this.mExportClickListener = onExportClickListener;
+    }
+
     public OnItemClickListener getmOnEditListener() {
         return mOnEditListener;
     }
@@ -56,7 +56,8 @@ public class LocalFileAdapter extends RecyclerView.Adapter<LocalFileAdapter.View
 
     @Override
     public LocalFileAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_local_file, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_local_file,
+                parent, false);
         return new ViewHolder(view);
     }
 
@@ -74,15 +75,15 @@ public class LocalFileAdapter extends RecyclerView.Adapter<LocalFileAdapter.View
                     mOnDeleteClickListener.onItemClick(view, position);
                 }
             });
-            holder.tvExport.setOnClickListener(new View.OnClickListener() {
+            holder.tv_postServer.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     mOnSubmitServerClickListener.onItemClick(view, position);
                 }
             });
-            holder.tvEdit.setOnClickListener(v -> {
-                mOnEditListener.onItemClick(v, position);
-            });
+//            holder.tvEdit.setOnClickListener(v -> {
+//                mOnEditListener.onItemClick(v, position);
+//            });
         }
         if (mOnItemClickListener != null) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +93,12 @@ public class LocalFileAdapter extends RecyclerView.Adapter<LocalFileAdapter.View
                 }
             });
         }
+        holder.tv_export.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mExportClickListener.onItemClick(v, position);
+            }
+        });
 
     }
 
@@ -101,15 +108,18 @@ public class LocalFileAdapter extends RecyclerView.Adapter<LocalFileAdapter.View
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvCheckedUnitContent, tvDateContent, tvDelete, tvExport, tvEdit;
+        public TextView tvCheckedUnitContent, tvDateContent;
+
+        public View tvDelete, tv_postServer, tv_export;
 
         public ViewHolder(View itemView) {
             super(itemView);
             tvCheckedUnitContent = (TextView) itemView.findViewById(R.id.tv_checked_unit_content);
             tvDateContent = (TextView) itemView.findViewById(R.id.tv_date_content);
-            tvDelete = (TextView) itemView.findViewById(R.id.tv_delete);
-            tvExport = (TextView) itemView.findViewById(R.id.tv_export);
-            tvEdit = (TextView) itemView.findViewById(R.id.tv_edit);
+            tvDelete = itemView.findViewById(R.id.tv_delete);
+            tv_postServer = itemView.findViewById(R.id.tv_postServer);
+            tv_export = itemView.findViewById(R.id.tv_export);
+//            tvEdit = (TextView) itemView.findViewById(R.id.tv_edit);
         }
     }
 }

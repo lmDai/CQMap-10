@@ -639,6 +639,7 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
                 public void onCompleted() {
                     if (!export) {
                         ToastUtil.showShort("提交成功！");
+                        finish();
                     }
 //                    finish();
                 }

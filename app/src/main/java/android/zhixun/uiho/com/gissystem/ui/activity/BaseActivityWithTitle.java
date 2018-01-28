@@ -11,6 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
 
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
+
 /**
  * Created by parcool on 2016/11/29.
  */
@@ -98,4 +100,19 @@ public abstract class BaseActivityWithTitle extends BaseActivityWithStatusBar {
         llMenu.addView(textView);
     }
 
+    private QMUITipDialog mProgressDialog;
+
+    protected void showLoading() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new QMUITipDialog.Builder(this)
+                    .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                    .setTipWord("加载中...")
+                    .create();
+        }
+        mProgressDialog.show();
+    }
+
+    protected void hideLoading() {
+        mProgressDialog.dismiss();
+    }
 }

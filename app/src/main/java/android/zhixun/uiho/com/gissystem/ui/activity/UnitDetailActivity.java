@@ -36,7 +36,6 @@ import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.PictureMarkerSymbol;
-import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.yibogame.flux.stores.Store;
 import com.yibogame.util.ToastUtil;
 
@@ -468,19 +467,4 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         });
     }
 
-    private QMUITipDialog mProgressDialog;
-
-    protected void showLoading() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new QMUITipDialog.Builder(UnitDetailActivity.this)
-                    .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
-                    .setTipWord("加载中...")
-                    .create();
-        }
-        mProgressDialog.show();
-    }
-
-    protected void hideLoading() {
-        mProgressDialog.dismiss();
-    }
 }

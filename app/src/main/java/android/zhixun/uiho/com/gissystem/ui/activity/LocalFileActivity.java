@@ -14,7 +14,9 @@ import android.zhixun.uiho.com.gissystem.flux.models.api.UserModel;
 import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
+import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
 import android.zhixun.uiho.com.gissystem.ui.adapter.LocalFileAdapter;
+import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.VerticalRecyclerView;
 
 import com.alibaba.fastjson.JSONObject;
@@ -24,6 +26,7 @@ import com.yibogame.flux.stores.Store;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.SPUtil;
 import com.yibogame.util.ToastUtil;
+import com.yibogame.util.ValidateUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,18 +92,18 @@ public class LocalFileActivity extends BaseActivityWithTitle {
         });
         mRecyclerView.setAdapter(localFileAdapter);
 
-        localFileAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                Intent intent = new Intent();
-//                intent.putExtra("tid", lists.get(position).getId().longValue());
-                intent.setClass(LocalFileActivity.this, CensorshipDetailActivity.class);
-                intent.putExtra("tid", lists.get(position).getCompanyId());
-                intent.putExtra("CompanyDetailByCheckedModel", lists.get(position));
-                startActivity(intent);
-
-            }
-        });
+//        localFileAdapter.setOnItemClickListener(new OnItemClickListener() {
+//            @Override
+//            public void onItemClick(View view, int position) {
+//                Intent intent = new Intent();
+////                intent.putExtra("tid", lists.get(position).getId().longValue());
+//                intent.setClass(LocalFileActivity.this, CensorshipDetailActivity.class);
+//                intent.putExtra("tid", lists.get(position).getCompanyId());
+//                intent.putExtra("CompanyDetailByCheckedModel", lists.get(position));
+//                startActivity(intent);
+//
+//            }
+//        });
         localFileAdapter.setOnDeleteClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -141,16 +144,60 @@ public class LocalFileActivity extends BaseActivityWithTitle {
             }
         });
 
-        localFileAdapter.setmOnEditListener((view, position) -> {
+        localFileAdapter.setOnItemClickListener((view, position) -> {
             Intent intent = new Intent();
             intent.setClass(LocalFileActivity.this, CensorshipRegisterActivity.class);
-            intent.putExtra("secrecyInspectId",lists.get(position).getSecrecyInspectId());
+            intent.putExtra("secrecyInspectId", lists.get(position).getSecrecyInspectId());
             intent.putExtra("tid", lists.get(position).getCompanyId());
             intent.putExtra("CompanyDetailByCheckedModel", lists.get(position));
-            intent.putExtra("tName",lists.get(position).getCompanyName());
+            intent.putExtra("tName", lists.get(position).getCompanyName());
             startActivity(intent);
         });
 
+        localFileAdapter.setOnExportClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                CompanyDetailByCheckedModel model = lists.get(position);
+                showExportDialog(String.valueOf(model.getSecrecyInspectId()));
+            }
+        });
+
+    }
+
+    private void showExportDialog(String secrecyInspectId) {
+        new SimpleAlertDialog(mContext)
+                .visibleEditText()
+                .title("导出")
+                .message("请输入一个您需要导出的邮箱地址")
+                .setOkOnClickListener("确定", (dialog, view) -> {
+                    String email = dialog.getEditText().getText().toString();
+                    if (!ValidateUtil.getInstance().validateEmail(email)) {
+                        ToastUtil.showShort("请输入一个正确的邮箱地址哦！");
+                        return;
+                    }
+                    export(dialog, secrecyInspectId, email);
+                }).setCancelOnClickListener("取消", null)
+                .show();
+    }
+
+    private void export(SimpleAlertDialog dialog, String secrecyInspectId, String email) {
+        Map<Object, Object> map = new HashMap<>();
+        map.put("secrecyInspectId", secrecyInspectId);
+        map.put("toMail", email);
+        APIService.getInstance()
+                .export(map, new SimpleSubscriber<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        dialog.dismiss();
+                        ToastUtil.showShort("导出成功！");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        ToastUtil.showShort(e.getMessage());
+                    }
+                });
     }
 
     /***
@@ -233,7 +280,7 @@ public class LocalFileActivity extends BaseActivityWithTitle {
             public void onError(Throwable e) {
                 super.onError(e);
 //                if (e.getCause().toString().equals("0")){
-                    lists.clear();
+                lists.clear();
 //                    LogUtil.d("这是没有数据");
 //                }
                 mRecyclerView.refreshComplete();
