@@ -144,8 +144,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         mCVLayer = view.findViewById(R.id.cv_layer);
         mCVSift = view.findViewById(R.id.cv_sift);
         mCVLocation = view.findViewById(R.id.cv_my_location);
-        mZoomIn = view.findViewById(R.id.aiv_zoom_in);
-        mZoomOut = view.findViewById(R.id.aiv_zoom_out);
+        mZoomIn = view.findViewById(R.id.iv_zoom_in);
+        mZoomOut = view.findViewById(R.id.iv_zoom_out);
         mCVSpace = view.findViewById(R.id.cv_space);
         mCVClear = view.findViewById(R.id.cv_clear);
         mIvUser = view.findViewById(R.id.iv_user);
@@ -194,10 +194,10 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
             case R.id.cv_my_location://我的位置
                 mMapView.location();
                 break;
-            case R.id.aiv_zoom_in://
+            case R.id.iv_zoom_in://
                 mMapView.zoomin();
                 break;
-            case R.id.aiv_zoom_out://
+            case R.id.iv_zoom_out://
                 mMapView.zoomout();
                 break;
             case R.id.cv_space://空间查询
@@ -1047,8 +1047,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
     //显示空间查询dialog
     private void showSpaceDialog(View view) {
-        int[] resIds = {R.mipmap.ic_add, R.mipmap.ic_add, R.mipmap.ic_add
-                , R.mipmap.ic_add, R.mipmap.ic_add};
+        int[] resIds = {R.drawable.ic_rect, R.drawable.ic_poygen, R.drawable.ic_buffer
+                , R.drawable.ic_map_number, R.drawable.ic_admi_region};
         String[] texts = {"矩形框选", "多边形框选", "缓冲区查询", "图幅号查询", "行政区域查询"};
         new SpaceDialog(getActivity(), (ViewGroup) getView())
                 .setData(resIds, texts)
@@ -1076,8 +1076,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             showAdminRegionDialog();
                             break;
                     }
-                    AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
-                    ivSpace.setImageResource(R.mipmap.ic_sure_modifi);
+                    mCVSpace.setBackgroundResource(R.mipmap.ic_sure_modifi);
                     showClearBtn();
                 });
     }
@@ -1333,8 +1332,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 
     private void restoreSpaceStatus() {
         mMapView.setCurrentDrawSpace(BaseMapView.SPACE_NONE);
-        AppCompatImageView ivSpace = mCVSpace.findViewById(R.id.aci_space);
-        ivSpace.setImageResource(R.mipmap.ic_kongjian);
+        mCVSpace.setBackgroundResource(R.drawable.ic_space_black);
         mMapView.clearAll();
         hideClearBtn();
     }
