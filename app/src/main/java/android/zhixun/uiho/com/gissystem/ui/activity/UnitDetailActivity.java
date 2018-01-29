@@ -64,6 +64,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
     private RecyclerView recyclerView1, recyclerView2, recyclerView3;
     private List<String> companyCertificatesWayImgList = new ArrayList<>();
     private CompanyDetailModel mCompanyModel;
+    private CompanyDetailModel mCompanyModelDetail;
     private RelativeLayout rlHolder;//持证人
     private RelativeLayout rlCheckResult;//检查结果
     private RelativeLayout rlCHResult;//拥有的涉密测绘成果
@@ -122,7 +123,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
                             @Override
                             public void onResponse(CompanyDetailModel response) {
                                 hideLoading();
-                                mCompanyModel = response;
+                                mCompanyModelDetail = response;
                                 //初始化
                                 initViews();
                                 //设置监听
@@ -176,7 +177,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
                                 int padding = DensityUtils.dp2px(mContext, 3);
                                 textView.setPadding(padding, padding, padding, padding);
                                 textView.setTextColor(Color.WHITE);
-                                textView.setText(mCompanyModel.getCompanyName());
+                                textView.setText(mCompanyModelDetail.getCompanyName());
                                 callout.setCoordinates(point);
                                 callout.setContent(textView);
                                 callout.show();
@@ -199,9 +200,9 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(UnitDetailActivity.this, HolderSizeMarkActivity.class);
-                intent.putParcelableArrayListExtra("holders", mCompanyModel.getHolders());
-                intent.putExtra("companyId", mCompanyModel.getCompanyId());
-                intent.putExtra("companyName", mCompanyModel.getCompanyName());
+                intent.putParcelableArrayListExtra("holders", mCompanyModelDetail.getHolders());
+                intent.putExtra("companyId", mCompanyModelDetail.getCompanyId());
+                intent.putExtra("companyName", mCompanyModelDetail.getCompanyName());
                 startActivity(intent);
             }
         });
@@ -215,7 +216,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 //                } else {
 
                 Intent intent = new Intent(UnitDetailActivity.this, UnitCensorShipActivity.class);
-                intent.putExtra("company", mCompanyModel.getCompanyId());
+                intent.putExtra("company", mCompanyModelDetail.getCompanyId());
                 startActivity(intent);
 //                }
             }
@@ -224,7 +225,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(UnitDetailActivity.this, OwnSecretResultActivity.class);
-                intent.putExtra("company", (long) mCompanyModel.getCompanyId());//这个数据是个long
+                intent.putExtra("company", (long) mCompanyModelDetail.getCompanyId());//这个数据是个long
                 startActivity(intent);
 
             }
@@ -241,30 +242,31 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         rlCHResult = (RelativeLayout) findViewById(R.id.rlCHResult);//拥有的涉密测绘成果
 
         tvNumber = (TextView) findViewById(R.id.tv_number);
-        int holderNumber = mCompanyModel.getHolders() == null ? 0 : mCompanyModel.getHolders().size();
+        int holderNumber = mCompanyModelDetail.getHolders() == null ? 0 :
+                mCompanyModelDetail.getHolders().size();
         tvNumber.setText(holderNumber + "人");
         tvState = (TextView) findViewById(R.id.tv_state);
 
-        tvState.setText(mCompanyModel.getSecrecyIsPass() == 0 ? "不通过" : "通过");
+        tvState.setText(mCompanyModelDetail.getSecrecyIsPass() == 0 ? "不通过" : "通过");
         tvEnterpriseCodeContent = (TextView) findViewById(R.id.tv_enterprise_code_content);
-        tvEnterpriseCodeContent.setText(mCompanyModel.getOrganizationCode());//企业代码
+        tvEnterpriseCodeContent.setText(mCompanyModelDetail.getOrganizationCode());//企业代码
         tvBusinessCategoryContent = (TextView) findViewById(R.id.tv_business_category_content);
-        tvBusinessCategoryContent.setText(mCompanyModel.getIndustryCategoryName());//行业类别
+        tvBusinessCategoryContent.setText(mCompanyModelDetail.getIndustryCategoryName());//行业类别
         tvDomicileontent = (TextView) findViewById(R.id.tv_domicile_content);
-        tvDomicileontent.setText(mCompanyModel.getAreaName());//注册地
+        tvDomicileontent.setText(mCompanyModelDetail.getAreaName());//注册地
         tvContactsContacts = (TextView) findViewById(R.id.tv_contacts_contacts);
-        tvContactsContacts.setText(mCompanyModel.getCompanyName());//联系人
+        tvContactsContacts.setText(mCompanyModelDetail.getCompanyName());//联系人
         tvTelContacts = (TextView) findViewById(R.id.tv_tel_contacts);
-        tvTelContacts.setText(mCompanyModel.getCompanyTelephone());//座机电话
+        tvTelContacts.setText(mCompanyModelDetail.getCompanyTelephone());//座机电话
         tvPhoneContent = (TextView) findViewById(R.id.tv_phone_content);
-        tvPhoneContent.setText(mCompanyModel.getSecrecyPersonPhone());//联系电话
+        tvPhoneContent.setText(mCompanyModelDetail.getSecrecyPersonPhone());//联系电话
         tvCompany = (TextView) findViewById(R.id.tv_company);
-        tvCompany.setText(mCompanyModel.getCompanyName());//重庆宝威有限科技公司
+        tvCompany.setText(mCompanyModelDetail.getCompanyName());//重庆宝威有限科技公司
         tvPositionContent = (TextView) findViewById(R.id.tv_position_content);//公司地址
-        tvPositionContent.setText(mCompanyModel.getCompanyAddre());
+        tvPositionContent.setText(mCompanyModelDetail.getCompanyAddre());
         tvOwnNumber = (TextView) findViewById(R.id.tv_own_number);
         //拥有的测绘成果几条
-        tvOwnNumber.setText(String.valueOf(mCompanyModel.getFruitNum()) + "个报件");
+        tvOwnNumber.setText(String.valueOf(mCompanyModelDetail.getFruitNum()) + "个报件");
 
         aivMethodLeft = (AppCompatImageView) findViewById(R.id.aiv_method_left);//管理方法左滑动
         aivMethodRight = (AppCompatImageView) findViewById(R.id.aiv_method_right);//管理方法右滑动
@@ -281,7 +283,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        for (CompanyCertificatesWayModel companyCertificatesWayModel : mCompanyModel.getCompanyCertificatesWay()) {
+        for (CompanyCertificatesWayModel companyCertificatesWayModel : mCompanyModelDetail.getCompanyCertificatesWay()) {
             companyCertificatesWayImgList.add(companyCertificatesWayModel.getCertificatesUrl());
         }
         ImageArrayAdapter imageArrayAdapter = new ImageArrayAdapter(this, companyCertificatesWayImgList);
@@ -328,7 +330,8 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
                 linearLayoutManager.scrollToPositionWithOffset(n, 0);
             }
         });
-        for (CompanyCertificatesLicenseModel companyCertificatesLicenseModel : mCompanyModel.getCompanyCertificatesLicense()) {
+        for (CompanyCertificatesLicenseModel companyCertificatesLicenseModel :
+                mCompanyModelDetail.getCompanyCertificatesLicense()) {
             companyCertificatesLicenseImgList.add(companyCertificatesLicenseModel.getCertificatesUrl());
         }
         ImageArrayAdapter imageArrayAdapterPerson = new ImageArrayAdapter(this, companyCertificatesLicenseImgList);
@@ -368,7 +371,8 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 
             }
         });
-        for (CompanyCertificatesQualificationsModel companyCertificatesQualificationsModel : mCompanyModel.getCompanyCertificatesQualifications()) {
+        for (CompanyCertificatesQualificationsModel companyCertificatesQualificationsModel :
+                mCompanyModelDetail.getCompanyCertificatesQualifications()) {
             companyCertificatesQualificationsImgList.add(companyCertificatesQualificationsModel.getCertificatesUrl());
         }
         ImageArrayAdapter imageArrayAdapterZZ = new ImageArrayAdapter(this, companyCertificatesQualificationsImgList);
