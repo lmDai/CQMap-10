@@ -1,9 +1,11 @@
 package android.zhixun.uiho.com.gissystem.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.zhixun.uiho.com.gissystem.R;
@@ -24,6 +26,7 @@ public class InstructionsActivity extends BaseActivityWithTitle {
         return R.layout.activity_instructions;
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreateActivity(@Nullable Bundle savedInstanceState) {
         setTitleText("使用说明");
@@ -44,6 +47,8 @@ public class InstructionsActivity extends BaseActivityWithTitle {
                 }
             }
         });
+        WebSettings settings = mWebView.getSettings();
+        settings.setJavaScriptEnabled(true);
 //        mWebView.setWebViewClient(new WebViewClient(){
 //
 //            @Override

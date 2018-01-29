@@ -211,6 +211,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
         query.setOutFields(new String[]{"*"});
         query.setReturnGeometry(true);
         QueryTask queryTask = new QueryTask(url);
+
         queryTask.execute(query, new CallbackListener<FeatureResult>() {
             @Override
             public void onCallback(FeatureResult objects) {

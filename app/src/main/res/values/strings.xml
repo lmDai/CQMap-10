@@ -31,7 +31,7 @@
     <!--点查询-->
     <string name="point_feature_server_url">http://www.map023.cn:6080/arcgis/rest/services/pointCG/MapServer/0</string>
     <!--面查询-->
-    <string name="polygon_feature_server_url">http://www.map023.cn:6080/arcgis/rest/services/polygonCG/MapServer/0</string>
+    <string name="polygon_feature_server_url">http://www.map023.cn:6080/arcgis/rest/services/polygonCG/MapServer/0/query</string>
     <!--矢量地图-->
     <string name="tdt_vec_base_map_url">http://www.digitalcq.com/RemoteRest/services/CQMap_VEC/MapServer</string>
     <!--地形图-->
