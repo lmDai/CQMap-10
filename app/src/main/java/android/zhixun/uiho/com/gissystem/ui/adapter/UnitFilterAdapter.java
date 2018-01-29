@@ -1,6 +1,7 @@
 package android.zhixun.uiho.com.gissystem.ui.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,11 +53,11 @@ public class UnitFilterAdapter extends RecyclerView.Adapter<UnitFilterAdapter.Vi
         IndustryCategoryModel unitFilterModel = lists.get(position);
         holder.tvContent.setText(unitFilterModel.getIndustryCategoryName());
         if (unitFilterModel.isChecked()) {
-            holder.tvContent.setBackgroundColor(context.getResources().getColor(R.color.cardView));
-            holder.tvContent.setTextColor(context.getResources().getColor(R.color.cardViewTextColorTrue));
+            holder.tvContent.setBackgroundColor(ContextCompat.getColor(context,R.color.ee7559));
+            holder.tvContent.setTextColor(ContextCompat.getColor(context,R.color.cardViewTextColorTrue));
         } else {
-            holder.tvContent.setBackgroundColor(context.getResources().getColor(R.color.colorWhite));
-            holder.tvContent.setTextColor(context.getResources().getColor(R.color.cardViewTextColorFalse));
+            holder.tvContent.setBackgroundColor(ContextCompat.getColor(context,R.color.colorWhite));
+            holder.tvContent.setTextColor(ContextCompat.getColor(context,R.color.cardViewTextColorFalse));
         }
 
     }

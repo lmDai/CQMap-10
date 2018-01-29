@@ -30,9 +30,7 @@
         android:paddingLeft="8dp"
         android:singleLine="true"
         android:textColorHint="#BBBBBB"
-        android:textSize="12sp">
-
-    </EditText>
+        android:textSize="12sp"></EditText>
 
     <TextView
         android:layout_width="match_parent"
@@ -58,7 +56,6 @@
 
     </android.support.v7.widget.RecyclerView>
 
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="32dp"
@@ -76,7 +73,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerViewLB"
         android:layout_width="match_parent"
-        android:layout_height="110dp"
+        android:layout_height="100dp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp">
 
@@ -85,9 +82,9 @@
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/acb_query"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:background="@color/cardView"
+        android:background="@drawable/sp_rr_2395fc"
         android:text="查询"
         android:textColor="#FFFFFF"
         android:textSize="16sp" />

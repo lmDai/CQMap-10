@@ -17,16 +17,32 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="7dp"
             android:text="比例尺"
-            android:textSize="18sp" />
+            android:textColor="@color/colorAccent"
+            android:textSize="15sp" />
 
-        <TextView
-            android:id="@+id/tv_attrTip"
+        <LinearLayout
+            android:id="@+id/ll_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:text="分类统计字段" />
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="全部"
+                android:textColor="@android:color/darker_gray" />
+
+            <ImageView
+                android:id="@+id/iv_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_arrow_up" />
+
+        </LinearLayout>
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView

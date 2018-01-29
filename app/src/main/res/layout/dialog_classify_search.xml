@@ -16,38 +16,61 @@
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="420dp">
+        android:layout_height="200dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
+            <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="7dp"
-                android:text="成果类型"
-                android:textSize="18sp" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="7dp"
+                    android:text="成果类型"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="15sp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="全部"
+                        android:textColor="@android:color/darker_gray" />
+
+                    <ImageView
+                        android:id="@+id/iv_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_arrow_up" />
+
+                </LinearLayout>
+            </RelativeLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_flow_type"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 app:max_select="1">
 
             </android.support.v7.widget.RecyclerView>
-
-            <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:id="@+id/rv_type"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content">-->
-
-            <!--</android.support.v7.widget.RecyclerView>-->
 
             <LinearLayout
                 android:id="@+id/ll_container"
@@ -56,154 +79,15 @@
                 android:orientation="vertical">
 
             </LinearLayout>
-
-            <!--<RelativeLayout-->
-            <!--android:visibility="gone"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content">-->
-
-            <!--<TextView-->
-            <!--android:id="@+id/tv_attrName1"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginBottom="7dp"-->
-            <!--android:layout_marginLeft="16dp"-->
-            <!--android:layout_marginTop="7dp"-->
-            <!--android:textSize="18sp"-->
-            <!--android:text="比例尺" />-->
-
-            <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:layout_marginRight="10dp"-->
-            <!--android:text="分类统计字段" />-->
-            <!--</RelativeLayout>-->
-
-            <!--<com.zhy.view.flowlayout.TagFlowLayout-->
-            <!--android:visibility="gone"-->
-            <!--android:id="@+id/flow_1"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginBottom="14dp"-->
-            <!--android:layout_marginLeft="15dp"-->
-            <!--android:layout_marginTop="14dp"-->
-            <!--app:max_select="1">-->
-
-            <!--</com.zhy.view.flowlayout.TagFlowLayout>-->
-
-            <!--<RelativeLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content">-->
-
-            <!--<TextView-->
-            <!--android:id="@+id/tv_attrName2"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginBottom="7dp"-->
-            <!--android:layout_marginLeft="16dp"-->
-            <!--android:layout_marginTop="7dp"-->
-            <!--android:textSize="18sp"-->
-            <!--android:text="大地基准" />-->
-
-            <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:layout_marginRight="10dp"-->
-            <!--android:text="条件查询字段" />-->
-            <!--</RelativeLayout>-->
-
-            <!--<com.zhy.view.flowlayout.TagFlowLayout-->
-            <!--android:id="@+id/flow_2"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginBottom="14dp"-->
-            <!--android:layout_marginLeft="15dp"-->
-            <!--android:layout_marginTop="14dp"-->
-            <!--app:max_select="1">-->
-
-            <!--</com.zhy.view.flowlayout.TagFlowLayout>-->
-
-            <!--<RelativeLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content">-->
-
-            <!--<TextView-->
-            <!--android:id="@+id/tv_attrName3"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginBottom="7dp"-->
-            <!--android:layout_marginLeft="16dp"-->
-            <!--android:layout_marginTop="7dp"-->
-            <!--android:textSize="18sp"-->
-            <!--android:text="高程基准" />-->
-
-            <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:layout_marginRight="10dp"-->
-            <!--android:text="条件查询字段" />-->
-            <!--</RelativeLayout>-->
-
-            <!--<com.zhy.view.flowlayout.TagFlowLayout-->
-            <!--android:id="@+id/flow_3"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginBottom="14dp"-->
-            <!--android:layout_marginLeft="15dp"-->
-            <!--android:layout_marginTop="14dp"-->
-            <!--app:max_select="1">-->
-
-            <!--</com.zhy.view.flowlayout.TagFlowLayout>-->
-
-            <!--<RelativeLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content">-->
-
-            <!--<TextView-->
-            <!--android:id="@+id/tv_attrName4"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginBottom="7dp"-->
-            <!--android:layout_marginLeft="16dp"-->
-            <!--android:layout_marginTop="7dp"-->
-            <!--android:textSize="18sp"-->
-            <!--android:text="生成时间" />-->
-
-            <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:layout_marginRight="10dp"-->
-            <!--android:text="条件查询字段" />-->
-
-            <!--</RelativeLayout>-->
-
-            <!--<com.zhy.view.flowlayout.TagFlowLayout-->
-            <!--android:id="@+id/flow_4"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginBottom="14dp"-->
-            <!--android:layout_marginLeft="15dp"-->
-            <!--android:layout_marginTop="14dp"-->
-            <!--app:max_select="1">-->
-
-            <!--</com.zhy.view.flowlayout.TagFlowLayout>-->
-
-            <Button
-                android:id="@+id/btn_search"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:background="#2395fb"
-                android:text="确定"
-                android:textColor="@android:color/white" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+
+    <Button
+        android:id="@+id/btn_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/sp_rr_2395fc"
+        android:text="确定"
+        android:textColor="@android:color/white" />
 </LinearLayout>

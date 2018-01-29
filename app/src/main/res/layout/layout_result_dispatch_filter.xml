@@ -146,7 +146,6 @@
                 android:paddingLeft="8dp"
                 android:text="2016-11-25" />
 
-
         </RelativeLayout>
 
         <TextView
@@ -184,8 +183,6 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:text="2016-11-25" />
-
-
         </RelativeLayout>
     </LinearLayout>
 
@@ -197,7 +194,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="16dp"
-        android:background="@color/cardView"
+        android:background="@drawable/sp_rr_2395fc"
         android:text="查询"
         android:textColor="#FFF"
         android:textSize="16sp" />

@@ -1,6 +1,7 @@
 package android.zhixun.uiho.com.gissystem.ui.adapter;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,11 +54,11 @@ public class UnitFilterUnitAdapter extends RecyclerView.Adapter<UnitFilterUnitAd
         holder.tvContentUnit.setText(unitFilterUnitModel.getAreaName());
 
         if (unitFilterUnitModel.isChecked()) {
-            holder.tvContentUnit.setBackgroundColor(context.getResources().getColor(R.color.cardView));
-            holder.tvContentUnit.setTextColor(context.getResources().getColor(R.color.cardViewTextColorTrue));
+            holder.tvContentUnit.setBackgroundColor(ContextCompat.getColor(context, R.color.ee7559));
+            holder.tvContentUnit.setTextColor(ContextCompat.getColor(context, R.color.cardViewTextColorTrue));
         } else {
-            holder.tvContentUnit.setBackgroundColor(context.getResources().getColor(R.color.colorWhite));
-            holder.tvContentUnit.setTextColor(context.getResources().getColor(R.color.cardViewTextColorFalse));
+            holder.tvContentUnit.setBackgroundColor(ContextCompat.getColor(context, R.color.colorWhite));
+            holder.tvContentUnit.setTextColor(ContextCompat.getColor(context, R.color.cardViewTextColorFalse));
         }
     }
 

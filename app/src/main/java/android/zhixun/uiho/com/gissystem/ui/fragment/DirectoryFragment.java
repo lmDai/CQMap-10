@@ -310,9 +310,20 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         View dialogRoot = LayoutInflater.from(getActivity())
                 .inflate(R.layout.dialog_classify_search, ((ViewGroup) getView()),
                         false);
-
-        response.get(0).selected = true;
         RecyclerView rv_flowType = dialogRoot.findViewById(R.id.rv_flow_type);
+        response.get(0).selected = true;
+
+        View ll_arrow = dialogRoot.findViewById(R.id.ll_arrow);
+        View iv_arrow = dialogRoot.findViewById(R.id.iv_arrow);
+        ll_arrow.setOnClickListener(v -> {
+            iv_arrow.animate()
+                    .rotationBy(180)
+                    .start();
+            int visible = rv_flowType.getVisibility() == View.VISIBLE ? View.GONE
+                    : View.VISIBLE;
+            rv_flowType.setVisibility(visible);
+        });
+        //成果类型列表
         rv_flowType.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         CommonAdapter flowTypeAdapter = new CommonAdapter<FruitCategoryListModel>(getActivity(),
                 R.layout.item_flow_type, response) {
@@ -409,6 +420,8 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             View itemView = LayoutInflater.from(dialogRoot.getContext())
                     .inflate(R.layout.dispatch_dialog_item, llContainer,
                             false);
+
+            RecyclerView recyclerView = itemView.findViewById(R.id.recycler_view);
             TextView tv_attrName = itemView.findViewById(R.id.tv_attrName);
             tv_attrName.setText(gcbfModel.attrName);
             llContainer.addView(itemView);
@@ -422,7 +435,18 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                 attrVals.add(0, new GethandoutConditionByFCModel.FruitCateGoryAttrVal("全部"));
             }
             attrVals.get(0).selected = true;
-            RecyclerView recyclerView = itemView.findViewById(R.id.recycler_view);
+            //全部展开，收缩
+            View ll_arrow = itemView.findViewById(R.id.ll_arrow);
+            View iv_arrow = itemView.findViewById(R.id.iv_arrow);
+            ll_arrow.setOnClickListener(v -> {
+                iv_arrow.animate()
+                        .rotationBy(180)
+                        .start();
+                int visible = recyclerView.getVisibility() == View.VISIBLE ? View.GONE
+                        : View.VISIBLE;
+                recyclerView.setVisibility(visible);
+            });
+
             recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
             ClassifyFlowTypeAttrValAdapter typeAdapter = new ClassifyFlowTypeAttrValAdapter(getActivity(), attrVals);
             recyclerView.setAdapter(typeAdapter);

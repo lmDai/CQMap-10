@@ -343,11 +343,25 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         View dialogRoot = LayoutInflater.from(getActivity())
                 .inflate(R.layout.dialog_classify_search, ((ViewGroup) getView()),
                         false);
+        RecyclerView rv_flowType = dialogRoot.findViewById(R.id.rv_flow_type);
+
         for (FruitCategoryListModel model : response) {
             model.selected = false;
         }
         response.get(0).selected = true;
-        RecyclerView rv_flowType = dialogRoot.findViewById(R.id.rv_flow_type);
+        //
+        View ll_arrow = dialogRoot.findViewById(R.id.ll_arrow);
+        View iv_arrow = dialogRoot.findViewById(R.id.iv_arrow);
+        ll_arrow.setOnClickListener(v -> {
+            iv_arrow.animate()
+                    .rotationBy(180)
+                    .start();
+            int visible = rv_flowType.getVisibility() == View.VISIBLE ? View.GONE
+                    : View.VISIBLE;
+            rv_flowType.setVisibility(visible);
+        });
+        //成果类型列表
+
         rv_flowType.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         CommonAdapter flowTypeAdapter = new CommonAdapter<FruitCategoryListModel>(getActivity(),
                 R.layout.item_flow_type, response) {
@@ -445,6 +459,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     .inflate(R.layout.dispatch_dialog_item, llContainer,
                             false);
             TextView tv_attrName = itemView.findViewById(R.id.tv_attrName);
+            RecyclerView recyclerView = itemView.findViewById(R.id.recycler_view);
+            //列名
             tv_attrName.setText(gcbfModel.attrName);
             llContainer.addView(itemView);
 
@@ -457,7 +473,18 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 attrVals.add(0, new GethandoutConditionByFCModel.FruitCateGoryAttrVal("全部"));
             }
             attrVals.get(0).selected = true;
-            RecyclerView recyclerView = itemView.findViewById(R.id.recycler_view);
+            //全部展开，收缩
+            View ll_arrow = itemView.findViewById(R.id.ll_arrow);
+            View iv_arrow = itemView.findViewById(R.id.iv_arrow);
+            ll_arrow.setOnClickListener(v -> {
+                iv_arrow.animate()
+                        .rotationBy(180)
+                        .start();
+                int visible = recyclerView.getVisibility() == View.VISIBLE ? View.GONE
+                        : View.VISIBLE;
+                recyclerView.setVisibility(visible);
+            });
+            //列表
             recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
             ClassifyFlowTypeAttrValAdapter typeAdapter = new ClassifyFlowTypeAttrValAdapter(getActivity(), attrVals);
             recyclerView.setAdapter(typeAdapter);
@@ -565,7 +592,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                     symbol =
                                             new PictureMarkerSymbol(getActivity(),
                                                     ContextCompat.getDrawable(getActivity(),
-                                                    R.drawable.ic_location_green));
+                                                            R.drawable.ic_location_green));
                                 } else {
                                     symbol = createSimpleFillSymbol();
                                 }
@@ -1089,7 +1116,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             showAdminRegionDialog();
                             break;
                     }
-                    mCVSpace.setBackgroundResource(R.mipmap.ic_sure_modifi);
+                    mCVSpace.setBackgroundResource(R.drawable.ic_sure);
                     showClearBtn();
                 });
     }
