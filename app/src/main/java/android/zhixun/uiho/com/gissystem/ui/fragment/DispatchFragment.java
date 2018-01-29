@@ -203,8 +203,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
             case R.id.cv_space://空间查询
                 onSpaceClick(v);
                 break;
-            case R.id.cv_clear:
-                setSearhText("");
+            case R.id.cv_clear://地图上的清除
                 restoreSpaceStatus();
                 break;
             case R.id.iv_user:
@@ -265,10 +264,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 showSearchTextViewWithSpace();
                 break;
             case BaseMapView.SPACE_MAP_NUMBER:
-//                if (mMapView.getCurrentDrawGraphic() == null) {
-//                    ToastUtil.showShort("请滑动屏幕框并输入缓冲区的范围");
-//                    return;
-//                }
                 setSearhText(mEtSearch.getText().toString() + "图幅号查询");
                 showSearchTextViewWithSpace();
                 break;
@@ -1117,6 +1112,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             break;
                     }
                     mCVSpace.setBackgroundResource(R.drawable.ic_sure);
+                    showSearchTextViewWithSpace();
                     showClearBtn();
                 });
     }
@@ -1342,7 +1338,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         for (Object object : objects) {
                             if (object instanceof Feature) {
                                 Feature feature = (Feature) object;
-                                double FRUIT_ID = (double) feature.getAttributeValue(FRUITID);
+                                long FRUIT_ID = ((Double) feature.getAttributeValue(FRUITID)).longValue();
 
                                 for (ReportHandoutListModel model : handoutList) {
                                     for (ReportHandoutListModel.FruitCategoryList fruitCategory

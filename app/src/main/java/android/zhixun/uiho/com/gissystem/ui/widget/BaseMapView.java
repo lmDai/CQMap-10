@@ -190,6 +190,10 @@ public class BaseMapView extends MapView implements DrawEventListener {
         drawLayer.addGraphic(graphic);
     }
 
+    public void addDrawLayerGraphics(Graphic[] graphic) {
+        drawLayer.addGraphics(graphic);
+    }
+
     public DrawTool getDrawTool() {
         return drawTool;
     }

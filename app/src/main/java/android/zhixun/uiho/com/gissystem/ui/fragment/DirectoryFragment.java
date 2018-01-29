@@ -190,7 +190,6 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                 onSpaceClick(v);
                 break;
             case R.id.cv_clear:
-                setSearhText("");
                 restoreSpaceStatus();
                 break;
             case R.id.iv_user:
@@ -269,6 +268,11 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         mIvSearchClear.setVisibility(View.GONE);
         mEtSearch.setText("");
         mMapView.clearAll();
+    }
+
+    private void showSearchTextViewWithSapce() {
+        mTvSearch.setVisibility(View.VISIBLE);
+        mIvSearchClear.setVisibility(View.GONE);
     }
 
     private void showSearchClearView() {
@@ -531,6 +535,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             url = getString(R.string.polygon_feature_server_url);
         }
         showLoading();
+
         mMapView.querySQL(getActivity(), url, whereClause,
                 new BaseMapView.MainThreadCallback<FeatureResult>() {
                     @Override
@@ -542,22 +547,27 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             return;
                         }
                         showLoading();
+                        Symbol symbol;
+                        if (mapType == 1) {
+                            symbol = new SimpleMarkerSymbol(Color.RED, 20,
+                                    SimpleMarkerSymbol.STYLE.CIRCLE);
+                        } else {
+                            symbol = createSimpleFillSymbol();
+                        }
+                        Graphic graphic;
+                        List<Graphic> graphicList = new ArrayList<>(1000);
                         for (Object object : result) {
                             if (object instanceof Feature) {
                                 Feature feature = (Feature) object;
 
-                                Symbol symbol = null;
-                                if (mapType == 1) {
-                                    symbol = new SimpleMarkerSymbol(Color.RED, 20,
-                                            SimpleMarkerSymbol.STYLE.CIRCLE);
-                                } else {
-                                    symbol = createSimpleFillSymbol();
-                                }
-                                Graphic graphic = new Graphic(feature.getGeometry(),
+                                graphic = new Graphic(feature.getGeometry(),
                                         symbol, feature.getAttributes());
-                                mMapView.addDrawLayerGraphic(graphic);
+//                                mMapView.addDrawLayerGraphic(graphic);
+                                graphicList.add(graphic);
                             }
                         }
+                        Graphic[] graphicArray = graphicList.toArray(new Graphic[graphicList.size()]);
+                        mMapView.addDrawLayerGraphics(graphicArray);
                         dismissLoading();
                         //地图单击事件
                         mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
@@ -572,10 +582,10 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                                 return;
                             }
                             GraphicsLayer drawLayer = mMapView.getDrawLayer();
-                            Graphic graphic = drawLayer.getGraphic(ids[0]);
-                            if (graphic == null) return;
+                            Graphic updateGraphic = drawLayer.getGraphic(ids[0]);
+                            if (updateGraphic == null) return;
                             drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
-                            double FRUIT_ID = (double) graphic.getAttributeValue("FRUITID");
+                            double FRUIT_ID = (double) updateGraphic.getAttributeValue("FRUITID");
                             for (FruitListModel model : mFruitList) {
                                 if (FRUIT_ID != model.fruitId) continue;
 
@@ -882,8 +892,9 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             showAdminRegionDialog();
                             break;
                     }
-                    mCVSpace.setBackgroundResource(R.mipmap.ic_sure_modifi);
+                    mCVSpace.setBackgroundResource(R.drawable.ic_sure);
                     showClearBtn();
+                    showSearchTextViewWithSapce();
                 });
     }
 
@@ -904,6 +915,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                     int distance = Integer.parseInt(text);
                     setBufferGeometry(distance);
                     mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_SET_FINISH);
+                    dialog1.dismiss();
                 })
                 .visibleEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
@@ -1125,7 +1137,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
 
     private void restoreSpaceStatus() {
         mMapView.setCurrentDrawSpace(BaseMapView.SPACE_NONE);
-        mCVSpace.setBackgroundResource(R.mipmap.ic_kongjian);
+        mCVSpace.setBackgroundResource(R.drawable.ic_space);
         mMapView.clearAll();
         hideClearBtn();
     }
