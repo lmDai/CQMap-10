@@ -8,7 +8,6 @@ import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
-import android.zhixun.uiho.com.gissystem.flux.models.HolderModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.HoldersParentModel;
 import android.zhixun.uiho.com.gissystem.interfaces.OnExpandableItemCheckedListener;
 
@@ -28,9 +27,10 @@ public class HolderViewHolder extends ParentViewHolder {
 
     @NonNull
 
-    private TextView tvName,tvUploading,tvState,tvDateContent;
-    private ImageView ivState,ivHolderSj;
-    public HolderViewHolder(@NonNull View itemView,OnExpandableItemCheckedListener onExpandableItemCheckedListener) {
+    private TextView tvName, tvUploading, tvState, tvDateContent;
+    private ImageView ivState, ivHolderSj;
+
+    public HolderViewHolder(@NonNull View itemView, OnExpandableItemCheckedListener onExpandableItemCheckedListener) {
         super(itemView);
         this.mOnExpandableItemCheckedListener = onExpandableItemCheckedListener;
         tvName = (TextView) itemView.findViewById(R.id.tv_name);
@@ -45,7 +45,7 @@ public class HolderViewHolder extends ParentViewHolder {
         tvName.setText(holderModel.getName());
         tvUploading.setText("证件上传");
 //        tvState.setText(holderModel.getState());
-        tvDateContent.setText(DateUtil.longToString(DateUtil.yyyyMMDD,holderModel.getCardBeginTime())+" - "+DateUtil.longToString(DateUtil.yyyyMMDD,holderModel.getCardEndTime()));
+        tvDateContent.setText(DateUtil.longToString(DateUtil.yyyyMMDD, holderModel.getCardBeginTime()) + " - " + DateUtil.longToString(DateUtil.yyyyMMDD, holderModel.getCardEndTime()));
     }
 
     @SuppressLint("NewApi")
@@ -59,11 +59,11 @@ public class HolderViewHolder extends ParentViewHolder {
 //                mArrowExpandImageView.setRotation(INITIAL_POSITION);
 //            }
 //        }
-        if(isFirst){
-            ivHolderSj.setImageResource(R.mipmap.ic_arrow_drop_up_black_36dp);
+        if (isFirst) {
+            ivHolderSj.setImageResource(R.mipmap.arrow_down);
             isFirst = false;
-        }else{
-            ivHolderSj.setImageResource(R.mipmap.arrow_bottom);
+        } else {
+            ivHolderSj.setImageResource(R.drawable.ic_arrow_up);
             isFirst = true;
         }
     }

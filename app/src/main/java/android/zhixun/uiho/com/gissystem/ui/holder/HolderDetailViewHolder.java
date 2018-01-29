@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
-import android.zhixun.uiho.com.gissystem.flux.models.HolderDetailModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.HoldersModel;
 import android.zhixun.uiho.com.gissystem.interfaces.OnExpandableItemCheckedListener;
 
@@ -34,7 +33,7 @@ public class HolderDetailViewHolder  extends ChildViewHolder {
     public void bind(@NonNull HoldersModel holderDetailModel) {
         tvIdCardContent.setText(holderDetailModel.getIdcard());
         tvPhoneContent.setText(holderDetailModel.getPhone());
-        tvEmailContent.setText("差个该字段");
+        tvEmailContent.setText(holderDetailModel.eMail);
         tvUnitContent.setText(companyName);
         tvNumberContent.setText(String.valueOf(holderDetailModel.getCardSource()));
     }

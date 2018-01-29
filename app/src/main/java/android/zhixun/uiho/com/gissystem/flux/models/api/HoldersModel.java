@@ -46,6 +46,8 @@ public class HoldersModel implements Parcelable {
     private int userId;
     private String userName;
 
+    public String eMail;
+
     public HoldersModel() {
     }
 
@@ -66,6 +68,7 @@ public class HoldersModel implements Parcelable {
         type = in.readInt();
         userId = in.readInt();
         userName = in.readString();
+        eMail = in.readString();
     }
 
     public static final Creator<HoldersModel> CREATOR = new Creator<HoldersModel>() {
@@ -231,5 +234,6 @@ public class HoldersModel implements Parcelable {
         dest.writeInt(type);
         dest.writeInt(userId);
         dest.writeString(userName);
+        dest.writeString(eMail);
     }
 }
