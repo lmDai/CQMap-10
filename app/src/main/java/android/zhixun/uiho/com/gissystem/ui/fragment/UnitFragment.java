@@ -434,7 +434,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     PictureMarkerSymbol symbol =
                             new PictureMarkerSymbol(getActivity(),
                                     ContextCompat.getDrawable(getActivity(),
-                                    R.drawable.ic_location_green));
+                                            R.drawable.ic_location_green));
                     Graphic graphic = new Graphic(feature.getGeometry(),
                             symbol, feature.getAttributes());
                     Location location = mMapView.getLocationDisplayManager().getLocation();
@@ -580,16 +580,17 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                         ToastUtil.showShort("不能为空");
                         return;
                     }
-                    int distance = Integer.parseInt(text);
+                    float distance = Float.parseFloat(text);
                     setBufferGeometry(distance);
                     mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_SET_FINISH);
+                    dialog1.dismiss();
                 })
                 .visibleEditText()
                 .setCancelOnClickListener(R.string.alert_cancel, null)
                 .alert();
     }
 
-    private void setBufferGeometry(int distance) {
+    private void setBufferGeometry(float distance) {
         SimpleLineSymbol lineSymbol = new SimpleLineSymbol(Color.RED,
                 distance,
                 SimpleLineSymbol.STYLE.SOLID

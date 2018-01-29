@@ -221,15 +221,15 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 //                }
             }
         });
-        rlCHResult.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(UnitDetailActivity.this, OwnSecretResultActivity.class);
-                intent.putExtra("company", (long) mCompanyModelDetail.getCompanyId());//这个数据是个long
-                startActivity(intent);
-
-            }
-        });
+//        rlCHResult.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(UnitDetailActivity.this, OwnSecretResultActivity.class);
+//                intent.putExtra("company", (long) mCompanyModelDetail.getCompanyId());//这个数据是个long
+//                startActivity(intent);
+//
+//            }
+//        });
     }
 
     private void initViews() {
@@ -245,8 +245,11 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         int holderNumber = mCompanyModelDetail.getHolders() == null ? 0 :
                 mCompanyModelDetail.getHolders().size();
         tvNumber.setText(holderNumber + "人");
+        //邮政编码
+        TextView tv_postCode = findViewById(R.id.tv_postCode);
+        tv_postCode.setText(mCompanyModelDetail.getZipCode());
+        //
         tvState = (TextView) findViewById(R.id.tv_state);
-
         tvState.setText(mCompanyModelDetail.getSecrecyIsPass() == 0 ? "不通过" : "通过");
         tvEnterpriseCodeContent = (TextView) findViewById(R.id.tv_enterprise_code_content);
         tvEnterpriseCodeContent.setText(mCompanyModelDetail.getOrganizationCode());//企业代码
@@ -255,7 +258,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         tvDomicileontent = (TextView) findViewById(R.id.tv_domicile_content);
         tvDomicileontent.setText(mCompanyModelDetail.getAreaName());//注册地
         tvContactsContacts = (TextView) findViewById(R.id.tv_contacts_contacts);
-        tvContactsContacts.setText(mCompanyModelDetail.getCompanyName());//联系人
+        tvContactsContacts.setText(mCompanyModelDetail.getCorporation().getName());//联系人
         tvTelContacts = (TextView) findViewById(R.id.tv_tel_contacts);
         tvTelContacts.setText(mCompanyModelDetail.getCompanyTelephone());//座机电话
         tvPhoneContent = (TextView) findViewById(R.id.tv_phone_content);
