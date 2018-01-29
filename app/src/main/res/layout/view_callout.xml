@@ -17,6 +17,8 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:textSize="15sp"
+            android:ellipsize="end"
+            android:maxLength="10"
             android:singleLine="true"
             tools:text="公司名" />
 
@@ -26,6 +28,8 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:textSize="13sp"
+            android:maxLength="10"
+            android:ellipsize="end"
             android:singleLine="true"
             tools:text="地理位置" />
     </LinearLayout>

@@ -280,12 +280,12 @@
 
             <ImageView
                 android:id="@+id/arrow_JCQK"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="10dp"
-                android:src="@mipmap/arrow_bottom" />
+                android:src="@mipmap/arrow_down" />
 
         </RelativeLayout>
 
@@ -327,7 +327,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -355,10 +355,11 @@
                 <ImageView
                     android:id="@+id/arrow_result_type"
                     android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_height="match_parent"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:src="@mipmap/arrow_bottom" />
+                    android:src="@mipmap/arrow_bottom"
+                    android:visibility="gone" />
             </RelativeLayout>
 
             <View
@@ -411,7 +412,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -446,7 +447,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -481,7 +482,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -516,7 +517,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -551,7 +552,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -586,7 +587,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -621,7 +622,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -656,7 +657,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -691,7 +692,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -726,7 +727,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -761,7 +762,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -798,7 +799,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -833,7 +834,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="未选择"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -855,7 +856,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:text="其他问题："
+                    android:text="（十六）其他问题："
                     android:textColor="#666666"
                     android:textSize="12sp" />
 
@@ -868,8 +869,12 @@
                     android:layout_toRightOf="@+id/JCsixteen_one"
                     android:textColor="#666666"
                     android:textSize="12sp" />
-
             </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@color/gray" />
         </LinearLayout>
 
         <TextView
@@ -916,7 +921,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:text="未选择"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
         </RelativeLayout>
 
@@ -953,7 +958,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:text="未选择"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
         </RelativeLayout>
 
@@ -990,7 +995,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:text="未选择"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
         </RelativeLayout>
 
@@ -1027,7 +1032,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:text="未选择"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
         </RelativeLayout>
 
@@ -1064,7 +1069,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:text="未选择"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
         </RelativeLayout>
 
@@ -1079,7 +1084,8 @@
             android:layout_height="34dp"
             android:background="#FFFFFF"
             android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:paddingRight="16dp"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tv_otherZGIdea"
@@ -1102,6 +1108,10 @@
 
         </RelativeLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/gray" />
 
         <TextView
             android:layout_width="match_parent"
@@ -1146,7 +1156,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:text="未选择"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
         </RelativeLayout>
 
@@ -1183,7 +1193,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:text="未选择"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
         </RelativeLayout>
 
@@ -1206,7 +1216,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="领导意见:"
+                android:text="意见内容:"
                 android:textColor="#666666"
                 android:textSize="12sp" />
 
@@ -1255,10 +1265,25 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:text="未选择"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@android:color/darker_gray"
                 android:textSize="12sp" />
         </RelativeLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/gray" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="图片及现场拍照"
+            android:textColor="#333333"
+            android:textSize="14sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -1288,43 +1313,97 @@
 
         </LinearLayout>
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout17"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="8dp"
-            android:background="#FFFFFF">
+            android:layout_height="10dp"
+            android:background="@color/gray" />
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="32dp"
-                android:layout_toLeftOf="@+id/tv_submitter"
-                android:src="@mipmap/submitter" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="提交人" />
 
             <TextView
                 android:id="@+id/tv_submitter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="8dp"
-                android:text="欧阳娜娜"
-                android:textColor="#333333"
-                android:textSize="14sp" />
+                android:layout_marginLeft="10dp"
+                />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginLeft="16dp"
+            android:background="@color/colorDivider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="提交时间" />
 
             <TextView
                 android:id="@+id/tv_submit_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/tv_submitter"
-                android:layout_marginTop="8dp"
-                android:paddingRight="16dp"
-                android:text="2016-11-25"
-                android:textColor="#333333"
-                android:textSize="14sp" />
-        </RelativeLayout>
+                android:layout_marginLeft="10dp"
+                />
+
+        </LinearLayout>
+
+        <!--<RelativeLayout-->
+        <!--android:id="@+id/relativeLayout17"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:visibility="gone"-->
+        <!--android:background="#FFFFFF">-->
+
+        <!--<ImageView-->
+        <!--android:layout_width="40dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_marginRight="32dp"-->
+        <!--android:layout_toLeftOf="@+id/tv_submitter"-->
+        <!--android:src="@mipmap/submitter" />-->
+
+        <!--<TextView-->
+        <!--android:id="@+id/tv_submitter"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_marginRight="16dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:text="欧阳娜娜"-->
+        <!--android:textColor="#333333"-->
+        <!--android:textSize="14sp" />-->
+
+        <!--<TextView-->
+        <!--android:id="@+id/tv_submit_date"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_below="@+id/tv_submitter"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:paddingRight="16dp"-->
+        <!--android:text="2016-11-25"-->
+        <!--android:textColor="#333333"-->
+        <!--android:textSize="14sp" />-->
+        <!--</RelativeLayout>-->
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

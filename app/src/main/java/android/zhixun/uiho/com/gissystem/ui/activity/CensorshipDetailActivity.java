@@ -1,7 +1,7 @@
 package android.zhixun.uiho.com.gissystem.ui.activity;
 
-import android.support.annotation.Nullable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,31 +10,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
-import android.zhixun.uiho.com.gissystem.app.Config;
 import android.zhixun.uiho.com.gissystem.app.MyBaseApplication;
-import android.zhixun.uiho.com.gissystem.flux.models.CRActiveUserModel;
 import android.zhixun.uiho.com.gissystem.flux.models.CRCheckPersonModel;
 import android.zhixun.uiho.com.gissystem.flux.models.CRImageModel;
-import android.zhixun.uiho.com.gissystem.flux.models.CRModel;
 import android.zhixun.uiho.com.gissystem.flux.models.CRResultTypeModel;
 import android.zhixun.uiho.com.gissystem.flux.models.CheckGroupModel;
 import android.zhixun.uiho.com.gissystem.flux.models.CheckListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.UnitDetailModel;
 import android.zhixun.uiho.com.gissystem.flux.models.UserModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailByCheckedModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.SecrecyInspectEntryCompanyListModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.SecrecyInspectEntryListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.SecrecyInspectFruitListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.SecrecyInspectImgListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.SecrecyPersonListModel;
-import android.zhixun.uiho.com.gissystem.greendao_gen.CRActiveUserModelDao;
-import android.zhixun.uiho.com.gissystem.greendao_gen.CRCheckPersonModelDao;
-import android.zhixun.uiho.com.gissystem.greendao_gen.CRImageModelDao;
-import android.zhixun.uiho.com.gissystem.greendao_gen.CRModelDao;
-import android.zhixun.uiho.com.gissystem.greendao_gen.CRResultTypeModelDao;
 import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
-import android.zhixun.uiho.com.gissystem.greendao_gen.UserModelDao;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 import android.zhixun.uiho.com.gissystem.ui.adapter.CensorshipDetailAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.CheckSituationAdapter;
@@ -46,9 +35,6 @@ import com.yibogame.flux.stores.Store;
 import com.yibogame.util.DateUtil;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.SPUtil;
-import com.yibogame.util.ToastUtil;
-
-import org.greenrobot.greendao.query.Query;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -139,10 +125,10 @@ public class CensorshipDetailActivity extends BaseActivityWithTitle {
             public void onClick(View view) {
                 if (llJCQK.getVisibility() == View.VISIBLE) {
                     llJCQK.setVisibility(View.GONE);
-                    arrowJCQK.setImageResource(R.mipmap.ic_arrow_drop_up_black_36dp);
+                    arrowJCQK.setImageResource(R.drawable.ic_arrow_up);
                 } else {
                     llJCQK.setVisibility(View.VISIBLE);
-                    arrowJCQK.setImageResource(R.mipmap.arrow_bottom);
+                    arrowJCQK.setImageResource(R.mipmap.arrow_down);
                 }
             }
         });
@@ -431,14 +417,14 @@ public class CensorshipDetailActivity extends BaseActivityWithTitle {
         String Match_person = mCompanyDetailByCheckedModel.getCooperatePersons();//配合人员。
         String contacts = mCompanyDetailByCheckedModel.getPersonName();//联系人
         String contacts_number = mCompanyDetailByCheckedModel.getPhone();//联系电话
-        String date = DateUtil.longToString(DateUtil.yyyyMMddHHmmss, mCompanyDetailByCheckedModel.getSecrecyTime());//联系日期
+        String date = DateUtil.longToString(DateUtil.yyyyMMddHHmmss, mCompanyDetailByCheckedModel.getCreateTime());//联系日期
         String tempCheckPerson = mCompanyDetailByCheckedModel.getSecrecyPersonsInterim();//临时参检人员
 
         tv_check_unit_name.setText("重庆市规划局");
         for (int i = 0; i < CJname.size(); i++) {
             CJNameList += CJname.get(i) + " ";
         }
-        CJNameList += tempCheckPerson;
+//        CJNameList += tempCheckPerson;
 
         tv_check_person_name.setText(CJNameList);
         tv_beChecked_unit_name.setText(checked_unit);

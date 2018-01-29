@@ -1,7 +1,6 @@
 package android.zhixun.uiho.com.gissystem.ui.adapter;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,16 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.zhixun.uiho.com.gissystem.R;
-import android.zhixun.uiho.com.gissystem.flux.models.CRCheckPersonModel;
-import android.zhixun.uiho.com.gissystem.flux.models.CRModel;
-import android.zhixun.uiho.com.gissystem.flux.models.UnitCensorShipModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailByCheckedModel;
-import android.zhixun.uiho.com.gissystem.flux.models.api.SecrecyPersonListModel;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 
-
 import com.yibogame.util.DateUtil;
-import com.yibogame.util.LogUtil;
 
 import java.util.List;
 
@@ -54,7 +47,8 @@ public class UnitCensorShipAdapter extends RecyclerView.Adapter<UnitCensorShipAd
     public UnitCensorShipAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_unitcensorship, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_unitcensorship,
+                parent, false);
 
         return new UnitCensorShipAdapter.ViewHolder(view);
 
@@ -69,9 +63,9 @@ public class UnitCensorShipAdapter extends RecyclerView.Adapter<UnitCensorShipAd
 //        holder.tvDate.setText(eventRecordModel.getDate());
 //        holder.tvContent.setText(eventRecordModel.getMessage());
         if (unitCensorShipModel.getIsAdoptLeader() == 1) {
-            holder.ivPassOrNot.setImageResource(R.mipmap.pass);
+            holder.ivPassOrNot.setImageResource(R.drawable.ic_pass);
         } else {
-            holder.ivPassOrNot.setImageResource(R.mipmap.notpass);
+            holder.ivPassOrNot.setImageResource(R.drawable.ic_not_pass);
         }
         String secrecyPerson = "";
         if (unitCensorShipModel.getSecrecyPersonList() != null) {
@@ -87,7 +81,7 @@ public class UnitCensorShipAdapter extends RecyclerView.Adapter<UnitCensorShipAd
         String cooperatePersons = unitCensorShipModel.getCooperatePersons();
         //参检人员
 //        String checkPerson = unitCensorShipModel.getExaminer() + unitCensorShipModel.getTempCheckPerson();
-        holder.tvExaminerContent.setText(secrecyPerson.equals("") ? "未选择检查人员" : secrecyPerson + cooperatePersons);
+        holder.tvExaminerContent.setText(secrecyPerson.equals("") ? "未选择检查人员" : secrecyPerson);
         holder.tvCheckTimeContent.setText(DateUtil.longToString(DateUtil.yyyyMMddHHmmss, unitCensorShipModel.getSecrecyTime()));
         //如果mOnItemClickListener不为空，则回调。
         if (mOnItemClickListener != null) {
