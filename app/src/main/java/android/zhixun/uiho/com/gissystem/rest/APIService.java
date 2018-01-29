@@ -583,7 +583,7 @@ public class APIService {
     }
 
     /**
-     * 获取成果种类,分类查询
+     * 获取成果种类,分类查询,成果分类
      */
     public Subscription getfruitCategoryList(DoOnSubscriber<List<FruitCategoryListModel>> subscriber) {
         return api.getfruitCategoryList(buildParams("{}", "fruitCategoryList", "fruit"))
@@ -594,7 +594,7 @@ public class APIService {
     }
 
     /**
-     * 获取成果种类下面的子类
+     * 获取成果种类下面的子类,成果分发
      */
     public Subscription gethandoutConditionByFCList(long fruitCategoryId,
                                                     DoOnSubscriber<List<GethandoutConditionByFCModel>> subscriber) {
@@ -606,6 +606,22 @@ public class APIService {
                 .compose(handleResponseList())
                 .subscribe(subscriber);
     }
+
+
+    /**
+     * 获取成果种类下面的子类,成果分发
+     */
+    public Subscription getDirectoryHandoutConditionByFCList(long fruitCategoryId,
+                                                    DoOnSubscriber<List<GethandoutConditionByFCModel>> subscriber) {
+        return api.gethandoutConditionByFCList(
+                buildParams("{\"fruitCategoryId\": " + fruitCategoryId + "}",
+                        "getQueryConditionByFC", "fruit"))
+                .compose(applySchedulers())
+                .doOnSubscribe(subscriber::doOnSubscriber)
+                .compose(handleResponseList())
+                .subscribe(subscriber);
+    }
+
 
     /**
      * 成果分发查询-按成果类型
@@ -645,20 +661,7 @@ public class APIService {
     /**
      * 成果目录列表
      */
-    public void getFruitList(ReportHandoutListBody body, DoOnSubscriber<List<FruitListModel>> subscriber) {
-        Map<Object, Object> map = new HashMap<>();
-        map.put("attrValueList", body.attrValueList);
-        if (body.fruitCategoryId != -1) {
-            map.put("fruitCategoryId", body.fruitCategoryId);
-        }
-        if (!TextUtils.isEmpty(body.fruitIds)) {
-            map.put("attrValueList", body.fruitIds);
-        }
-//        if (body.mapNum != -1) {
-//            map.put("mapNum", body.mapNum);
-//        }
-        map.put("page", -1);
-        map.put("rows", -1);
+    public void getFruitList(Map<Object, Object> map, DoOnSubscriber<List<FruitListModel>> subscriber) {
         api.getFruitList(buildParams(map, "getFruitList", "fruit"))
                 .compose(applySchedulers())
                 .doOnSubscribe(subscriber::doOnSubscriber)

@@ -94,10 +94,12 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private ImageView mIvArrow;
     private LinearLayout mLLTitle;
     //
+    private ReportHandoutListBody mBody;
     //分类信息集合-成果类型那一坨
-    private List<FruitCategoryListModel> mClassifyList = new ArrayList<>();
+    private List<FruitCategoryListModel> mClassifyTypeList = new ArrayList<>();
     //分类信息集合-成果类型下面的集合
-    private List<GethandoutConditionByFCModel> mClassifyTypeList = new ArrayList<>();
+    private List<GethandoutConditionByFCModel> mFirstClassifyTypeBelowList = new ArrayList<>();
+    private List<GethandoutConditionByFCModel> mClassifyTypeBelowList = new ArrayList<>();
     //分类信息集合
     private List<FruitListModel> mFruitList = new ArrayList<>();
     //
@@ -159,7 +161,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     }
 
     private void initData() {
-        getClassifyData();
+        getClassifyTypeData();
     }
 
     private void initBottomDragView(View view) {
@@ -204,16 +206,19 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             case R.id.aciv_clear:
                 restoreAll();
                 showSearchTextView();
+                mBody = null;
                 break;
         }
     }
 
     private void searchBtnClick() {
-        String searchStr = mEtSearch.getText().toString();
-        if (TextUtils.isEmpty(searchStr)) {
-            setSearhText("全部");
-        }
-        getFruitList(mBody);
+//        String searchStr = mEtSearch.getText().toString();
+//        if (TextUtils.isEmpty(searchStr)) {
+//            setSearhText("全部");
+//        }
+
+        showSearchClearView();
+        getFruitList();
     }
 
     private void onSpaceClick(View v) {
@@ -280,34 +285,29 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         mTvSearch.setVisibility(View.GONE);
     }
 
-    private ReportHandoutListBody mBody;
-
     private void showClassifyDialog(View view) {
         showLoading();
-        if (!mClassifyList.isEmpty()) {
-            bindViewClassify(view, mClassifyList);
-        } else {
-            APIService.getInstance().getfruitCategoryList(
-                    new SimpleSubscriber<List<FruitCategoryListModel>>() {
-                        @Override
-                        public void onResponse(List<FruitCategoryListModel> response) {
-                            dismissLoading();
-                            if (response == null || response.isEmpty()) {
-                                ToastUtil.showShort("未获取到信息");
-                                return;
-                            }
-                            mClassifyList.clear();
-                            mClassifyList.addAll(response);
-                            bindViewClassify(view, mClassifyList);
+        APIService.getInstance().getfruitCategoryList(
+                new SimpleSubscriber<List<FruitCategoryListModel>>() {
+                    @Override
+                    public void onResponse(List<FruitCategoryListModel> response) {
+                        dismissLoading();
+                        if (response == null || response.isEmpty()) {
+                            ToastUtil.showShort("未获取到信息");
+                            return;
                         }
+                        mClassifyTypeList.clear();
+                        mClassifyTypeList.addAll(response);
+                        bindViewClassify(view, mClassifyTypeList);
+                    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            super.onError(e);
-                            dismissLoading();
-                        }
-                    });
-        }
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                    }
+                });
+
     }
 
     private void bindViewClassify(View view, List<FruitCategoryListModel> response) {
@@ -356,19 +356,20 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         Button btnSearch = dialogRoot.findViewById(R.id.btn_search);
         btnSearch.setOnClickListener(v -> {
 
-            if (mClassifyList.isEmpty()) return;
+            if (mClassifyTypeList.isEmpty()) return;
+            //填充请求参数
             mBody = new ReportHandoutListBody();
             StringBuilder sb = new StringBuilder();
-            for (FruitCategoryListModel model : mClassifyList) {
+            for (FruitCategoryListModel model : mClassifyTypeList) {
                 if (model.selected) {
                     sb.append(model.categoryName);
                     sb.append(",");
                     mBody.fruitCategoryId = model.fruitCategoryId;
                 }
             }
-            if (!mClassifyTypeList.isEmpty()) {
+            if (!mClassifyTypeBelowList.isEmpty()) {
 
-                for (GethandoutConditionByFCModel gethandoutConditionByFCModel : mClassifyTypeList) {
+                for (GethandoutConditionByFCModel gethandoutConditionByFCModel : mClassifyTypeBelowList) {
                     if (gethandoutConditionByFCModel.fruitCateGoryAttrVal == null ||
                             gethandoutConditionByFCModel.fruitCateGoryAttrVal.isEmpty()) {
                         continue;
@@ -402,7 +403,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private void switchType(FruitCategoryListModel model, View dialogRoot) {
         showLoading();
         APIService.getInstance()
-                .gethandoutConditionByFCList(model.fruitCategoryId,
+                .getDirectoryHandoutConditionByFCList(model.fruitCategoryId,
                         new SimpleSubscriber<List<GethandoutConditionByFCModel>>() {
                             @Override
                             public void onResponse(List<GethandoutConditionByFCModel> response) {
@@ -410,16 +411,17 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                                 if (response == null || response.isEmpty()) {
                                     return;
                                 }
-                                mClassifyTypeList.clear();
-                                mClassifyTypeList.addAll(response);
-                                bindViewClassifyType(dialogRoot, mClassifyTypeList);
+                                mClassifyTypeBelowList.clear();
+                                mClassifyTypeBelowList.addAll(response);
+                                bindViewClassifyTypeBelow(dialogRoot, mClassifyTypeBelowList);
                             }
                         });
     }
 
-    private void bindViewClassifyType(View dialogRoot, List<GethandoutConditionByFCModel> response) {
+    private void bindViewClassifyTypeBelow(View dialogRoot, List<GethandoutConditionByFCModel> response) {
         LinearLayout llContainer = dialogRoot.findViewById(R.id.ll_container);
         llContainer.removeAllViews();
+
         for (GethandoutConditionByFCModel gcbfModel : response) {
             View itemView = LayoutInflater.from(dialogRoot.getContext())
                     .inflate(R.layout.dispatch_dialog_item, llContainer,
@@ -468,13 +470,39 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     }
 
     //查询分发的集合
-    private void getFruitList(ReportHandoutListBody body) {
-        if (body == null) {
-            body = new ReportHandoutListBody();
-        }
-        showSearchClearView();
+    private void getFruitList() {
         showLoading();
-        APIService.getInstance().getFruitList(body,
+        if (mBody == null) {
+            mBody = new ReportHandoutListBody();
+
+            if (mClassifyTypeList.isEmpty()) return;
+            mBody = new ReportHandoutListBody();
+            mBody.fruitCategoryId = mClassifyTypeList.get(0).fruitCategoryId;
+
+            if (mFirstClassifyTypeBelowList.isEmpty())
+                return;
+            GethandoutConditionByFCModel gethandoutConditionByFCModel = mFirstClassifyTypeBelowList.get(0);
+            //attrValues
+            ReportHandoutListBody.AttrValueList attrValueList =
+                    new ReportHandoutListBody.AttrValueList(
+                            gethandoutConditionByFCModel.fruitCategoryAttrId,
+                            gethandoutConditionByFCModel.fruitCateGoryAttrVal
+                                    .get(0).attrValue);
+            mBody.attrValueList.add(attrValueList);
+        }
+        Map<Object, Object> map = new HashMap<>();
+        if (!mBody.attrValueList.isEmpty()) {
+            map.put("attrValueList", mBody.attrValueList);
+        }
+        if (mBody.fruitCategoryId != -1) {
+            map.put("fruitCategoryId", mBody.fruitCategoryId);
+        }
+        if (!TextUtils.isEmpty(mBody.fruitIds)) {
+            map.put("attrValueList", mBody.fruitIds);
+        }
+        map.put("page", -1);
+        map.put("rows", -1);
+        APIService.getInstance().getFruitList(map,
                 new SimpleSubscriber<List<FruitListModel>>() {
                     @Override
                     public void onResponse(List<FruitListModel> response) {
@@ -1158,7 +1186,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     }
 
     //获取分类信息，成果类型那一坨
-    private void getClassifyData() {
+    private void getClassifyTypeData() {
         showLoading();
         APIService.getInstance()
                 .getfruitCategoryList(new SimpleSubscriber<List<FruitCategoryListModel>>() {
@@ -1168,8 +1196,9 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         if (response == null || response.isEmpty()) {
                             return;
                         }
-                        mClassifyList.clear();
-                        mClassifyList.addAll(response);
+                        mClassifyTypeList.clear();
+                        mClassifyTypeList.addAll(response);
+                        getClassifyTypeBelow(response.get(0).fruitCategoryId);
                     }
 
                     @Override
@@ -1180,4 +1209,21 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                 });
     }
 
+    private void getClassifyTypeBelow(long fruitCategoryId) {
+        showLoading();
+        APIService.getInstance()
+                .getDirectoryHandoutConditionByFCList(fruitCategoryId,
+                        new SimpleSubscriber<List<GethandoutConditionByFCModel>>() {
+                            @Override
+                            public void onResponse(List<GethandoutConditionByFCModel> response) {
+                                dismissLoading();
+                                if (response == null || response.isEmpty()) {
+                                    return;
+                                }
+                                mFirstClassifyTypeBelowList.clear();
+                                mFirstClassifyTypeBelowList.addAll(response);
+
+                            }
+                        });
+    }
 }
