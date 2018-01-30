@@ -517,11 +517,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         if (response == null || response.isEmpty()) return;
                         mFruitList.clear();
                         mFruitList.addAll(response);
-//                        if (mMapView.getCurrentDrawSpace() != BaseMapView.SPACE_NONE) {
-//                            queryGeometry(mFruitList);
-//                        } else {
                         searchMapService(mFruitList);
-//                        }
                     }
 
                     @Override

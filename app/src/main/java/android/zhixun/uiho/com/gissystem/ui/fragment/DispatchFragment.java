@@ -107,10 +107,12 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     //
     private AppCompatImageView calendar1, calendar2;
     private RelativeLayout relativeLayoutLeft, relativeLayoutRight;
+    private ReportHandoutListBody mBody;
     //分类信息集合-成果类型那一坨
-    private List<FruitCategoryListModel> mClassifyList = new ArrayList<>();
+    private List<FruitCategoryListModel> mClassifyTypeList = new ArrayList<>();
     //分类信息集合-成果类型下面的集合
-    private List<GethandoutConditionByFCModel> mClassifyTypeList = new ArrayList<>();
+    private List<GethandoutConditionByFCModel> mFirstClassifyTypeBelowList = new ArrayList<>();
+    private List<GethandoutConditionByFCModel> mClassifyTypeBelowList = new ArrayList<>();
     //分发信息集合
     private List<ReportHandoutListModel> mHandoutList = new ArrayList<>();
     //
@@ -173,7 +175,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     private void initData() {
-        getClassifyData();
+        getClassifyTypeData();
     }
 
     private void initBottomDragView(View view) {
@@ -216,6 +218,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 showClassifyDialog(v);
                 break;
             case R.id.aciv_clear:
+                mBody = null;
                 restoreAll();
                 showSearchTextView();
                 break;
@@ -223,11 +226,12 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     private void searchBtnClick() {
-        String searchStr = mEtSearch.getText().toString();
-        if (TextUtils.isEmpty(searchStr)) {
-            setSearhText("全部");
-        }
-        getReportHandoutList(mBody);
+//        String searchStr = mEtSearch.getText().toString();
+//        if (TextUtils.isEmpty(searchStr)) {
+//            setSearhText("全部");
+//        }
+        showSearchClearView();
+        getReportHandoutList();
     }
 
     private void onSpaceClick(View v) {
@@ -304,34 +308,29 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
 //        queryGeometry();
 //    }
 
-    private ReportHandoutListBody mBody;
-
     private void showClassifyDialog(View view) {
         showLoading();
-        if (!mClassifyList.isEmpty()) {
-            bindViewClassify(view, mClassifyList);
-        } else {
-            APIService.getInstance().getfruitCategoryList(
-                    new SimpleSubscriber<List<FruitCategoryListModel>>() {
-                        @Override
-                        public void onResponse(List<FruitCategoryListModel> response) {
-                            dismissLoading();
-                            if (response == null || response.isEmpty()) {
-                                ToastUtil.showShort("未获取到信息");
-                                return;
-                            }
-                            mClassifyList.clear();
-                            mClassifyList.addAll(response);
-                            bindViewClassify(view, mClassifyList);
+        APIService.getInstance().getfruitCategoryList(
+                new SimpleSubscriber<List<FruitCategoryListModel>>() {
+                    @Override
+                    public void onResponse(List<FruitCategoryListModel> response) {
+                        dismissLoading();
+                        if (response == null || response.isEmpty()) {
+                            ToastUtil.showShort("未获取到信息");
+                            return;
                         }
+                        mClassifyTypeList.clear();
+                        mClassifyTypeList.addAll(response);
+                        bindViewClassify(view, mClassifyTypeList);
+                    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            super.onError(e);
-                            dismissLoading();
-                        }
-                    });
-        }
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        dismissLoading();
+                    }
+                });
+
     }
 
     private void bindViewClassify(View view, List<FruitCategoryListModel> response) {
@@ -385,19 +384,19 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         Button btnSearch = dialogRoot.findViewById(R.id.btn_search);
         btnSearch.setOnClickListener(v -> {
 
-            if (mClassifyList.isEmpty()) return;
+            if (mClassifyTypeList.isEmpty()) return;
             mBody = new ReportHandoutListBody();
             StringBuilder sb = new StringBuilder();
-            for (FruitCategoryListModel model : mClassifyList) {
+            for (FruitCategoryListModel model : mClassifyTypeList) {
                 if (model.selected) {
                     sb.append(model.categoryName);
                     sb.append(",");
                     mBody.fruitCategoryId = model.fruitCategoryId;
                 }
             }
-            if (!mClassifyTypeList.isEmpty()) {
+            if (!mClassifyTypeBelowList.isEmpty()) {
 
-                for (GethandoutConditionByFCModel gethandoutConditionByFCModel : mClassifyTypeList) {
+                for (GethandoutConditionByFCModel gethandoutConditionByFCModel : mClassifyTypeBelowList) {
                     if (gethandoutConditionByFCModel.fruitCateGoryAttrVal == null ||
                             gethandoutConditionByFCModel.fruitCateGoryAttrVal.isEmpty()) {
                         continue;
@@ -439,9 +438,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 if (response == null || response.isEmpty()) {
                                     return;
                                 }
-                                mClassifyTypeList.clear();
-                                mClassifyTypeList.addAll(response);
-                                bindViewClassifyType(dialogRoot, mClassifyTypeList);
+                                mClassifyTypeBelowList.clear();
+                                mClassifyTypeBelowList.addAll(response);
+                                bindViewClassifyType(dialogRoot, mClassifyTypeBelowList);
                             }
                         });
     }
@@ -497,13 +496,34 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     //查询分发的集合
-    private void getReportHandoutList(ReportHandoutListBody body) {
-        if (body == null) {
-            body = new ReportHandoutListBody();
+    private void getReportHandoutList() {
+        if (mBody == null) {
+            mBody = new ReportHandoutListBody();
+            if (mClassifyTypeList.isEmpty()) return;
+            StringBuilder sb = new StringBuilder();
+            mBody = new ReportHandoutListBody();
+            mBody.fruitCategoryId = mClassifyTypeList.get(0).fruitCategoryId;
+            sb.append(mClassifyTypeList.get(0).categoryName);
+            if (mFirstClassifyTypeBelowList.isEmpty())
+                return;
+            sb.append(",");
+            GethandoutConditionByFCModel gethandoutConditionByFCModel = mFirstClassifyTypeBelowList.get(0);
+            //attrValues
+            ReportHandoutListBody.AttrValueList attrValueList =
+                    new ReportHandoutListBody.AttrValueList(
+                            gethandoutConditionByFCModel.fruitCategoryAttrId,
+                            gethandoutConditionByFCModel.fruitCateGoryAttrVal
+                                    .get(0).attrValue);
+            mBody.attrValueList.add(attrValueList);
+            List<GethandoutConditionByFCModel.FruitCateGoryAttrVal> fruitCateGoryAttrVal =
+                    gethandoutConditionByFCModel.fruitCateGoryAttrVal;
+            String attrValue = fruitCateGoryAttrVal.get(0).attrValue;
+            sb.append(attrValue);
+            setSearhText(sb.toString());
         }
-        showSearchClearView();
+
         showLoading();
-        APIService.getInstance().getReportHandoutList(body,
+        APIService.getInstance().getReportHandoutList(mBody,
                 new SimpleSubscriber<List<ReportHandoutListModel>>() {
                     @Override
                     public void onResponse(List<ReportHandoutListModel> response) {
@@ -511,11 +531,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         if (response == null || response.isEmpty()) return;
                         mHandoutList.clear();
                         mHandoutList.addAll(response);
-                        if (mMapView.getCurrentDrawSpace() != BaseMapView.SPACE_NONE) {
-                            queryGeometry(mHandoutList);
-                        } else {
-                            searchMapService(mHandoutList);
-                        }
+                        searchMapService(mHandoutList);
                     }
 
                     @Override
@@ -567,74 +583,21 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
             url = getString(R.string.polygon_feature_server_url);
         }
         showLoading();
+        if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
+            querySql(mapType, whereClause, url);
+        } else {
+            queryGeometryAndSql(mapType, url, whereClause);
+        }
+        dismissLoading();
+    }
+
+    private void querySql(int mapType, String whereClause, String url) {
         mMapView.querySQL(getActivity(), url, whereClause,
                 new BaseMapView.MainThreadCallback<FeatureResult>() {
                     @Override
                     public void onCallback(FeatureResult result) {
                         dismissLoading();
-                        if (result.featureCount() == 0) {
-                            ToastUtil.showShort("未获取信息,请重试");
-                            restoreAll();
-                            return;
-                        }
-                        Symbol symbol = null;
-                        if (mapType == 1) {//水准点
-                            symbol =
-                                    new PictureMarkerSymbol(getActivity(),
-                                            ContextCompat.getDrawable(getActivity(),
-                                                    R.drawable.ic_location_green));
-                        } else {
-                            symbol = createSimpleFillSymbol();
-                        }
-                        List<Graphic> graphicList = new ArrayList<>();
-                        for (Object object : result) {
-                            if (object instanceof Feature) {
-                                Feature feature = (Feature) object;
-
-                                Graphic graphic = new Graphic(feature.getGeometry(),
-                                        symbol, feature.getAttributes());
-                                graphicList.add(graphic);
-//                                mMapView.addGraphic(graphic);
-                            }
-                        }
-                        if (!graphicList.isEmpty()){
-                            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
-                            mMapView.addGraphics(graphics);
-                        }
-                        //地图单击事件
-                        mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
-
-                            int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
-                                    1, 1);
-                            if (ids.length == 0) return;
-                            GraphicsLayer drawLayer = mMapView.getDrawLayer();
-                            Graphic graphic = drawLayer.getGraphic(ids[0]);
-                            if (graphic == null) return;
-                            long FRUIT_ID;
-                            if (mapType == 1) {
-
-                                drawLayer.updateGraphic(ids[0], new PictureMarkerSymbol(getActivity(),
-                                        ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red)));
-                                FRUIT_ID = (int) graphic.getAttributeValue("FRUITID");
-                            } else {
-                                drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
-                                FRUIT_ID = ((Double) graphic.getAttributeValue("FRUITID")).longValue();
-                            }
-
-                            List<ReportHandoutListModel> handoutList = new ArrayList<>();
-                            for (ReportHandoutListModel handout : mHandoutList) {
-                                for (ReportHandoutListModel.FruitCategoryList fruitCategory :
-                                        handout.fruitCategoryList) {
-                                    for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList
-                                            : fruitCategory.fruitList) {
-                                        if (FRUIT_ID != fruitList.fruitId) continue;
-                                        fruitList.selected = true;
-                                        handoutList.add(handout);
-                                    }
-                                }
-                            }
-                            showBottomLayout(handoutList);
-                        });
+                        showMapSymbol(result, mapType);
                     }
 
                     @Override
@@ -644,7 +607,91 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         ToastUtil.showShort(e.getMessage());
                     }
                 });
-        dismissLoading();
+    }
+
+    private void queryGeometryAndSql(int mapType, String url, String where) {
+        mMapView.queryGeometryAndSql(getActivity(), url, where,
+                new BaseMapView.MainThreadCallback<FeatureResult>() {
+                    @Override
+                    public void onCallback(FeatureResult result) {
+                        dismissLoading();
+                        restoreSpaceStatus();
+                        showMapSymbol(result, mapType);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        dismissLoading();
+                        ToastUtil.showShort(e.getMessage());
+                    }
+                });
+    }
+
+    private void showMapSymbol(FeatureResult result, int mapType) {
+        if (result.featureCount() == 0) {
+            ToastUtil.showShort("未获取信息,请重试");
+            restoreAll();
+            return;
+        }
+        Symbol symbol = null;
+        if (mapType == 1) {//水准点
+            symbol =
+                    new PictureMarkerSymbol(getActivity(),
+                            ContextCompat.getDrawable(getActivity(),
+                                    R.drawable.ic_location_green));
+        } else {
+            symbol = createSimpleFillSymbol();
+        }
+        List<Graphic> graphicList = new ArrayList<>();
+        for (Object object : result) {
+            if (object instanceof Feature) {
+                Feature feature = (Feature) object;
+
+                Graphic graphic = new Graphic(feature.getGeometry(),
+                        symbol, feature.getAttributes());
+                graphicList.add(graphic);
+//                                mMapView.addGraphic(graphic);
+            }
+        }
+        if (!graphicList.isEmpty()) {
+            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
+            mMapView.addGraphics(graphics);
+        }
+        //地图单击事件
+        mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
+
+            int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
+                    1, 1);
+            if (ids.length == 0) return;
+            GraphicsLayer drawLayer = mMapView.getDrawLayer();
+            Graphic graphic = drawLayer.getGraphic(ids[0]);
+            if (graphic == null) return;
+            long FRUIT_ID;
+            if (mapType == 1) {
+
+                drawLayer.updateGraphic(ids[0], new PictureMarkerSymbol(getActivity(),
+                        ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red)));
+                FRUIT_ID = (int) graphic.getAttributeValue("FRUITID");
+            } else {
+                drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
+                FRUIT_ID = ((Double) graphic.getAttributeValue("FRUITID")).longValue();
+            }
+
+            List<ReportHandoutListModel> handoutList = new ArrayList<>();
+            for (ReportHandoutListModel handout : mHandoutList) {
+                for (ReportHandoutListModel.FruitCategoryList fruitCategory :
+                        handout.fruitCategoryList) {
+                    for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList
+                            : fruitCategory.fruitList) {
+                        if (FRUIT_ID != fruitList.fruitId) continue;
+                        fruitList.selected = true;
+                        handoutList.add(handout);
+                    }
+                }
+            }
+            showBottomLayout(handoutList);
+        });
     }
 
     @NonNull
@@ -1308,7 +1355,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                                 SimpleLineSymbol.STYLE.SOLID);
                                 Graphic graphic = new Graphic(feature.getGeometry(), symbol);
                                 graphicList.add(graphic);
-//                                mMapView.addGraphic(graphic);
                             }
                         }
                         if (!graphicList.isEmpty()) {
@@ -1440,7 +1486,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     //获取分类信息，成果类型那一坨
-    private void getClassifyData() {
+    private void getClassifyTypeData() {
         showLoading();
         APIService.getInstance()
                 .getfruitCategoryList(new SimpleSubscriber<List<FruitCategoryListModel>>() {
@@ -1450,8 +1496,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         if (response == null || response.isEmpty()) {
                             return;
                         }
-                        mClassifyList.clear();
-                        mClassifyList.addAll(response);
+                        mClassifyTypeList.clear();
+                        mClassifyTypeList.addAll(response);
+                        getClassifyTypeBelowData(response.get(0).fruitCategoryId);
                     }
 
                     @Override
@@ -1461,6 +1508,23 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         dismissLoading();
                     }
                 });
+    }
+
+    private void getClassifyTypeBelowData(long fruitCategoryId) {
+        showLoading();
+        APIService.getInstance()
+                .gethandoutConditionByFCList(fruitCategoryId,
+                        new SimpleSubscriber<List<GethandoutConditionByFCModel>>() {
+                            @Override
+                            public void onResponse(List<GethandoutConditionByFCModel> response) {
+                                dismissLoading();
+                                if (response == null || response.isEmpty()) {
+                                    return;
+                                }
+                                mFirstClassifyTypeBelowList.clear();
+                                mFirstClassifyTypeBelowList.addAll(response);
+                            }
+                        });
     }
 
     private void getOrderList(OrderBody orderBody) {

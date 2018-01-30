@@ -640,7 +640,9 @@ public class APIService {
     public Subscription getReportHandoutList(ReportHandoutListBody body,
                                              DoOnSubscriber<List<ReportHandoutListModel>> subscriber) {
         Map<Object, Object> map = new HashMap<>();
-        map.put("attrValueList", body.attrValueList);
+        if (!body.attrValueList.isEmpty()) {
+            map.put("attrValueList", body.attrValueList);
+        }
         if (body.fruitCategoryId != -1) {
             map.put("fruitCategoryId", body.fruitCategoryId);
         }
