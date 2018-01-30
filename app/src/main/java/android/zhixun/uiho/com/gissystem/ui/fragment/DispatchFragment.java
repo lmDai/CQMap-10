@@ -560,7 +560,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 mMapType = fruitCategoryList.mapType;
                 for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList :
                         fruitCategoryList.fruitList) {
-
+                    if (mBody.fruitCategoryId != fruitList.fruitCategoryId)
+                        continue;
                     String fruitId = String.valueOf(fruitList.fruitId);
                     sb.append(fruitId);
                     sb.append(",");

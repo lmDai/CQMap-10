@@ -101,8 +101,6 @@ public class CensorshipDetailActivity extends BaseActivityWithTitle {
         userModel = JSONObject.parseObject(userJson, android.zhixun.uiho.com.gissystem.flux.models.api.UserModel.class);
         mDaoSession = ((MyBaseApplication) getApplication()).getDaoSession();
 
-
-
     }
 
     private void getData(String params){
@@ -192,6 +190,7 @@ public class CensorshipDetailActivity extends BaseActivityWithTitle {
         String JCone = "未选择", JCThree = "未选择", JCFour = "未选择", JCFive = "未选择", JCSix = "未选择", JCSeven = "未选择",
                 JCEight = "未选择", JCNine = "未选择", JCTen = "未选择", JCelevn = "未选择",
                 JCtwelve = "", JCthirteen = "未选择", JCfourteen = "未选择", JCfifteen = "未选择";
+
         String ZGone = "未选择", ZGtwo = "未选择", ZGthree = "未选择", ZGfour = "未选择", ZGfive = "未选择";
         String LDone = "未选择", LDtwo = "未选择", LDthree = "未选择";
         if (mCompanyDetailByCheckedModel.getSecrecyInspectEntryCompanyList() != null) {
