@@ -56,6 +56,7 @@ public class CompanyDetailByCheckedModel implements Parcelable{
     private int secrecyCompanyId;
     private int secrecyInspectId;
     private String secrecyPersons;
+    public String secrecyPersonNames;
     private long secrecyTime;
     private int userId;
     private List<SecrecyInspectEntryCompanyListModel> secrecyInspectEntryCompanyList;

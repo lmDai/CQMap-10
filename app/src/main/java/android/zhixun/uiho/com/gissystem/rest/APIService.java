@@ -509,13 +509,24 @@ public class APIService {
      * @param subscriber
      * @return
      */
-    public Subscription getCompanyDetailByCheckedList(Map<Object, Object> map, DoOnSubscriber<List<CompanyDetailByCheckedModel>> subscriber) {
+    public Subscription getCompanyDetailByCheckedList(Map<Object, Object> map,
+                                                      DoOnSubscriber<List<CompanyDetailByCheckedModel>> subscriber) {
         return api.getCompanyDetailByCheckedList(buildParams(map, "getSecrecyInspectList", "secrecyInspect"))
                 .compose(applySchedulers())
                 .doOnSubscribe(subscriber::doOnSubscriber)
                 .compose(handleResponseList())
                 .subscribe(subscriber);
     }
+
+    public Subscription getSecrecyInspect(String params,
+                                          DoOnSubscriber<CompanyDetailByCheckedModel> subscriber) {
+        return api.getSecrecyInspect(buildParams(params, "getSecrecyInspect", "secrecyInspect"))
+                .compose(applySchedulers())
+                .doOnSubscribe(subscriber::doOnSubscriber)
+                .compose(handleResponse())
+                .subscribe(subscriber);
+    }
+
 
     /***
      * 导出PDF
@@ -612,7 +623,7 @@ public class APIService {
      * 获取成果种类下面的子类,成果分发
      */
     public Subscription getDirectoryHandoutConditionByFCList(long fruitCategoryId,
-                                                    DoOnSubscriber<List<GethandoutConditionByFCModel>> subscriber) {
+                                                             DoOnSubscriber<List<GethandoutConditionByFCModel>> subscriber) {
         return api.gethandoutConditionByFCList(
                 buildParams("{\"fruitCategoryId\": " + fruitCategoryId + "}",
                         "getQueryConditionByFC", "fruit"))

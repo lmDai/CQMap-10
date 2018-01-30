@@ -10,19 +10,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.zhixun.uiho.com.gissystem.R;
-import android.zhixun.uiho.com.gissystem.app.MyBaseApplication;
 import android.zhixun.uiho.com.gissystem.flux.models.CRCheckPersonModel;
 import android.zhixun.uiho.com.gissystem.flux.models.CRModel;
-import android.zhixun.uiho.com.gissystem.flux.models.UnitCensorShipModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailByCheckedModel;
-import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.ui.adapter.CensorshipRegisterAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.UnitCensorShipAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.DividerItemDecoration;
 
-import com.jcodecraeer.xrecyclerview.LoadingMoreFooter;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import com.yibogame.app.DoOnSubscriber;
 import com.yibogame.flux.stores.Store;
@@ -113,7 +109,8 @@ public class UnitCensorShipActivity extends BaseActivityWithTitle {
     private void getData() {
         Map<Object, Object> map = new HashMap<>();
         map.put("companyId", unitId);
-        APIService.getInstance().getCompanyDetailByCheckedList(map, new DoOnSubscriber<List<CompanyDetailByCheckedModel>>() {
+        APIService.getInstance().getCompanyDetailByCheckedList(map,
+                new DoOnSubscriber<List<CompanyDetailByCheckedModel>>() {
             @Override
             public void doOnSubscriber() {
 

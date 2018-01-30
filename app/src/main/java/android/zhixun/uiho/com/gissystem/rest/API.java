@@ -162,6 +162,10 @@ public interface API {
     Observable<BaseListResultModel<CompanyDetailByCheckedModel>> getCompanyDetailByCheckedList(@Field("data") String data);
 
 
+    @POST(BASE_URL)
+    @FormUrlEncoded
+    Observable<BaseResultModel<CompanyDetailByCheckedModel>> getSecrecyInspect(@Field("data") String data);
+
     /***
      * 导出
      * @param data

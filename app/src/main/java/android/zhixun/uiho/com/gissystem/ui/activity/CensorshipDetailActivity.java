@@ -25,6 +25,8 @@ import android.zhixun.uiho.com.gissystem.flux.models.api.SecrecyInspectImgListMo
 import android.zhixun.uiho.com.gissystem.flux.models.api.SecrecyPersonListModel;
 import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
+import android.zhixun.uiho.com.gissystem.rest.APIService;
+import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
 import android.zhixun.uiho.com.gissystem.ui.adapter.CensorshipDetailAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.CheckSituationAdapter;
 import android.zhixun.uiho.com.gissystem.ui.adapter.MyViewPagerAdapter;
@@ -35,6 +37,7 @@ import com.yibogame.flux.stores.Store;
 import com.yibogame.util.DateUtil;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.SPUtil;
+import com.yibogame.util.ToastUtil;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -92,13 +95,35 @@ public class CensorshipDetailActivity extends BaseActivityWithTitle {
         setTitleText("保密检查详情");
         //初始化
         mCompanyDetailByCheckedModel = getIntent().getParcelableExtra("CompanyDetailByCheckedModel");
+        String params = String.valueOf(mCompanyDetailByCheckedModel.getSecrecyInspectId());
+        getData(params);
         String userJson = SPUtil.getInstance().getString("UserModelOfJson");
         userModel = JSONObject.parseObject(userJson, android.zhixun.uiho.com.gissystem.flux.models.api.UserModel.class);
         mDaoSession = ((MyBaseApplication) getApplication()).getDaoSession();
 
-        initViews();
-        addAchievement();
 
+
+    }
+
+    private void getData(String params){
+        showLoading();
+        APIService.getInstance()
+                .getSecrecyInspect(params, new SimpleSubscriber<CompanyDetailByCheckedModel>() {
+                    @Override
+                    public void onResponse(CompanyDetailByCheckedModel response) {
+                        hideLoading();
+                        mCompanyDetailByCheckedModel = response;
+                        initViews();
+                        addAchievement();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        hideLoading();
+                        ToastUtil.showShort(e.getMessage());
+                    }
+                });
     }
 
     private void initViews() {
@@ -391,7 +416,7 @@ public class CensorshipDetailActivity extends BaseActivityWithTitle {
             LDthree = "未选择";
         }
 
-////        String LDthree;
+//        String LDthree;
 //        if (crModel.getLeaderIdea_three() == 1) {
 //            LDthree = "是";
 //        } else if (crModel.getLeaderIdea_three() == -1) {
@@ -417,7 +442,7 @@ public class CensorshipDetailActivity extends BaseActivityWithTitle {
         String Match_person = mCompanyDetailByCheckedModel.getCooperatePersons();//配合人员。
         String contacts = mCompanyDetailByCheckedModel.getPersonName();//联系人
         String contacts_number = mCompanyDetailByCheckedModel.getPhone();//联系电话
-        String date = DateUtil.longToString(DateUtil.yyyyMMddHHmmss, mCompanyDetailByCheckedModel.getCreateTime());//联系日期
+        String date = DateUtil.longToString(DateUtil.yyyyMMDD, mCompanyDetailByCheckedModel.getSecrecyTime());//联系日期
         String tempCheckPerson = mCompanyDetailByCheckedModel.getSecrecyPersonsInterim();//临时参检人员
 
         tv_check_unit_name.setText("重庆市规划局");
@@ -426,7 +451,7 @@ public class CensorshipDetailActivity extends BaseActivityWithTitle {
         }
 //        CJNameList += tempCheckPerson;
 
-        tv_check_person_name.setText(CJNameList);
+        tv_check_person_name.setText(mCompanyDetailByCheckedModel.secrecyPersonNames);
         tv_beChecked_unit_name.setText(checked_unit);
         tv_contact_name.setText(contacts);
         tv_contact_tel_content.setText(contacts_number);
