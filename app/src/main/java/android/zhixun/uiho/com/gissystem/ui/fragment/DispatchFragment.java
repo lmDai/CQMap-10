@@ -979,8 +979,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     for (int graphicID : graphicIDs) {
                         Graphic graphic = mMapView.getDrawLayer().getGraphic(graphicID);
                         if (graphic == null) continue;
-                        double fruitId = (double) graphic.getAttributeValue(FRUITID);
-                        if (fruitId != fruitList.fruitId) continue;
+                        String fruitId = graphic.getAttributeValue(FRUITID).toString();
+                        if (!fruitId.contains(String.valueOf(fruitList.fruitId))) continue;
+
                         mMapView.getDrawLayer().updateGraphic(graphicID, new SimpleFillSymbol(Color.RED));
                         if (graphic.getGeometry() == null) continue;
                         switch (graphic.getGeometry().getType()) {

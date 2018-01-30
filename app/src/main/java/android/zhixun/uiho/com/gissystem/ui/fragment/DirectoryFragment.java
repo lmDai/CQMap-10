@@ -95,6 +95,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private LinearLayout mLLTitle;
     //
     private ReportHandoutListBody mBody;
+    private int mMapType = 0;
     //分类信息集合-成果类型那一坨
     private List<FruitCategoryListModel> mClassifyTypeList = new ArrayList<>();
     //分类信息集合-成果类型下面的集合
@@ -204,6 +205,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                 showClassifyDialog(v);
                 break;
             case R.id.aciv_clear:
+                mMapType = 0;
                 restoreAll();
                 showSearchTextView();
                 mBody = null;
@@ -311,6 +313,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     }
 
     private void bindViewClassify(View view, List<FruitCategoryListModel> response) {
+
         View dialogRoot = LayoutInflater.from(getActivity())
                 .inflate(R.layout.dialog_classify_search, ((ViewGroup) getView()),
                         false);
@@ -343,6 +346,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             }
         };
         rv_flowType.setAdapter(flowTypeAdapter);
+        //成果类型item的点击事件
         flowTypeAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
@@ -350,15 +354,15 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                 for (FruitCategoryListModel model : response) {
                     model.selected = response.indexOf(model) == position;
                 }
+                mMapType = response.get(position).mapType;
                 flowTypeAdapter.notifyDataSetChanged();
             }
         });
         Button btnSearch = dialogRoot.findViewById(R.id.btn_search);
         btnSearch.setOnClickListener(v -> {
-
             if (mClassifyTypeList.isEmpty()) return;
-            //填充请求参数
             mBody = new ReportHandoutListBody();
+            //填充请求参数
             StringBuilder sb = new StringBuilder();
             for (FruitCategoryListModel model : mClassifyTypeList) {
                 if (model.selected) {
@@ -480,6 +484,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             mBody = new ReportHandoutListBody();
             mBody.fruitCategoryId = mClassifyTypeList.get(0).fruitCategoryId;
             sb.append(mClassifyTypeList.get(0).categoryName);
+            mMapType = mClassifyTypeList.get(0).mapType;
             if (mFirstClassifyTypeBelowList.isEmpty())
                 return;
             sb.append(",");
@@ -537,7 +542,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         sb.append("FRUITID");
         sb.append(" in ");
         sb.append("(");
-        int mapType = 2;
+        int mapType = mMapType;
         int index = 0;
         for (FruitListModel model : fruitList) {
             index++;
@@ -639,7 +644,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             Graphic updateGraphic = drawLayer.getGraphic(ids[0]);
             if (updateGraphic == null) return;
             drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
-            double FRUIT_ID = (double) updateGraphic.getAttributeValue("FRUITID");
+            long FRUIT_ID = ((Double) updateGraphic.getAttributeValue("FRUITID")).longValue();
             for (FruitListModel model : mFruitList) {
                 if (FRUIT_ID != model.fruitId) continue;
 
@@ -757,14 +762,14 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
                 long fruitId = fruitList.get(position).fruitId;
                 int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
-                if (graphicIDs.length == 0) {
-                    ToastUtil.showShort("未找到相关信息，请重试");
+                if (graphicIDs == null || graphicIDs.length == 0) {
+                    ToastUtil.showShort("未在地图上找到相关信息，请重试");
                     return;
                 }
                 for (int id : graphicIDs) {
                     Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
                     if (graphic == null) continue;
-                    double attributeValue = (double) graphic.getAttributeValue(FRUITID);
+                    long attributeValue = ((Double) graphic.getAttributeValue(FRUITID)).longValue();
                     if (fruitId != attributeValue) continue;
                     mMapView.getDrawLayer().updateGraphic(id, new SimpleFillSymbol(Color.RED));
                     if (graphic.getGeometry() == null) continue;
