@@ -476,11 +476,13 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             mBody = new ReportHandoutListBody();
 
             if (mClassifyTypeList.isEmpty()) return;
+            StringBuilder sb = new StringBuilder();
             mBody = new ReportHandoutListBody();
             mBody.fruitCategoryId = mClassifyTypeList.get(0).fruitCategoryId;
-
+            sb.append(mClassifyTypeList.get(0).categoryName);
             if (mFirstClassifyTypeBelowList.isEmpty())
                 return;
+            sb.append(",");
             GethandoutConditionByFCModel gethandoutConditionByFCModel = mFirstClassifyTypeBelowList.get(0);
             //attrValues
             ReportHandoutListBody.AttrValueList attrValueList =
@@ -489,6 +491,11 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             gethandoutConditionByFCModel.fruitCateGoryAttrVal
                                     .get(0).attrValue);
             mBody.attrValueList.add(attrValueList);
+            List<GethandoutConditionByFCModel.FruitCateGoryAttrVal> fruitCateGoryAttrVal =
+                    gethandoutConditionByFCModel.fruitCateGoryAttrVal;
+            String attrValue = fruitCateGoryAttrVal.get(0).attrValue;
+            sb.append(attrValue);
+            setSearhText(sb.toString());
         }
         Map<Object, Object> map = new HashMap<>();
         if (!mBody.attrValueList.isEmpty()) {
@@ -1199,7 +1206,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             ToastUtil.showShort("未查询到相关信息");
                             return;
                         }
-                        showMapSymbol(objects,mapType);
+                        showMapSymbol(objects, mapType);
                     }
 
                     @Override
