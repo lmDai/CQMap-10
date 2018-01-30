@@ -183,14 +183,14 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
     public void setCurrentDrawGraphic(Graphic graphic) {
         this.currentDrawGraphic = graphic;
-    }
-
-    public void addDrawLayerGraphic(Graphic graphic) {
-        this.currentDrawGraphic = graphic;
         drawLayer.addGraphic(graphic);
     }
 
-    public void addDrawLayerGraphics(Graphic[] graphic) {
+    public void addGraphic(Graphic graphic) {
+        drawLayer.addGraphic(graphic);
+    }
+
+    public void addGraphics(Graphic[] graphic) {
         drawLayer.addGraphics(graphic);
     }
 
@@ -211,7 +211,6 @@ public class BaseMapView extends MapView implements DrawEventListener {
         query.setOutFields(new String[]{"*"});
         query.setReturnGeometry(true);
         QueryTask queryTask = new QueryTask(url);
-
         queryTask.execute(query, new CallbackListener<FeatureResult>() {
             @Override
             public void onCallback(FeatureResult objects) {
@@ -233,6 +232,9 @@ public class BaseMapView extends MapView implements DrawEventListener {
         query.setOutFields(new String[]{"*"});
         query.setReturnGeometry(true);
         query.setWhere(where);
+//        query.setReturnIdsOnly(false);
+//        query.setReturnZ(false);
+//        query.setReturnM(false);
         QueryTask qTask = new QueryTask(url);
         qTask.execute(query, new CallbackListener<FeatureResult>() {
             @Override
@@ -250,6 +252,28 @@ public class BaseMapView extends MapView implements DrawEventListener {
             }
         });
 
+    }
+
+    public void queryGeometryAndSql(Activity act, String url,String where,
+                              MainThreadCallback<FeatureResult> callback) {
+        QueryParameters query = new QueryParameters();
+        query.setGeometry(currentDrawGraphic.getGeometry());
+        query.setWhere(where);
+        query.setOutSpatialReference(this.getSpatialReference());
+        query.setOutFields(new String[]{"*"});
+        query.setReturnGeometry(true);
+        QueryTask queryTask = new QueryTask(url);
+        queryTask.execute(query, new CallbackListener<FeatureResult>() {
+            @Override
+            public void onCallback(FeatureResult objects) {
+                act.runOnUiThread(() -> callback.onCallback(objects));
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                act.runOnUiThread(() -> callback.onError(throwable));
+            }
+        });
     }
 
     public interface MainThreadCallback<T> {

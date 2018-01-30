@@ -577,24 +577,29 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             restoreAll();
                             return;
                         }
-
+                        Symbol symbol = null;
+                        if (mapType == 1) {//水准点
+                            symbol =
+                                    new PictureMarkerSymbol(getActivity(),
+                                            ContextCompat.getDrawable(getActivity(),
+                                                    R.drawable.ic_location_green));
+                        } else {
+                            symbol = createSimpleFillSymbol();
+                        }
+                        List<Graphic> graphicList = new ArrayList<>();
                         for (Object object : result) {
                             if (object instanceof Feature) {
                                 Feature feature = (Feature) object;
 
-                                Symbol symbol = null;
-                                if (mapType == 1) {//水准点
-                                    symbol =
-                                            new PictureMarkerSymbol(getActivity(),
-                                                    ContextCompat.getDrawable(getActivity(),
-                                                            R.drawable.ic_location_green));
-                                } else {
-                                    symbol = createSimpleFillSymbol();
-                                }
                                 Graphic graphic = new Graphic(feature.getGeometry(),
                                         symbol, feature.getAttributes());
-                                mMapView.addDrawLayerGraphic(graphic);
+                                graphicList.add(graphic);
+//                                mMapView.addGraphic(graphic);
                             }
+                        }
+                        if (!graphicList.isEmpty()){
+                            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
+                            mMapView.addGraphics(graphics);
                         }
                         //地图单击事件
                         mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
@@ -1192,14 +1197,19 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             SimpleLineSymbol symbol =
                                     new SimpleLineSymbol(Color.RED, 2,
                                             SimpleLineSymbol.STYLE.SOLID);
+                            List<Graphic> graphicList = new ArrayList<>(1000);
                             for (Object o : result) {
                                 if (o instanceof Feature) {
                                     Feature feature = (Feature) o;
                                     Graphic graphic = new Graphic(feature.getGeometry(), symbol);
-                                    mMapView.addDrawLayerGraphic(graphic);
+//                                    mMapView.addGraphic(graphic);
+                                    graphicList.add(graphic);
                                 }
                             }
-
+                            if (!graphicList.isEmpty()) {
+                                Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
+                                mMapView.addGraphics(graphics);
+                            }
                         }
 
                         @Override
@@ -1289,7 +1299,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             ToastUtil.showShort(" 未获取到相关信息");
                             return;
                         }
-
+                        List<Graphic> graphicList = new ArrayList<>(1000);
                         for (Object o : result) {
                             if (o instanceof Feature) {
                                 Feature feature = (Feature) o;
@@ -1297,8 +1307,13 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                         new SimpleLineSymbol(Color.RED, 2,
                                                 SimpleLineSymbol.STYLE.SOLID);
                                 Graphic graphic = new Graphic(feature.getGeometry(), symbol);
-                                mMapView.addDrawLayerGraphic(graphic);
+                                graphicList.add(graphic);
+//                                mMapView.addGraphic(graphic);
                             }
+                        }
+                        if (!graphicList.isEmpty()) {
+                            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
+                            mMapView.addGraphics(graphics);
                         }
                     }
 
@@ -1318,7 +1333,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         );
         Geometry geometry = mMapView.getCurrentDrawGraphic().getGeometry();
         Graphic graphic = new Graphic(geometry, lineSymbol);
-        mMapView.addDrawLayerGraphic(graphic);
+        mMapView.setCurrentDrawGraphic(graphic);
     }
 
     private void queryGeometry(List<ReportHandoutListModel> handoutList) {

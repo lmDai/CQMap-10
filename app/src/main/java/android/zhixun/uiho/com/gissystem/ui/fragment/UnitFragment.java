@@ -421,8 +421,13 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
     private void showCompanyMarker(FeatureResult objects, List<CompanyDetailModel> companyList) {
         List<CompanyDetailModel> exitsCompanyList = new ArrayList<>();
+        PictureMarkerSymbol symbol =
+                new PictureMarkerSymbol(getActivity(),
+                        ContextCompat.getDrawable(getActivity(),
+                                R.drawable.ic_location_green));
+
+        List<Graphic> graphicList = new ArrayList<>(1000);
         for (Object object : objects) {
-//            if (object == null) continue;
             for (CompanyDetailModel companyDetailModel : companyList) {
 
                 if (object instanceof Feature) {
@@ -431,10 +436,6 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     if (companyDetailModel.getCompanyId() != unitid)
                         continue;
 
-                    PictureMarkerSymbol symbol =
-                            new PictureMarkerSymbol(getActivity(),
-                                    ContextCompat.getDrawable(getActivity(),
-                                            R.drawable.ic_location_green));
                     Graphic graphic = new Graphic(feature.getGeometry(),
                             symbol, feature.getAttributes());
                     Location location = mMapView.getLocationDisplayManager().getLocation();
@@ -447,12 +448,17 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                         LogUtil.d("distance == " + distance);
                         companyDetailModel.distance = distance;
                     }
-                    mMapView.addDrawLayerGraphic(graphic);
+                    graphicList.add(graphic);
+//                    mMapView.addGraphic(graphic);
                     if (!exitsCompanyList.contains(companyDetailModel)) {
                         exitsCompanyList.add(companyDetailModel);
                     }
                 }
             }
+        }
+        if (!graphicList.isEmpty()) {
+            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
+            mMapView.addGraphics(graphics);
         }
         showBottomLayout(exitsCompanyList);
     }
@@ -597,7 +603,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         );
         Geometry geometry = mMapView.getCurrentDrawGraphic().getGeometry();
         Graphic graphic = new Graphic(geometry, lineSymbol);
-        mMapView.addDrawLayerGraphic(graphic);
+        mMapView.setCurrentDrawGraphic(graphic);
     }
 
     private void searchGeometry(List<CompanyDetailModel> companyList) {

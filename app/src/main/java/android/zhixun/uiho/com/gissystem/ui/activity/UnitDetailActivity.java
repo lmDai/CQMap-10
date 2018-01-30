@@ -161,7 +161,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
                         Graphic graphic = new Graphic(feature.getGeometry(),
                                 symbol, feature.getAttributes());
 
-                        mMapView.addDrawLayerGraphic(graphic);
+                        mMapView.addGraphic(graphic);
                         switch (feature.getGeometry().getType()) {
                             case POINT:
                                 Point point = (Point) feature.getGeometry();

@@ -510,11 +510,11 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         if (response == null || response.isEmpty()) return;
                         mFruitList.clear();
                         mFruitList.addAll(response);
-                        if (mMapView.getCurrentDrawSpace() != BaseMapView.SPACE_NONE) {
-                            queryGeometry(mFruitList);
-                        } else {
-                            searchMapService(mFruitList);
-                        }
+//                        if (mMapView.getCurrentDrawSpace() != BaseMapView.SPACE_NONE) {
+//                            queryGeometry(mFruitList);
+//                        } else {
+                        searchMapService(mFruitList);
+//                        }
                     }
 
                     @Override
@@ -563,7 +563,16 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             url = getString(R.string.polygon_feature_server_url);
         }
         showLoading();
+        if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
+            querySql(mapType, whereClause, url);
+        } else {
+            queryGeometryAndSql(mapType, whereClause, url);
+        }
 
+        dismissLoading();
+    }
+
+    private void querySql(int mapType, String whereClause, String url) {
         mMapView.querySQL(getActivity(), url, whereClause,
                 new BaseMapView.MainThreadCallback<FeatureResult>() {
                     @Override
@@ -575,57 +584,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             return;
                         }
                         showLoading();
-                        Symbol symbol;
-                        if (mapType == 1) {
-                            symbol = new SimpleMarkerSymbol(Color.RED, 20,
-                                    SimpleMarkerSymbol.STYLE.CIRCLE);
-                        } else {
-                            symbol = createSimpleFillSymbol();
-                        }
-                        Graphic graphic;
-                        List<Graphic> graphicList = new ArrayList<>(1000);
-                        for (Object object : result) {
-                            if (object instanceof Feature) {
-                                Feature feature = (Feature) object;
-
-                                graphic = new Graphic(feature.getGeometry(),
-                                        symbol, feature.getAttributes());
-//                                mMapView.addDrawLayerGraphic(graphic);
-                                graphicList.add(graphic);
-                            }
-                        }
-                        Graphic[] graphicArray = graphicList.toArray(new Graphic[graphicList.size()]);
-                        mMapView.addDrawLayerGraphics(graphicArray);
-                        dismissLoading();
-                        //地图单击事件
-                        mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
-                            if (mFruitList.isEmpty()) {
-                                ToastUtil.showShort("分类信息集合为空，请重新获取");
-                                return;
-                            }
-                            int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
-                                    1, 1);
-                            if (ids.length == 0) {
-//                                ToastUtil.showShort("图层为空，请再次点击");
-                                return;
-                            }
-                            GraphicsLayer drawLayer = mMapView.getDrawLayer();
-                            Graphic updateGraphic = drawLayer.getGraphic(ids[0]);
-                            if (updateGraphic == null) return;
-                            drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
-                            double FRUIT_ID = (double) updateGraphic.getAttributeValue("FRUITID");
-                            for (FruitListModel model : mFruitList) {
-                                if (FRUIT_ID != model.fruitId) continue;
-
-                                model.selected = true;
-                                if (mContentRv.getAdapter() != null) {
-                                    int position = mFruitList.indexOf(model);
-                                    mContentRv.getAdapter()
-                                            .notifyItemChanged(position);
-                                    mContentRv.scrollToPosition(position);
-                                }
-                            }
-                        });
+                        showMapSymbol(result, mapType);
                     }
 
                     @Override
@@ -635,7 +594,61 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         ToastUtil.showShort("未获取信息,请重试");
                     }
                 });
+    }
+
+    private void showMapSymbol(FeatureResult result, int mapType) {
+        Symbol symbol;
+        if (mapType == 1) {
+            symbol = new SimpleMarkerSymbol(Color.RED, 20,
+                    SimpleMarkerSymbol.STYLE.CIRCLE);
+        } else {
+            symbol = createSimpleFillSymbol();
+        }
+        Graphic graphic;
+        List<Graphic> graphicList = new ArrayList<>(1000);
+        for (Object object : result) {
+            if (object instanceof Feature) {
+                Feature feature = (Feature) object;
+
+                graphic = new Graphic(feature.getGeometry(),
+                        symbol, feature.getAttributes());
+                graphicList.add(graphic);
+            }
+        }
+        if (!graphicList.isEmpty()) {
+            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
+            mMapView.addGraphics(graphics);
+        }
         dismissLoading();
+        //地图单击事件
+        mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
+            if (mFruitList.isEmpty()) {
+                ToastUtil.showShort("分类信息集合为空，请重新获取");
+                return;
+            }
+            int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
+                    1, 1);
+            if (ids.length == 0) {
+//                                ToastUtil.showShort("图层为空，请再次点击");
+                return;
+            }
+            GraphicsLayer drawLayer = mMapView.getDrawLayer();
+            Graphic updateGraphic = drawLayer.getGraphic(ids[0]);
+            if (updateGraphic == null) return;
+            drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
+            double FRUIT_ID = (double) updateGraphic.getAttributeValue("FRUITID");
+            for (FruitListModel model : mFruitList) {
+                if (FRUIT_ID != model.fruitId) continue;
+
+                model.selected = true;
+                if (mContentRv.getAdapter() != null) {
+                    int position = mFruitList.indexOf(model);
+                    mContentRv.getAdapter()
+                            .notifyItemChanged(position);
+                    mContentRv.scrollToPosition(position);
+                }
+            }
+        });
     }
 
     @NonNull
@@ -1001,12 +1014,18 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             SimpleLineSymbol symbol =
                                     new SimpleLineSymbol(Color.RED, 2,
                                             SimpleLineSymbol.STYLE.SOLID);
+                            List<Graphic> graphicList = new ArrayList<>();
                             for (Object o : result) {
                                 if (o instanceof Feature) {
                                     Feature feature = (Feature) o;
                                     Graphic graphic = new Graphic(feature.getGeometry(), symbol);
-                                    mMapView.addDrawLayerGraphic(graphic);
+                                    graphicList.add(graphic);
+//                                    mMapView.addGraphic(graphic);
                                 }
+                            }
+                            if (!graphicList.isEmpty()) {
+                                Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
+                                mMapView.addGraphics(graphics);
                             }
 
                         }
@@ -1096,7 +1115,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             ToastUtil.showShort(" 未获取到相关信息");
                             return;
                         }
-
+                        List<Graphic> graphicList = new ArrayList<>();
                         for (Object o : result) {
                             if (o instanceof Feature) {
                                 Feature feature = (Feature) o;
@@ -1104,8 +1123,13 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                                         new SimpleLineSymbol(Color.RED, 2,
                                                 SimpleLineSymbol.STYLE.SOLID);
                                 Graphic graphic = new Graphic(feature.getGeometry(), symbol);
-                                mMapView.addDrawLayerGraphic(graphic);
+                                graphicList.add(graphic);
+//                                mMapView.addGraphic(graphic);
                             }
+                        }
+                        if (!graphicList.isEmpty()) {
+                            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
+                            mMapView.addGraphics(graphics);
                         }
                     }
 
@@ -1124,7 +1148,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         );
         Geometry geometry = mMapView.getCurrentDrawGraphic().getGeometry();
         Graphic graphic = new Graphic(geometry, lineSymbol);
-        mMapView.addDrawLayerGraphic(graphic);
+        mMapView.setCurrentDrawGraphic(graphic);
     }
 
     private void queryGeometry(List<FruitListModel> fruitList) {
@@ -1152,6 +1176,30 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             }
                         }
                         searchMapService(selectHandoutList);
+                    }
+
+                    @Override
+                    public void onError(Throwable throwable) {
+                        ToastUtil.showShort("暂无数据");
+                        dismissLoading();
+                        restoreSpaceStatus();
+                    }
+                });
+    }
+
+    private void queryGeometryAndSql(int mapType, String whereClause, String url) {
+        showLoading();
+        mMapView.queryGeometryAndSql(getActivity(), url, whereClause,
+                new BaseMapView.MainThreadCallback<FeatureResult>() {
+                    @Override
+                    public void onCallback(FeatureResult objects) {
+                        dismissLoading();
+                        restoreSpaceStatus();
+                        if (objects.featureCount() == 0) {
+                            ToastUtil.showShort("未查询到相关信息");
+                            return;
+                        }
+                        showMapSymbol(objects,mapType);
                     }
 
                     @Override
