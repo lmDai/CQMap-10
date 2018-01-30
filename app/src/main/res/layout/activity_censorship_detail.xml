@@ -41,6 +41,11 @@
                 tools:text="重庆市规划局" />
         </RelativeLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/gray" />
+
         <RelativeLayout
             android:id="@+id/relativeLayout2"
             android:layout_width="match_parent"
@@ -251,6 +256,10 @@
                 tools:text="2016-11-28" />
         </RelativeLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/gray" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView1"
@@ -262,6 +271,7 @@
         </android.support.v7.widget.RecyclerView>
 
         <RelativeLayout
+            android:id="@+id/rl_item_jcqk"
             android:layout_width="match_parent"
             android:layout_height="40dp">
 
@@ -293,8 +303,8 @@
             android:id="@+id/ll_JCQK"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
+            android:orientation="vertical"
+            tools:visibility="gone">
 
             <View
                 android:layout_width="match_parent"
@@ -870,404 +880,452 @@
                     android:textColor="#666666"
                     android:textSize="12sp" />
             </RelativeLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:background="@color/gray" />
         </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginTop="8dp"
-            android:background="#FFFFFF"
-            android:gravity="center_vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:text="整改建议"
-            android:textColor="#333333"
-            android:textSize="14sp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="@color/colorDivider" />
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout8"
-            android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#FFFFFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-
-            <TextView
-                android:id="@+id/tv_suggest1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="(一) 是否需要进一步健全保密制度"
-                android:textColor="#666666"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_suggest1_state"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:ellipsize="end"
-                android:lines="1"
-                android:text="未选择"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:layout_marginLeft="16dp"
-            android:background="@color/colorDivider" />
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout9"
-            android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#FFFFFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-
-            <TextView
-                android:id="@+id/tv_suggest2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="(二) 是否需要进一步健全保密结构"
-                android:textColor="#666666"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_suggest2_state"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:ellipsize="end"
-                android:lines="1"
-                android:text="未选择"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:layout_marginLeft="16dp"
-            android:background="@color/colorDivider" />
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout10"
-            android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#FFFFFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-
-            <TextView
-                android:id="@+id/tv_suggest3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="(三) 是否需要进一步落实保密措施"
-                android:textColor="#666666"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_suggest3_state"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:ellipsize="end"
-                android:lines="1"
-                android:text="未选择"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:layout_marginLeft="16dp"
-            android:background="@color/colorDivider" />
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout11"
-            android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#FFFFFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-
-            <TextView
-                android:id="@+id/tv_suggest4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="(四) 核心涉密人员是否需要参加培训"
-                android:textColor="#666666"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_suggest4_state"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:ellipsize="end"
-                android:lines="1"
-                android:text="未选择"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:layout_marginLeft="16dp"
-            android:background="@color/colorDivider" />
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout12"
-            android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#FFFFFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-
-            <TextView
-                android:id="@+id/tv_suggest5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="(五) 是否需要进一步开展全员培训"
-                android:textColor="#666666"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_suggest5_state"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:ellipsize="end"
-                android:lines="1"
-                android:text="未选择"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:layout_marginLeft="16dp"
-            android:background="@color/colorDivider" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#FFFFFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/tv_otherZGIdea"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="其他整改意见："
-                android:textColor="#666666"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_otherZGIdea_content"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:layout_toRightOf="@+id/tv_otherZGIdea"
-                android:textColor="#666666"
-                android:textSize="12sp" />
-
-        </RelativeLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="10dp"
             android:background="@color/gray" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginTop="8dp"
-            android:gravity="center_vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:text="领导意见"
-            android:textColor="#333333"
-            android:textSize="14sp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:background="@color/colorDivider" />
-
         <RelativeLayout
-            android:id="@+id/relativeLayout13"
+            android:id="@+id/rl_zgyj"
             android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#FFFFFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/tv_suggest6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="是否检查通过 "
-                android:textColor="#666666"
-                android:textSize="12sp" />
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="8dp"
+                android:background="#FFFFFF"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="整改建议"
+                android:textColor="#333333"
+                android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/tv_suggest6_state"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/arrow_zgyj"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:ellipsize="end"
-                android:lines="1"
-                android:text="未选择"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:layout_marginRight="10dp"
+                android:src="@mipmap/arrow_down" />
         </RelativeLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:layout_marginLeft="16dp"
             android:background="@color/colorDivider" />
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout14"
+        <LinearLayout
+            android:id="@+id/ll_zgyj"
             android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#FFFFFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/relativeLayout8"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/tv_suggest1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="(一) 是否需要进一步健全保密制度"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_suggest1_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="未选择"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="16dp"
+                android:background="@color/colorDivider" />
+
+            <RelativeLayout
+                android:id="@+id/relativeLayout9"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/tv_suggest2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="(二) 是否需要进一步健全保密结构"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_suggest2_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="未选择"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="16dp"
+                android:background="@color/colorDivider" />
+
+            <RelativeLayout
+                android:id="@+id/relativeLayout10"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/tv_suggest3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="(三) 是否需要进一步落实保密措施"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_suggest3_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="未选择"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="16dp"
+                android:background="@color/colorDivider" />
+
+            <RelativeLayout
+                android:id="@+id/relativeLayout11"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/tv_suggest4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="(四) 核心涉密人员是否需要参加培训"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_suggest4_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="未选择"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="16dp"
+                android:background="@color/colorDivider" />
+
+            <RelativeLayout
+                android:id="@+id/relativeLayout12"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/tv_suggest5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="(五) 是否需要进一步开展全员培训"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_suggest5_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="未选择"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="16dp"
+                android:background="@color/colorDivider" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_otherZGIdea"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="其他整改意见："
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_otherZGIdea_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:layout_toRightOf="@+id/tv_otherZGIdea"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/gray" />
+
+        <RelativeLayout
+            android:id="@+id/rl_ldyj"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/tv_suggest7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="领导是否签字确认"
-                android:textColor="#666666"
-                android:textSize="12sp" />
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="8dp"
+                android:background="#FFFFFF"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="领导意见"
+                android:textColor="#333333"
+                android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/tv_suggest7_state"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/arrow_ldyj"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:ellipsize="end"
-                android:lines="1"
-                android:text="未选择"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:layout_marginRight="10dp"
+                android:src="@mipmap/arrow_down" />
         </RelativeLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:layout_marginLeft="16dp"
             android:background="@color/colorDivider" />
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout15"
+        <LinearLayout
+            android:id="@+id/ll_ldyj"
             android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#FFFFFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:orientation="vertical"
+            tools:visibility="gone"
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tv_suggest8_one"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="意见内容:"
-                android:textColor="#666666"
-                android:textSize="12sp" />
+            <RelativeLayout
+                android:id="@+id/relativeLayout13"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
 
-            <TextView
-                android:id="@+id/tv_suggest8"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:layout_toRightOf="@+id/tv_suggest8_one"
-                android:textColor="#666666"
-                android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/tv_suggest6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="是否检查通过 "
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
 
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/tv_suggest6_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="未选择"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            android:layout_marginLeft="16dp"
-            android:background="@color/colorDivider" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="16dp"
+                android:background="@color/colorDivider" />
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout16"
-            android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#FFFFFF"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            <RelativeLayout
+                android:id="@+id/relativeLayout14"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
 
-            <TextView
-                android:id="@+id/tv_suggest9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="被检单位是否签字确认"
-                android:textColor="#666666"
-                android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/tv_suggest7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="领导是否签字确认"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/tv_suggest9_state"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:ellipsize="end"
-                android:lines="1"
-                android:text="未选择"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
-        </RelativeLayout>
+                <TextView
+                    android:id="@+id/tv_suggest7_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="未选择"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="16dp"
+                android:background="@color/colorDivider" />
+
+            <RelativeLayout
+                android:id="@+id/relativeLayout15"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/tv_suggest8_one"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="意见内容:"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_suggest8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:layout_toRightOf="@+id/tv_suggest8_one"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginLeft="16dp"
+                android:background="@color/colorDivider" />
+
+            <RelativeLayout
+                android:id="@+id/relativeLayout16"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:background="#FFFFFF"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+
+                <TextView
+                    android:id="@+id/tv_suggest9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="被检单位是否签字确认"
+                    android:textColor="#666666"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_suggest9_state"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="未选择"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
@@ -1321,9 +1379,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="34dp"
+            android:gravity="center_vertical"
             android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:gravity="center_vertical">
+            android:paddingRight="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -1334,8 +1392,7 @@
                 android:id="@+id/tv_submitter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                />
+                android:layout_marginLeft="10dp" />
 
         </LinearLayout>
 
@@ -1348,9 +1405,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="34dp"
+            android:gravity="center_vertical"
             android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:gravity="center_vertical">
+            android:paddingRight="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -1361,8 +1418,7 @@
                 android:id="@+id/tv_submit_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                />
+                android:layout_marginLeft="10dp" />
 
         </LinearLayout>
 

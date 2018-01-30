@@ -136,9 +136,10 @@ public class CensorshipDetailActivity extends BaseActivityWithTitle {
             }
         });
 
+        View view_jcqk = findViewById(R.id.rl_item_jcqk);
         arrowJCQK = (ImageView) findViewById(R.id.arrow_JCQK);
         llJCQK = (LinearLayout) findViewById(R.id.ll_JCQK);
-        arrowJCQK.setOnClickListener(view -> {
+        view_jcqk.setOnClickListener(view -> {
             if (llJCQK.getVisibility() == View.VISIBLE) {
                 llJCQK.setVisibility(View.GONE);
                 arrowJCQK.setImageResource(R.drawable.ic_arrow_up);
@@ -147,6 +148,33 @@ public class CensorshipDetailActivity extends BaseActivityWithTitle {
                 arrowJCQK.setImageResource(R.mipmap.arrow_down);
             }
         });
+
+        View view_zgyj = findViewById(R.id.rl_zgyj);
+        ImageView ivArrow_zgyj = findViewById(R.id.arrow_zgyj);
+        View ll_zgyj = findViewById(R.id.ll_zgyj);
+        view_zgyj.setOnClickListener(view -> {
+            if (ll_zgyj.getVisibility() == View.VISIBLE) {
+                ll_zgyj.setVisibility(View.GONE);
+                ivArrow_zgyj.setImageResource(R.drawable.ic_arrow_up);
+            } else {
+                ll_zgyj.setVisibility(View.VISIBLE);
+                ivArrow_zgyj.setImageResource(R.mipmap.arrow_down);
+            }
+        });
+
+        View rl_ldyj = findViewById(R.id.rl_ldyj);
+        ImageView ivArrow_ldyi = findViewById(R.id.arrow_ldyj);
+        View ll_ldyj = findViewById(R.id.ll_ldyj);
+        rl_ldyj.setOnClickListener(view -> {
+            if (ll_ldyj.getVisibility() == View.VISIBLE) {
+                ll_ldyj.setVisibility(View.GONE);
+                ivArrow_ldyi.setImageResource(R.drawable.ic_arrow_up);
+            } else {
+                ll_ldyj.setVisibility(View.VISIBLE);
+                ivArrow_ldyi.setImageResource(R.mipmap.arrow_down);
+            }
+        });
+
         if (mCompanyDetailByCheckedModel.getSecrecyPersonList() != null) {
             for (SecrecyPersonListModel secrecyPersonListModel : mCompanyDetailByCheckedModel.getSecrecyPersonList()) {
                 CJname.add(secrecyPersonListModel.getName());
