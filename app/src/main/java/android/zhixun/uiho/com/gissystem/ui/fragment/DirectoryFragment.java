@@ -54,9 +54,9 @@ import com.esri.core.geometry.Polygon;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
+import com.esri.core.symbol.PictureMarkerSymbol;
 import com.esri.core.symbol.SimpleFillSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
-import com.esri.core.symbol.SimpleMarkerSymbol;
 import com.esri.core.symbol.Symbol;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
@@ -607,8 +607,8 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private void showMapSymbol(FeatureResult result, int mapType) {
         Symbol symbol;
         if (mapType == 1) {
-            symbol = new SimpleMarkerSymbol(Color.RED, 20,
-                    SimpleMarkerSymbol.STYLE.CIRCLE);
+            symbol = new PictureMarkerSymbol(getActivity(),
+                    ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_green));
         } else {
             symbol = createSimpleFillSymbol();
         }
@@ -629,7 +629,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         }
         dismissLoading();
         //地图单击事件
-        mMapView.setOnSingleTapListener((OnSingleTapListener) (x, y) -> {
+        mMapView.setOnSingleTapListener((OnSingleTapListener) (float x, float y) -> {
             if (mFruitList.isEmpty()) {
                 ToastUtil.showShort("分类信息集合为空，请重新获取");
                 return;
@@ -642,9 +642,18 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             }
             GraphicsLayer drawLayer = mMapView.getDrawLayer();
             Graphic updateGraphic = drawLayer.getGraphic(ids[0]);
+            Symbol updateSymbol;
             if (updateGraphic == null) return;
-            drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
-            long FRUIT_ID = ((Double) updateGraphic.getAttributeValue("FRUITID")).longValue();
+            long FRUIT_ID;
+            if (mMapType == 1) {
+                updateSymbol = new PictureMarkerSymbol(getActivity(),
+                        ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red));
+                FRUIT_ID = ((Integer) updateGraphic.getAttributeValue("FRUITID"));
+            } else {
+                updateSymbol = new SimpleFillSymbol(Color.RED);
+                FRUIT_ID = ((Double) updateGraphic.getAttributeValue("FRUITID")).longValue();
+            }
+            drawLayer.updateGraphic(ids[0], updateSymbol);
             for (FruitListModel model : mFruitList) {
                 if (FRUIT_ID != model.fruitId) continue;
 
@@ -769,9 +778,19 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                 for (int id : graphicIDs) {
                     Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
                     if (graphic == null) continue;
-                    long attributeValue = ((Double) graphic.getAttributeValue(FRUITID)).longValue();
+                    long attributeValue;
+                    Symbol updateSymbol;
+                    if (mMapType == 1) {
+                        updateSymbol = new PictureMarkerSymbol(getActivity(),
+                                ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red));
+                        attributeValue = ((Integer) graphic.getAttributeValue(FRUITID)).longValue();
+                    } else {
+                        updateSymbol = new SimpleFillSymbol(Color.RED);
+                        attributeValue = ((Double) graphic.getAttributeValue(FRUITID)).longValue();
+                    }
+
                     if (fruitId != attributeValue) continue;
-                    mMapView.getDrawLayer().updateGraphic(id, new SimpleFillSymbol(Color.RED));
+                    mMapView.getDrawLayer().updateGraphic(id, updateSymbol);
                     if (graphic.getGeometry() == null) continue;
                     switch (graphic.getGeometry().getType()) {
                         case ENVELOPE:
@@ -1159,41 +1178,41 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         mMapView.setCurrentDrawGraphic(graphic);
     }
 
-    private void queryGeometry(List<FruitListModel> fruitList) {
-        showLoading();
-        String url = getString(R.string.polygon_feature_server_url);
-        mMapView.queryGeometry(getActivity(), url,
-                new BaseMapView.MainThreadCallback<FeatureResult>() {
-                    @Override
-                    public void onCallback(FeatureResult objects) {
-                        dismissLoading();
-                        restoreSpaceStatus();
-                        if (objects.featureCount() == 0) {
-                            ToastUtil.showShort("未查询到相关信息");
-                            return;
-                        }
-                        List<FruitListModel> selectHandoutList = new ArrayList<>();
-                        for (Object object : objects) {
-                            if (object instanceof Feature) {
-                                Feature feature = (Feature) object;
-                                double FRUIT_ID = (double) feature.getAttributeValue(FRUITID);
-                                for (FruitListModel model : fruitList) {
-                                    if (FRUIT_ID != model.fruitId) continue;
-                                    selectHandoutList.add(model);
-                                }
-                            }
-                        }
-                        searchMapService(selectHandoutList);
-                    }
-
-                    @Override
-                    public void onError(Throwable throwable) {
-                        ToastUtil.showShort("暂无数据");
-                        dismissLoading();
-                        restoreSpaceStatus();
-                    }
-                });
-    }
+//    private void queryGeometry(List<FruitListModel> fruitList) {
+//        showLoading();
+//        String url = getString(R.string.polygon_feature_server_url);
+//        mMapView.queryGeometry(getActivity(), url,
+//                new BaseMapView.MainThreadCallback<FeatureResult>() {
+//                    @Override
+//                    public void onCallback(FeatureResult objects) {
+//                        dismissLoading();
+//                        restoreSpaceStatus();
+//                        if (objects.featureCount() == 0) {
+//                            ToastUtil.showShort("未查询到相关信息");
+//                            return;
+//                        }
+//                        List<FruitListModel> selectHandoutList = new ArrayList<>();
+//                        for (Object object : objects) {
+//                            if (object instanceof Feature) {
+//                                Feature feature = (Feature) object;
+//                                double FRUIT_ID = (double) feature.getAttributeValue(FRUITID);
+//                                for (FruitListModel model : fruitList) {
+//                                    if (FRUIT_ID != model.fruitId) continue;
+//                                    selectHandoutList.add(model);
+//                                }
+//                            }
+//                        }
+//                        searchMapService(selectHandoutList);
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable throwable) {
+//                        ToastUtil.showShort("暂无数据");
+//                        dismissLoading();
+//                        restoreSpaceStatus();
+//                    }
+//                });
+//    }
 
     private void queryGeometryAndSql(int mapType, String whereClause, String url) {
         showLoading();
@@ -1254,6 +1273,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         }
                         mClassifyTypeList.clear();
                         mClassifyTypeList.addAll(response);
+                        mMapType = response.get(0).mapType;
                         getClassifyTypeBelow(response.get(0).fruitCategoryId);
                     }
 
@@ -1278,7 +1298,6 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                                 }
                                 mFirstClassifyTypeBelowList.clear();
                                 mFirstClassifyTypeBelowList.addAll(response);
-
                             }
                         });
     }
