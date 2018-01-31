@@ -257,8 +257,8 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
     }
 
-    public void queryGeometryAndSql(Activity act, String url,String where,
-                              MainThreadCallback<FeatureResult> callback) {
+    public void queryGeometryAndSql(Activity act, String url, String where,
+                                    MainThreadCallback<FeatureResult> callback) {
         QueryParameters query = new QueryParameters();
         query.setGeometry(currentDrawGraphic.getGeometry());
         query.setWhere(where);
@@ -319,7 +319,9 @@ public class BaseMapView extends MapView implements DrawEventListener {
         }
     };
 
-    public void centerAtGraphic(Graphic graphic){
+    public void centerAtGraphic(Graphic graphic) {
+        if (graphic.getGeometry() == null)
+            return;
         switch (graphic.getGeometry().getType()) {
             case ENVELOPE:
                 Envelope envelope = (Envelope) graphic.getGeometry();

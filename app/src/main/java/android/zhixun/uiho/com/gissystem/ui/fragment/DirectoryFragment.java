@@ -47,10 +47,7 @@ import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
 import com.alibaba.fastjson.JSON;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.event.OnSingleTapListener;
-import com.esri.core.geometry.Envelope;
 import com.esri.core.geometry.Geometry;
-import com.esri.core.geometry.Point;
-import com.esri.core.geometry.Polygon;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
@@ -523,6 +520,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         if (response == null || response.isEmpty()) return;
                         mFruitList.clear();
                         mFruitList.addAll(response);
+//                        showBottomLayout(mFruitList);
                         searchMapService(mFruitList);
                     }
 
@@ -538,7 +536,6 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private void searchMapService(List<FruitListModel> fruitList) {
         if (fruitList.isEmpty()) return;
         showLoading();
-        showBottomLayout(fruitList);
         StringBuilder sb = new StringBuilder();
         sb.append("FRUITID");
         sb.append(" in ");
@@ -573,6 +570,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         }
         showLoading();
         if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
+            showBottomLayout(mFruitList);
             querySql(mapType, whereClause, url);
         } else {
             switch (mMapView.getCurrentDrawSpace()) {
@@ -598,6 +596,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             return;
                         }
                         showMapSymbol(result, mapType);
+
                     }
 
                     @Override
@@ -622,7 +621,6 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         for (Object object : result) {
             if (object instanceof Feature) {
                 Feature feature = (Feature) object;
-
                 graphic = new Graphic(feature.getGeometry(),
                         symbol, feature.getAttributes());
                 graphicList.add(graphic);
@@ -642,7 +640,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             }
             int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
                     1, 1);
-            if (ids == null ||ids.length == 0) {
+            if (ids == null || ids.length == 0) {
 //                                ToastUtil.showShort("图层为空，请再次点击");
                 return;
             }
@@ -798,22 +796,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                     if (fruitId != attributeValue) continue;
                     mMapView.getDrawLayer().updateGraphic(id, updateSymbol);
                     if (graphic.getGeometry() == null) continue;
-                    switch (graphic.getGeometry().getType()) {
-                        case ENVELOPE:
-                            Envelope envelope = (Envelope) graphic.getGeometry();
-                            mMapView.centerAt(envelope.getCenter(), true);
-                            break;
-                        case POLYGON:
-                            Polygon polygon = (Polygon) graphic.getGeometry();
-                            int pointCount = polygon.getPointCount();
-                            Point point = polygon.getPoint(1);
-                            mMapView.centerAt(point, true);
-                            break;
-                        case POINT:
-                            Point point1 = (Point) graphic.getGeometry();
-                            mMapView.centerAt(point1, true);
-                            break;
-                    }
+                    mMapView.centerAtGraphic(graphic);
                     fruitList.get(position).selected = true;
                     adapter.notifyItemChanged(position);
                 }
@@ -1218,14 +1201,15 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         mMapView.queryGeometryAndSql(getActivity(), url, whereClause,
                 new BaseMapView.MainThreadCallback<FeatureResult>() {
                     @Override
-                    public void onCallback(FeatureResult objects) {
+                    public void onCallback(FeatureResult result) {
                         dismissLoading();
                         restoreSpaceStatus();
-                        if (objects.featureCount() == 0) {
+                        if (result.featureCount() == 0) {
                             ToastUtil.showShort("未查询到相关信息");
                             return;
                         }
-                        showMapSymbol(objects, mapType);
+                        showMapSymbol(result, mapType);
+                        filterDataWithSymbol(result, mapType);
                     }
 
                     @Override
@@ -1235,6 +1219,26 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         restoreSpaceStatus();
                     }
                 });
+    }
+
+    private void filterDataWithSymbol(FeatureResult result, int mapType) {
+        List<FruitListModel> filterList = new ArrayList<>();
+        for (FruitListModel model : mFruitList) {
+            for (Object o : result) {
+                if (o instanceof Feature) {
+                    Feature feature = (Feature) o;
+                    long fruitIdValue;
+                    if (mapType == 1) {
+                        fruitIdValue = (Integer) feature.getAttributeValue(FRUITID);
+                    } else {
+                        fruitIdValue = ((Double) feature.getAttributeValue(FRUITID)).longValue();
+                    }
+                    if (fruitIdValue != model.fruitId) continue;
+                    filterList.add(model);
+                }
+            }
+        }
+        showBottomLayout(filterList);
     }
 
     private void restoreSpaceStatus() {
