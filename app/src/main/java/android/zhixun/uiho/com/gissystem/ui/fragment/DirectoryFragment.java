@@ -597,7 +597,6 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             restoreAll();
                             return;
                         }
-                        showLoading();
                         showMapSymbol(result, mapType);
                     }
 
@@ -632,6 +631,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         if (!graphicList.isEmpty()) {
             Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
             mMapView.addGraphics(graphics);
+            mMapView.centerAtGraphic(graphicList.get(0));
         }
         dismissLoading();
         //地图单击事件
@@ -642,7 +642,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             }
             int[] ids = mMapView.getDrawLayer().getGraphicIDs(x, y,
                     1, 1);
-            if (ids.length == 0) {
+            if (ids == null ||ids.length == 0) {
 //                                ToastUtil.showShort("图层为空，请再次点击");
                 return;
             }

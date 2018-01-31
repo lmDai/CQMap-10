@@ -274,6 +274,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     private int zcdLastPosition = 0;
     private int lbLastPosition = 0;
 
+    //显示过滤dialog
     private void showSiftDialog(View view) {
         View contentView = LayoutInflater
                 .from(getActivity())
@@ -467,7 +468,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         GraphicsLayer drawLayer = mMapView.getDrawLayer();
         int[] ids = drawLayer.getGraphicIDs(x, y,
                 1, 1);
-        if (ids.length == 0)
+        if (ids == null || ids.length == 0)
             return;
         Graphic graphic = drawLayer.getGraphic(ids[0]);
         if (graphic == null)
@@ -514,7 +515,9 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
             switch (view.getId()) {
                 case R.id.rl_location:
                     int companyId = companyList.get(position).getCompanyId();
-                    for (int id : mMapView.getDrawLayer().getGraphicIDs()) {
+                    int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
+                    if (graphicIDs == null || graphicIDs.length == 0) return;
+                    for (int id : graphicIDs) {
                         Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
                         int unit_id = (int) graphic.getAttributeValue("UNITID");
                         if (companyId != unit_id) continue;
