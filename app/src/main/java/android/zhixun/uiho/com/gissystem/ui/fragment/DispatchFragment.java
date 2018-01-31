@@ -1007,7 +1007,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 break;
                             case POLYGON:
                                 Polygon polygon = (Polygon) graphic.getGeometry();
-//                                int pointCount = polygon.getPointCount();
                                 Point point = polygon.getPoint(1);
                                 mMapView.centerAt(point, true);
                                 break;
@@ -1214,7 +1213,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     private void showMapNumberDialog() {
         new SimpleAlertDialog(getActivity())
                 .title("图幅号查询")
-                .message("可输入多个图幅号，图幅号直接用空格或逗号分隔如\n'G49E005001 G49E005002'\n或\n'G49E005001,G49E005002'")
+                .message("可输入多个图幅号，图幅号直接用空格或逗号分隔如\n'H49E005001 H49E005002'\n或\n'H49E005001,H49E005002'")
                 .setOkOnClickListener(R.string.alert_ok, (dialog1, view) -> {
                     String text = dialog1.getEditText().getText().toString();
                     if (TextUtils.isEmpty(text)) {
@@ -1246,40 +1245,39 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
             }
             text = sb.substring(0, sb.lastIndexOf(","));
         }
+
         for (int i = 0; i < 7; i++) {
-            String url = String.format("http://ddk.digitalcq.com:6080/arcgis/rest/" +
-                    "services/CQGRID_2000/Mapserver/%s", i);
-            String where = String.format("1=1 and 新图号 in (%s)", text);
+            String url = String.format("http://ddk.digitalcq.com:6080/arcgis/rest/services/CQGRID_2000/Mapserver/%s/query", i);
+            String where = String.format("1=1 and 新图号 in ('%s')", text);
             showLoading();
             mMapView.querySQL(getActivity(), url, where,
                     new BaseMapView.MainThreadCallback<FeatureResult>() {
                         @Override
                         public void onCallback(FeatureResult result) {
                             dismissLoading();
-                            if (result.featureCount() == 0) {
-                                return;
+                            if (result.featureCount() == 0) return;
+                            Symbol symbol;
+                            if (mMapType == 1) {
+                                symbol = new PictureMarkerSymbol(getActivity(),
+                                        ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_green));
+                            } else {
+                                symbol = new SimpleLineSymbol(Color.RED, 2,
+                                        SimpleLineSymbol.STYLE.SOLID);
                             }
-                            SimpleLineSymbol symbol =
-                                    new SimpleLineSymbol(Color.RED, 2,
-                                            SimpleLineSymbol.STYLE.SOLID);
-                            List<Graphic> graphicList = new ArrayList<>(1000);
+
                             for (Object o : result) {
                                 if (o instanceof Feature) {
                                     Feature feature = (Feature) o;
                                     Graphic graphic = new Graphic(feature.getGeometry(), symbol);
-                                    graphicList.add(graphic);
+                                    mMapView.setCurrentDrawGraphic(graphic);
+                                    mMapView.centerAtGraphic(graphic);
                                 }
-                            }
-                            if (!graphicList.isEmpty()) {
-                                Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
-                                mMapView.addGraphics(graphics);
                             }
                         }
 
                         @Override
                         public void onError(Throwable e) {
                             dismissLoading();
-                            ToastUtil.showShort(e.getMessage());
                         }
                     });
         }

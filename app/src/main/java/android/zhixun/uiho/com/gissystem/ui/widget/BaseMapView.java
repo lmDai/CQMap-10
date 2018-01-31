@@ -17,6 +17,9 @@ import com.esri.android.map.LocationDisplayManager;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
 import com.esri.android.map.event.OnStatusChangedListener;
+import com.esri.core.geometry.Envelope;
+import com.esri.core.geometry.Point;
+import com.esri.core.geometry.Polygon;
 import com.esri.core.map.CallbackListener;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
@@ -232,9 +235,9 @@ public class BaseMapView extends MapView implements DrawEventListener {
         query.setOutFields(new String[]{"*"});
         query.setReturnGeometry(true);
         query.setWhere(where);
-//        query.setReturnIdsOnly(false);
-//        query.setReturnZ(false);
-//        query.setReturnM(false);
+        query.setReturnIdsOnly(false);
+        query.setReturnZ(false);
+        query.setReturnM(false);
         QueryTask qTask = new QueryTask(url);
         qTask.execute(query, new CallbackListener<FeatureResult>() {
             @Override
@@ -315,4 +318,22 @@ public class BaseMapView extends MapView implements DrawEventListener {
             }
         }
     };
+
+    public void centerAtGraphic(Graphic graphic){
+        switch (graphic.getGeometry().getType()) {
+            case ENVELOPE:
+                Envelope envelope = (Envelope) graphic.getGeometry();
+                this.centerAt(envelope.getCenter(), true);
+                break;
+            case POLYGON:
+                Polygon polygon = (Polygon) graphic.getGeometry();
+                Point point = polygon.getPoint(1);
+                this.centerAt(point, true);
+                break;
+            case POINT:
+                Point point1 = (Point) graphic.getGeometry();
+                this.centerAt(point1, true);
+                break;
+        }
+    }
 }
