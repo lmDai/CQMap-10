@@ -575,7 +575,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         searchType(mMapType, whereClause);
     }
 
-    private void searchMapServiceWithFruitList(List<ReportHandoutListModel.FruitCategoryList.FruitList>
+    private void searchMapServiceWithFruitList(int mapType,
+                                               List<ReportHandoutListModel.FruitCategoryList.FruitList>
                                                        fruitLists) {
         if (fruitLists.isEmpty()) return;
         StringBuilder sb = new StringBuilder();
@@ -591,7 +592,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         }
 
         String whereClause = sb.substring(0, sb.lastIndexOf(",")) + ")";
-        searchType(mMapType, whereClause);
+        searchType(mapType, whereClause);
     }
 
     private void searchType(int mapType, String whereClause) {
@@ -1001,7 +1002,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         List<ReportHandoutListModel.FruitCategoryList.FruitList> modes
                                 = new ArrayList<>();
                         modes.add(fruitList);
-                        searchMapServiceWithFruitList(modes);
+                        searchMapServiceWithFruitList(fruitCategory.mapType, modes);
                     } else {
                         int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
                         if (graphicIDs == null || graphicIDs.length == 0) return;
