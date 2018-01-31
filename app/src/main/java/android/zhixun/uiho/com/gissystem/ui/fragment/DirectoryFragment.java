@@ -575,6 +575,11 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
             querySql(mapType, whereClause, url);
         } else {
+            switch (mMapView.getCurrentDrawSpace()) {
+                case BaseMapView.SPACE_POLYGON:
+                    setPolygon();
+                    break;
+            }
             queryGeometryAndSql(mapType, whereClause, url);
         }
 
@@ -1158,6 +1163,8 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                     @Override
                     public void onError(Throwable e) {
                         dismissLoading();
+                        ToastUtil.showShort(" 未获取到相关信息,请重试");
+                        restoreAll();
                     }
                 });
     }

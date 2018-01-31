@@ -591,6 +591,11 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
             querySql(mapType, whereClause, url);
         } else {
+            switch (mMapView.getCurrentDrawSpace()) {
+                case BaseMapView.SPACE_POLYGON:
+                    setPolygon();
+                    break;
+            }
             queryGeometryAndSql(mapType, url, whereClause);
         }
         dismissLoading();
@@ -1374,7 +1379,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     @Override
                     public void onError(Throwable e) {
                         dismissLoading();
-                        ToastUtil.showShort(e.getMessage());
+                        ToastUtil.showShort(" 未获取到相关信息,请重试");
+                        restoreAll();
                     }
                 });
     }
