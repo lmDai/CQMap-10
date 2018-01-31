@@ -1143,7 +1143,6 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             ToastUtil.showShort(" 未获取到相关信息");
                             return;
                         }
-                        List<Graphic> graphicList = new ArrayList<>();
                         for (Object o : result) {
                             if (o instanceof Feature) {
                                 Feature feature = (Feature) o;
@@ -1151,13 +1150,8 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                                         new SimpleLineSymbol(Color.RED, 2,
                                                 SimpleLineSymbol.STYLE.SOLID);
                                 Graphic graphic = new Graphic(feature.getGeometry(), symbol);
-                                graphicList.add(graphic);
-//                                mMapView.addGraphic(graphic);
+                                mMapView.setCurrentDrawGraphic(graphic);
                             }
-                        }
-                        if (!graphicList.isEmpty()) {
-                            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
-                            mMapView.addGraphics(graphics);
                         }
                     }
 

@@ -222,6 +222,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 mBody = null;
                 restoreAll();
                 showSearchTextView();
+                mMapType = 0;
                 break;
         }
     }
@@ -1261,7 +1262,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                 if (o instanceof Feature) {
                                     Feature feature = (Feature) o;
                                     Graphic graphic = new Graphic(feature.getGeometry(), symbol);
-//                                    mMapView.addGraphic(graphic);
                                     graphicList.add(graphic);
                                 }
                             }
@@ -1358,7 +1358,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                             ToastUtil.showShort(" 未获取到相关信息");
                             return;
                         }
-                        List<Graphic> graphicList = new ArrayList<>(1000);
                         for (Object o : result) {
                             if (o instanceof Feature) {
                                 Feature feature = (Feature) o;
@@ -1366,13 +1365,10 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                         new SimpleLineSymbol(Color.RED, 2,
                                                 SimpleLineSymbol.STYLE.SOLID);
                                 Graphic graphic = new Graphic(feature.getGeometry(), symbol);
-                                graphicList.add(graphic);
+                                mMapView.setCurrentDrawGraphic(graphic);
                             }
                         }
-                        if (!graphicList.isEmpty()) {
-                            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
-                            mMapView.addGraphics(graphics);
-                        }
+
                     }
 
                     @Override
