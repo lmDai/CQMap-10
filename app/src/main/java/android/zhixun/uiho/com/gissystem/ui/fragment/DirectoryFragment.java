@@ -300,6 +300,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         }
                         mClassifyTypeList.clear();
                         mClassifyTypeList.addAll(response);
+                        mMapType = mClassifyTypeList.get(0).mapType;
                         bindViewClassify(view, mClassifyTypeList);
                     }
 
