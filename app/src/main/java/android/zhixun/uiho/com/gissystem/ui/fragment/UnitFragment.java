@@ -221,7 +221,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
             case R.id.tv_search:
                 String searchStr = mEtSearch.getText().toString();
                 if (TextUtils.isEmpty(searchStr)) {
-                    ToastUtil.showShort("请输入单位名称或组织机构代码后再搜索");
+                    ToastUtil.showShort("请输入单位名称或统一社会信用代码后再搜索");
                     return;
                 }
                 getCompanyList(searchStr, -1, -1);

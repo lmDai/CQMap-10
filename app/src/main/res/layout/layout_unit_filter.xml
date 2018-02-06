@@ -15,7 +15,7 @@
         android:layout_height="36dp"
         android:background="#FFFFFF"
         android:gravity="center_vertical"
-        android:text="单位名称/组织机构代码"
+        android:text="单位名称/统一社会信用代码"
         android:textColor="@color/colorPrimary"
         android:textSize="14sp" />
 
@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="32dp"
         android:background="#DDDDDD"
-        android:hint="请输入单位名称或组织机构代码"
+        android:hint="请输入单位名称或统一社会信用代码"
         android:imeOptions="actionDone"
         android:maxLines="1"
         android:paddingLeft="8dp"

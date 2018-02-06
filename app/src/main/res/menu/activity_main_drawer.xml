@@ -9,7 +9,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/menu_resultDeclareMessage"
-            android:title="成果申报消息" />
+            android:title="成果申请消息" />
 
         <item
             android:id="@+id/menu_prepareCheckMessage"

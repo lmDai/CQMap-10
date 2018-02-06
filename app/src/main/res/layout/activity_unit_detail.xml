@@ -342,6 +342,12 @@
                 tools:text="40000" />
         </LinearLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="16dp"
+            android:background="#F5F5F5" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="34dp"
