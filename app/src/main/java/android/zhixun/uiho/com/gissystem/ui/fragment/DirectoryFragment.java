@@ -840,7 +840,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private void showFruitInfoDialog(String fruitId) {
         showLoading();
         APIService.getInstance()
-                .getHandoutFruit(fruitId, new SimpleSubscriber<HandoutFruitModel>() {
+                .getFruit(fruitId, new SimpleSubscriber<HandoutFruitModel>() {
                     @Override
                     public void onResponse(HandoutFruitModel response) {
                         dismissLoading();

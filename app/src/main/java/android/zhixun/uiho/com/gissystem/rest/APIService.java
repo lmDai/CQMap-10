@@ -672,6 +672,17 @@ public class APIService {
     }
 
     /**
+     * 成果详情（目录）
+     */
+    public void getFruit(String fruitId, DoOnSubscriber<HandoutFruitModel> subscriber) {
+        api.getHandoutFruit(buildParams(fruitId, "getFruit", "fruit"))
+                .compose(applySchedulers())
+                .doOnSubscribe(subscriber::doOnSubscriber)
+                .compose(handleResponse())
+                .subscribe(subscriber);
+    }
+
+    /**
      * 成果目录列表
      */
     public void getFruitList(Map<Object, Object> map, DoOnSubscriber<List<FruitListModel>> subscriber) {
