@@ -221,15 +221,15 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
 //                }
             }
         });
-//        rlCHResult.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(UnitDetailActivity.this, OwnSecretResultActivity.class);
-//                intent.putExtra("company", (long) mCompanyModelDetail.getCompanyId());//这个数据是个long
-//                startActivity(intent);
-//
-//            }
-//        });
+        rlCHResult.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(UnitDetailActivity.this, OwnSecretResultActivity.class);
+                intent.putExtra("company", (long) mCompanyModelDetail.getCompanyId());//这个数据是个long
+                startActivity(intent);
+
+            }
+        });
     }
 
     private void initViews() {

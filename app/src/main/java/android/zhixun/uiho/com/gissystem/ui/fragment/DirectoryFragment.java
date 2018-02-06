@@ -595,7 +595,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             restoreAll();
                             return;
                         }
-                        showMapSymbol(result, mapType);
+                        showMapSymbol(result, mapType, mFruitList);
 
                     }
 
@@ -608,7 +608,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                 });
     }
 
-    private void showMapSymbol(FeatureResult result, int mapType) {
+    private void showMapSymbol(FeatureResult result, int mapType, List<FruitListModel> fruitList) {
         Symbol symbol;
         if (mapType == 1) {
             symbol = new PictureMarkerSymbol(getActivity(),
@@ -634,7 +634,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         dismissLoading();
         //地图单击事件
         mMapView.setOnSingleTapListener((OnSingleTapListener) (float x, float y) -> {
-            if (mFruitList.isEmpty()) {
+            if (fruitList.isEmpty()) {
                 ToastUtil.showShort("分类信息集合为空，请重新获取");
                 return;
             }
@@ -658,14 +658,15 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                 FRUIT_ID = ((Double) updateGraphic.getAttributeValue("FRUITID")).longValue();
             }
             drawLayer.updateGraphic(ids[0], updateSymbol);
-            for (FruitListModel model : mFruitList) {
+            for (FruitListModel model : fruitList) {
                 if (FRUIT_ID != model.fruitId) continue;
 
                 model.selected = true;
                 if (mContentRv.getAdapter() != null) {
-                    int position = mFruitList.indexOf(model);
+                    int position = fruitList.indexOf(model);
                     mContentRv.getAdapter()
                             .notifyItemChanged(position);
+//                    LogUtil.d("smoothScrollToPosition ==" + position);
                     mContentRv.scrollToPosition(position);
                 }
             }
@@ -1208,7 +1209,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             ToastUtil.showShort("未查询到相关信息");
                             return;
                         }
-                        showMapSymbol(result, mapType);
+
                         filterDataWithSymbol(result, mapType);
                     }
 
@@ -1238,6 +1239,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                 }
             }
         }
+        showMapSymbol(result, mapType, filterList);
         showBottomLayout(filterList);
     }
 

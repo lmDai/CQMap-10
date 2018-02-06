@@ -249,7 +249,7 @@
         <android.zhixun.uiho.com.gissystem.ui.widget.SimpleVerRv
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@android:color/white">
 
         </android.zhixun.uiho.com.gissystem.ui.widget.SimpleVerRv>
