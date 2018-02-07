@@ -566,7 +566,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                             mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON);
                             break;
                         case 2://缓冲区查询
-                            mMapView.getDrawTool().activate(DrawTool.FREEHAND_POLYLINE);
+                            mMapView.getDrawTool().activate(DrawTool.POLYLINE);
                             mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER);
                             break;
                     }
@@ -600,11 +600,15 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     }
 
     private void setBufferGeometry(float distance) {
+        double scale = mMapView.getScale();
+        distance = (float) (scale / 1000 / distance);
         SimpleLineSymbol lineSymbol = new SimpleLineSymbol(Color.RED,
                 distance,
                 SimpleLineSymbol.STYLE.SOLID
         );
-        Geometry geometry = mMapView.getCurrentDrawGraphic().getGeometry();
+
+        Geometry geometry = mMapView.getDrawTool().drawGraphic.getGeometry();
+//        Geometry geometry = mMapView.getCurrentDrawGraphic().getGeometry();
         Graphic graphic = new Graphic(geometry, lineSymbol);
         mMapView.setCurrentDrawGraphic(graphic);
     }

@@ -657,7 +657,6 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     private void showMapSymbol(FeatureResult result, int mapType) {
         if (result.featureCount() == 0) {
             ToastUtil.showEmpty();
-//            restoreAll();
             return;
         }
         Symbol symbol;
@@ -702,19 +701,52 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                 FRUIT_ID = ((Double) graphic.getAttributeValue("FRUITID")).longValue();
             }
 
-            List<ReportHandoutListModel> handoutList = new ArrayList<>();
+            List<ReportHandoutListModel> selectHandoutList = new ArrayList<>();
+
             for (ReportHandoutListModel handout : mHandoutList) {
+
                 for (ReportHandoutListModel.FruitCategoryList fruitCategory :
                         handout.fruitCategoryList) {
+
                     for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList
                             : fruitCategory.fruitList) {
                         if (FRUIT_ID != fruitList.fruitId) continue;
                         fruitList.selected = true;
-                        handoutList.add(handout);
+                        LogUtil.d("selectHandoutList.add(handout)");
+                        selectHandoutList.add(handout);
                     }
                 }
             }
-            showBottomLayout(handoutList, false);
+            //遍历删除地图上没也graphic的数据，这真的坑爹
+            for (ReportHandoutListModel handout : selectHandoutList) {
+
+                for (ReportHandoutListModel.FruitCategoryList fruitCategory :
+                        handout.fruitCategoryList) {
+                    List<ReportHandoutListModel.FruitCategoryList.FruitList> existList =
+                            new ArrayList<>();
+                    for (ReportHandoutListModel.FruitCategoryList.FruitList fruitList
+                            : fruitCategory.fruitList) {
+
+                        for (Object o : result) {
+                            if (o instanceof Feature) {
+                                Feature feature = (Feature) o;
+                                long fruit_id;
+                                if (mapType == 1) {
+                                    fruit_id = (Integer) feature.getAttributeValue("FRUITID");
+                                } else {
+                                    fruit_id = ((Double) feature.getAttributeValue("FRUITID")).longValue();
+                                }
+                                if (fruit_id == fruitList.fruitId && !existList.contains(fruitList)) {
+                                    existList.add(fruitList);
+                                }
+                            }
+                        }
+                    }
+                    fruitCategory.fruitList.clear();
+                    fruitCategory.fruitList.addAll(existList);
+                }
+            }
+            showBottomLayout(selectHandoutList, false);
         });
     }
 
@@ -943,7 +975,8 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     }
 
     //设置弹出框分发内容的view
-    private void bindViewHandoutContent(ReportHandoutListModel item, LinearLayout ll_content, boolean byOrder) {
+    private void bindViewHandoutContent(ReportHandoutListModel item, LinearLayout ll_content,
+                                        boolean byOrder) {
         for (ReportHandoutListModel.FruitCategoryList fruitCategory : item.fruitCategoryList) {
             View contentView = View.inflate(getActivity(),
                     R.layout.item_dispatch_bottom_content, null);
