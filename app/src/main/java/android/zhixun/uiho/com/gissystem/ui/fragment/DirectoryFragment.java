@@ -48,6 +48,8 @@ import com.alibaba.fastjson.JSON;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.event.OnSingleTapListener;
 import com.esri.core.geometry.Geometry;
+import com.esri.core.geometry.GeometryEngine;
+import com.esri.core.geometry.Polygon;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
@@ -938,7 +940,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                             mMapView.setCurrentDrawSpace(BaseMapView.SPACE_POLYGON);
                             break;
                         case 2://缓冲区查询
-                            mMapView.getDrawTool().activate(DrawTool.FREEHAND_POLYLINE);
+                            mMapView.getDrawTool().activate(DrawTool.POLYLINE);
                             mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER);
                             break;
                         case 3://图幅号查询
@@ -970,7 +972,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         ToastUtil.showShort("不能为空");
                         return;
                     }
-                    int distance = Integer.parseInt(text);
+                    float distance = Float.parseFloat(text);
                     setBufferGeometry(distance);
                     mMapView.setCurrentDrawSpace(BaseMapView.SPACE_BUFFER_SET_FINISH);
                     dialog1.dismiss();
@@ -1151,13 +1153,14 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     }
 
     //设置缓冲区的图形
-    private void setBufferGeometry(int distance) {
-        SimpleLineSymbol lineSymbol = new SimpleLineSymbol(Color.RED,
-                distance,
-                SimpleLineSymbol.STYLE.SOLID
-        );
-        Geometry geometry = mMapView.getCurrentDrawGraphic().getGeometry();
-        Graphic graphic = new Graphic(geometry, lineSymbol);
+    private void setBufferGeometry(float distance) {
+        Geometry geometry = mMapView.getDrawTool().drawGraphic.getGeometry();
+        Polygon buffer = GeometryEngine.buffer(geometry, mMapView.getSpatialReference(),
+                distance / 1000, null);
+
+        SimpleFillSymbol symbol = new SimpleFillSymbol(Color.RED);
+
+        Graphic graphic = new Graphic(buffer, symbol);
         mMapView.setCurrentDrawGraphic(graphic);
     }
 

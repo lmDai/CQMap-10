@@ -45,12 +45,13 @@ import com.esri.core.geometry.Geometry;
 import com.esri.core.geometry.GeometryEngine;
 import com.esri.core.geometry.LinearUnit;
 import com.esri.core.geometry.Point;
+import com.esri.core.geometry.Polygon;
 import com.esri.core.geometry.SpatialReference;
 import com.esri.core.map.Feature;
 import com.esri.core.map.FeatureResult;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.PictureMarkerSymbol;
-import com.esri.core.symbol.SimpleLineSymbol;
+import com.esri.core.symbol.SimpleFillSymbol;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
 
@@ -580,6 +581,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
             ToastUtil.showShort(" 请多次点击地图");
             return;
         }
+
         new SimpleAlertDialog(getActivity())
                 .title("缓冲区查询")
                 .message("请输入范围(0-100公里)")
@@ -600,16 +602,13 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     }
 
     private void setBufferGeometry(float distance) {
-        double scale = mMapView.getScale();
-        distance = (float) (scale / 1000 / distance);
-        SimpleLineSymbol lineSymbol = new SimpleLineSymbol(Color.RED,
-                distance,
-                SimpleLineSymbol.STYLE.SOLID
-        );
-
         Geometry geometry = mMapView.getDrawTool().drawGraphic.getGeometry();
-//        Geometry geometry = mMapView.getCurrentDrawGraphic().getGeometry();
-        Graphic graphic = new Graphic(geometry, lineSymbol);
+        Polygon buffer = GeometryEngine.buffer(geometry, mMapView.getSpatialReference(),
+                distance / 1000, null);
+
+        SimpleFillSymbol symbol = new SimpleFillSymbol(Color.RED);
+
+        Graphic graphic = new Graphic(buffer, symbol);
         mMapView.setCurrentDrawGraphic(graphic);
     }
 
