@@ -226,6 +226,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
             public void onClick(View view) {
                 Intent intent = new Intent(UnitDetailActivity.this, OwnSecretResultActivity.class);
                 intent.putExtra("company", (long) mCompanyModelDetail.getCompanyId());//这个数据是个long
+                intent.putExtra(OwnSecretResultActivity.COMPANY_NAME,mCompanyModelDetail.getCompanyName());
                 startActivity(intent);
 
             }

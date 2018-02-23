@@ -26,10 +26,10 @@
         android:clickable="true"
         android:ellipsize="end"
         android:padding="4dp"
-        android:visibility="gone"
         android:singleLine="true"
         android:text="详情"
-        android:textColor="@color/colorPrimary" />
+        android:textColor="@color/colorPrimary"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/tv_code"
@@ -52,7 +52,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_date"
         android:layout_marginTop="4dp"
-        android:drawableRight="@mipmap/arrow_bottom"
+        android:drawableRight="@mipmap/arrow_down"
         android:paddingTop="4dp"
-        android:text="分发内容" />
+        android:text="分发内容"
+        android:textColor="@color/colorAccent" />
+
+    <LinearLayout
+        android:id="@+id/ll_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_dispatchContent"
+        android:orientation="vertical">
+
+    </LinearLayout>
 </RelativeLayout>
