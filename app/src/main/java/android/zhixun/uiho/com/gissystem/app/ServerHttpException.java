@@ -1,6 +1,5 @@
 package android.zhixun.uiho.com.gissystem.app;
 
-import com.yibogame.util.LogUtil;
 
 /**
  * Created by parcool on 2016/9/5.

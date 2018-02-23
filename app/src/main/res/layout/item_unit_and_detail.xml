@@ -47,6 +47,7 @@
         tools:text="时间：2016年12月20日" />
 
     <TextView
+        android:id="@+id/tv_dispatchContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_date"
