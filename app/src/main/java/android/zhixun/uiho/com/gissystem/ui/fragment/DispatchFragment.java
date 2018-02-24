@@ -693,11 +693,11 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
             GraphicsLayer drawLayer = mMapView.getDrawLayer();
             Graphic graphic = drawLayer.getGraphic(ids[0]);
             if (graphic == null) return;
-            long FRUIT_ID;
+            double FRUIT_ID;
             if (mapType == 1) {
                 drawLayer.updateGraphic(ids[0], new PictureMarkerSymbol(getActivity(),
                         ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red)));
-                FRUIT_ID = (Integer) graphic.getAttributeValue("FRUITID");
+                FRUIT_ID = (double) graphic.getAttributeValue("FRUITID");
             } else {
                 drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
                 FRUIT_ID = ((Double) graphic.getAttributeValue("FRUITID")).longValue();
@@ -732,9 +732,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         for (Object o : result) {
                             if (o instanceof Feature) {
                                 Feature feature = (Feature) o;
-                                long fruit_id;
+                                double fruit_id;
                                 if (mapType == 1) {
-                                    fruit_id = (Integer) feature.getAttributeValue("FRUITID");
+                                    fruit_id = (double) feature.getAttributeValue("FRUITID");
                                 } else {
                                     fruit_id = ((Double) feature.getAttributeValue("FRUITID")).longValue();
                                 }
@@ -1044,12 +1044,12 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                         for (int graphicID : graphicIDs) {
                             Graphic graphic = mMapView.getDrawLayer().getGraphic(graphicID);
                             if (graphic == null) continue;
-                            long fruitId;
+                            double fruitId;
                             Symbol updateSymbol;
                             if (mMapType == 1) {
                                 updateSymbol = new PictureMarkerSymbol(getActivity(),
                                         ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red));
-                                fruitId = (Integer) graphic.getAttributeValue(FRUITID);
+                                fruitId = (double) graphic.getAttributeValue(FRUITID);
                             } else {
                                 updateSymbol = new SimpleFillSymbol(Color.RED);
                                 fruitId = ((Double) graphic.getAttributeValue(FRUITID)).longValue();

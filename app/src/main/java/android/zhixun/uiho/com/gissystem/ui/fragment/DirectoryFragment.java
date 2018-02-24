@@ -650,11 +650,11 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             Graphic updateGraphic = drawLayer.getGraphic(ids[0]);
             Symbol updateSymbol;
             if (updateGraphic == null) return;
-            long FRUIT_ID;
+            double FRUIT_ID;
             if (mMapType == 1) {
                 updateSymbol = new PictureMarkerSymbol(getActivity(),
                         ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red));
-                FRUIT_ID = ((Integer) updateGraphic.getAttributeValue("FRUITID"));
+                FRUIT_ID = ((double) updateGraphic.getAttributeValue("FRUITID"));
             } else {
                 updateSymbol = new SimpleFillSymbol(Color.RED);
                 FRUIT_ID = ((Double) updateGraphic.getAttributeValue("FRUITID")).longValue();
@@ -785,12 +785,12 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                 for (int id : graphicIDs) {
                     Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
                     if (graphic == null) continue;
-                    long attributeValue;
+                    double attributeValue;
                     Symbol updateSymbol;
                     if (mMapType == 1) {
                         updateSymbol = new PictureMarkerSymbol(getActivity(),
                                 ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red));
-                        attributeValue = ((Integer) graphic.getAttributeValue(FRUITID)).longValue();
+                        attributeValue = ((Double) graphic.getAttributeValue(FRUITID)).longValue();
                     } else {
                         updateSymbol = new SimpleFillSymbol(Color.RED);
                         attributeValue = ((Double) graphic.getAttributeValue(FRUITID)).longValue();
@@ -1231,9 +1231,9 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             for (Object o : result) {
                 if (o instanceof Feature) {
                     Feature feature = (Feature) o;
-                    long fruitIdValue;
+                    double fruitIdValue;
                     if (mapType == 1) {
-                        fruitIdValue = (Integer) feature.getAttributeValue(FRUITID);
+                        fruitIdValue = (double) feature.getAttributeValue(FRUITID);
                     } else {
                         fruitIdValue = ((Double) feature.getAttributeValue(FRUITID)).longValue();
                     }

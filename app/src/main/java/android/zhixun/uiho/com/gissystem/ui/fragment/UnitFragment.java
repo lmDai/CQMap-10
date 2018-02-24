@@ -434,7 +434,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
                 if (object instanceof Feature) {
                     Feature feature = (Feature) object;
-                    int unitid = (int) feature.getAttributeValue("UNITID");
+                    double unitid = (double) feature.getAttributeValue("UNITID");
                     if (companyDetailModel.getCompanyId() != unitid)
                         continue;
 
@@ -475,7 +475,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         if (graphic == null)
             return;
 
-        int unitID = (int) graphic.getAttributeValue("UNITID");
+        double unitID = (double) graphic.getAttributeValue("UNITID");
         for (CompanyDetailModel model : companyList) {
             if (model.getCompanyId() != unitID) {
                 continue;
@@ -520,7 +520,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     if (graphicIDs == null || graphicIDs.length == 0) return;
                     for (int id : graphicIDs) {
                         Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
-                        int unit_id = (int) graphic.getAttributeValue("UNITID");
+                        double unit_id = (double) graphic.getAttributeValue("UNITID");
                         if (companyId != unit_id) continue;
                         switch (graphic.getGeometry().getType()) {
                             case POINT:
