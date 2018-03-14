@@ -33,7 +33,7 @@ public class InstructionsActivity extends BaseActivityWithTitle {
         mWebView = findViewById(R.id.webview);
         mProgressBar = findViewById(R.id.progressBar);
 
-        mWebView.loadUrl("http://www.map023.cn:8080/moveImg/index.html");
+        mWebView.loadUrl("http://www.map023.cn:8180/moveImg/index.html");
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {

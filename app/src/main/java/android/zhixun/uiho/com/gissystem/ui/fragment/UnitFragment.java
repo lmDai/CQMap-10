@@ -38,6 +38,7 @@ import android.zhixun.uiho.com.gissystem.ui.widget.DividerGridItemDecoration;
 import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
+import android.zhixun.uiho.com.gissystem.util.ClusterUtils;
 
 import com.esri.android.map.Callout;
 import com.esri.android.map.GraphicsLayer;
@@ -461,7 +462,9 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         if (!graphicList.isEmpty()) {
             Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
             mMapView.addGraphics(graphics);
+            new ClusterUtils(mMapView,graphics);
         }
+
         showBottomLayout(exitsCompanyList);
     }
 

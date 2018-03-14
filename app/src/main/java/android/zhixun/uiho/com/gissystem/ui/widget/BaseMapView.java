@@ -285,9 +285,10 @@ public class BaseMapView extends MapView implements DrawEventListener {
         void onError(Throwable e);
     }
 
-    private void requestLocationPermissioon() {
+    private void requestLocationPermission() {
         AndPermission.with(getContext())
-                .permission(Manifest.permission_group.LOCATION)
+                .permission(Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION)
                 .callback(listener)
                 .start();
 
@@ -311,7 +312,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
         public void onStatusChanged(Object o, OnStatusChangedListener.STATUS status) {
             switch (status) {
                 case INITIALIZED:
-                    requestLocationPermissioon();
+                    requestLocationPermission();
                     break;
                 case LAYER_LOADED:
                     break;
