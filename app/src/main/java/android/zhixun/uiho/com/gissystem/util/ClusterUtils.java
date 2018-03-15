@@ -1,17 +1,16 @@
 package android.zhixun.uiho.com.gissystem.util;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
 
 import com.esri.android.map.event.OnZoomListener;
-import com.esri.core.geometry.GeometryEngine;
-import com.esri.core.geometry.LinearUnit;
 import com.esri.core.geometry.Point;
-import com.esri.core.geometry.SpatialReference;
 import com.esri.core.map.Graphic;
+import com.esri.core.symbol.TextSymbol;
 import com.yibogame.util.LogUtil;
 
 import java.util.ArrayList;
@@ -25,19 +24,22 @@ import java.util.List;
 public class ClusterUtils {
 
     private double mScale;
-    private double mClusterDistance;
+    private long mClusterDistance;
     private int mClusterSize;
     private Handler mSignClusterHandler;
     private boolean mIsCanceled;
     private List<Graphic> mGraphics;
+    private BaseMapView mMapView;
+    private List<Cluster> mClusterList = new ArrayList<>();
 
     public ClusterUtils(BaseMapView mapView, Graphic[] graphics) {
 
         int length = graphics.length;
-        LogUtil.d("length == " + length);
-        mClusterSize = dp2px(mapView.getContext(), 100);
+//        LogUtil.d("length == " + length);
+        mClusterSize = 100;
+        mMapView = mapView;
         mScale = mapView.getScale();
-        mClusterDistance = mScale * mClusterSize;
+        mClusterDistance = (long) (mScale / mClusterSize);
         mGraphics = Arrays.asList(graphics);
         mSignClusterHandler = new SignClusterHandler(Looper.getMainLooper());
         assignClusters();
@@ -49,11 +51,13 @@ public class ClusterUtils {
             }
 
             @Override
-            public void postAction(float v, float v1, double v2) {
-
+            public void postAction(float pivotX, float pivotY, double factor) {
+//                LogUtil.d("factor == " + factor);
                 mScale = mapView.getScale();
-                mClusterDistance = mScale * mClusterSize;
+//                LogUtil.d("mScale == " + mScale);
+                mClusterDistance = (long) (mScale / mClusterSize);
                 assignClusters();
+
             }
         });
 
@@ -84,6 +88,7 @@ public class ClusterUtils {
      * 处理聚合点算法线程
      */
     class SignClusterHandler extends Handler {
+
         static final int CALCULATE_CLUSTER = 0;
         static final int CALCULATE_SINGLE_CLUSTER = 1;
 
@@ -104,7 +109,7 @@ public class ClusterUtils {
     }
 
     private void calculateClusters() {
-
+        mClusterList.clear();
         int length = mGraphics.size();
         for (int i = 0; i < length; i++) {
             for (int j = i + 1; j < length; j++) {
@@ -112,17 +117,53 @@ public class ClusterUtils {
                 Graphic g_i = mGraphics.get(i);
                 Graphic g_j = mGraphics.get(j);
 
-                double distance = GeometryEngine.geodesicDistance(((Point) g_i.getGeometry())
-                        , ((Point) g_j.getGeometry()),
-                        SpatialReference.create(SpatialReference.WKID_WGS84),
-                        new LinearUnit(LinearUnit.Code.KILOMETER));
-                LogUtil.d("distance == " + distance);
-                LogUtil.d("mClusterDistance == " + mClusterDistance);
-                if (distance < mClusterDistance) {
-
+                Point p_i = mMapView.toScreenPoint(((Point) g_i.getGeometry()));
+                Point p_j = mMapView.toScreenPoint(((Point) g_j.getGeometry()));
+                Cluster cluster = new Cluster(((Point) g_i.getGeometry()));
+                if (calcPoint(p_i, p_j)) {//加入聚合
+//                    Cluster cluster = getCluster(p_i);
+//                    if (cluster == null) {
+//                        cluster = new Cluster(((Point) g_i.getGeometry()));
+//                    }
+                    cluster.addGraphics(g_i);
+                    cluster.addGraphics(g_j);
+                } else {
+                    cluster.addGraphics(g_j);
                 }
-
+                mClusterList.add(cluster);
             }
+        }
+        addGraphicToMap();
+    }
+
+    private boolean calcPoint(Point point_i, Point point_j) {
+        int x = (int) Math.abs(point_i.getX() - point_j.getX());
+        int y = (int) Math.abs(point_i.getY() - point_j.getY());
+        int z = (int) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        LogUtil.d("z == " + z);
+        return z < 100;
+    }
+
+    private Cluster getCluster(Point point) {
+        for (Cluster cluster : mClusterList) {
+            if (cluster.mPoint == point) {
+                return cluster;
+            }
+        }
+        return null;
+    }
+
+    private void addGraphicToMap() {
+        for (Cluster cluster : mClusterList) {
+            int size = cluster.mGraphics.size();
+            if (size > 1) {
+                TextSymbol symbol = new TextSymbol(20, cluster.getGraphics().size() + "", Color.RED);
+                Graphic graphic = new Graphic(cluster.mPoint, symbol);
+                mMapView.addGraphic(graphic);
+            } else if (size == 1) {
+                mMapView.addGraphic(cluster.getGraphics().get(0));
+            }
+
         }
     }
 
@@ -137,6 +178,7 @@ public class ClusterUtils {
         }
 
         public void addGraphics(Graphic graphic) {
+            if (mGraphics.contains(graphic)) return;
             mGraphics.add(graphic);
         }
 

@@ -461,7 +461,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         }
         if (!graphicList.isEmpty()) {
             Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
-            mMapView.addGraphics(graphics);
+//            mMapView.addGraphics(graphics);
             new ClusterUtils(mMapView,graphics);
         }
 
