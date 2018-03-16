@@ -461,8 +461,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         }
         if (!graphicList.isEmpty()) {
             Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
-//            mMapView.addGraphics(graphics);
-            new ClusterUtils(mMapView,graphics);
+
+//            new ClusterUtils(mMapView, graphics);
         }
 
         showBottomLayout(exitsCompanyList);
@@ -523,6 +523,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     if (graphicIDs == null || graphicIDs.length == 0) return;
                     for (int id : graphicIDs) {
                         Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
+                        if (graphic == null) continue;
                         double unit_id = (double) graphic.getAttributeValue("UNITID");
                         if (companyId != unit_id) continue;
                         switch (graphic.getGeometry().getType()) {

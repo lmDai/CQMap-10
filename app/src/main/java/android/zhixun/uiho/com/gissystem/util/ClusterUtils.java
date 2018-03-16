@@ -5,11 +5,15 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.content.ContextCompat;
+import android.zhixun.uiho.com.gissystem.R;
 import android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView;
 
 import com.esri.android.map.event.OnZoomListener;
 import com.esri.core.geometry.Point;
 import com.esri.core.map.Graphic;
+import com.esri.core.symbol.PictureMarkerSymbol;
+import com.esri.core.symbol.Symbol;
 import com.esri.core.symbol.TextSymbol;
 import com.yibogame.util.LogUtil;
 
@@ -28,19 +32,20 @@ public class ClusterUtils {
     private int mClusterSize;
     private Handler mSignClusterHandler;
     private boolean mIsCanceled;
-    private List<Graphic> mGraphics;
+    private List<Graphic> mClusterItems;
     private BaseMapView mMapView;
-    private List<Cluster> mClusterList = new ArrayList<>();
+    private List<Cluster> mClusters = new ArrayList<>();
+    private List<Graphic> mAddMarkers = new ArrayList<>();
 
     public ClusterUtils(BaseMapView mapView, Graphic[] graphics) {
 
         int length = graphics.length;
-//        LogUtil.d("length == " + length);
+        LogUtil.d("length == " + length);
         mClusterSize = 100;
         mMapView = mapView;
         mScale = mapView.getScale();
         mClusterDistance = (long) (mScale / mClusterSize);
-        mGraphics = Arrays.asList(graphics);
+        mClusterItems = Arrays.asList(graphics);
         mSignClusterHandler = new SignClusterHandler(Looper.getMainLooper());
         assignClusters();
 
@@ -57,7 +62,6 @@ public class ClusterUtils {
 //                LogUtil.d("mScale == " + mScale);
                 mClusterDistance = (long) (mScale / mClusterSize);
                 assignClusters();
-
             }
         });
 
@@ -72,17 +76,6 @@ public class ClusterUtils {
         mSignClusterHandler.sendEmptyMessage(SignClusterHandler.CALCULATE_CLUSTER);
     }
 
-    /**
-     * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
-     */
-    public int dp2px(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
-
-    private void addClusters() {
-
-    }
 
     /**
      * 处理聚合点算法线程
@@ -109,33 +102,31 @@ public class ClusterUtils {
     }
 
     private void calculateClusters() {
-        mClusterList.clear();
-        int length = mGraphics.size();
-        for (int i = 0; i < length; i++) {
-            for (int j = i + 1; j < length; j++) {
-
-                Graphic g_i = mGraphics.get(i);
-                Graphic g_j = mGraphics.get(j);
-
-                Point p_i = mMapView.toScreenPoint(((Point) g_i.getGeometry()));
-                Point p_j = mMapView.toScreenPoint(((Point) g_j.getGeometry()));
-                Cluster cluster = new Cluster(((Point) g_i.getGeometry()));
-                if (calcPoint(p_i, p_j)) {//加入聚合
-//                    Cluster cluster = getCluster(p_i);
-//                    if (cluster == null) {
-//                        cluster = new Cluster(((Point) g_i.getGeometry()));
-//                    }
-                    cluster.addGraphics(g_i);
-                    cluster.addGraphics(g_j);
-                } else {
-                    cluster.addGraphics(g_j);
-                }
-                mClusterList.add(cluster);
+        mClusters.clear();
+        for (Graphic item : mClusterItems) {
+            Point point = (Point) item.getGeometry();
+            Cluster cluster = getCluster(point);
+            if (cluster != null) {
+                cluster.addClusterItem(item);
+            } else {
+                cluster = new Cluster(point);
+                mClusters.add(cluster);
+                cluster.addClusterItem(item);
             }
         }
-        addGraphicToMap();
+        //复制一份数据，规避同步
+        List<Cluster> clusters = new ArrayList<Cluster>();
+        clusters.addAll(mClusters);
+        addClusterToMap(clusters);
     }
 
+    /**
+     * 计算两个点是否需要聚合
+     *
+     * @param point_i
+     * @param point_j
+     * @return
+     */
     private boolean calcPoint(Point point_i, Point point_j) {
         int x = (int) Math.abs(point_i.getX() - point_j.getX());
         int y = (int) Math.abs(point_i.getY() - point_j.getY());
@@ -144,46 +135,84 @@ public class ClusterUtils {
         return z < 100;
     }
 
+    /**
+     * 根据一个点获取是否可以依附的聚合点，没有则返回null
+     */
     private Cluster getCluster(Point point) {
-        for (Cluster cluster : mClusterList) {
-            if (cluster.mPoint == point) {
+        for (Cluster cluster : mClusters) {
+            if (calcPoint(point, cluster.centerPoint)) {
                 return cluster;
             }
         }
         return null;
     }
 
-    private void addGraphicToMap() {
-        for (Cluster cluster : mClusterList) {
-            int size = cluster.mGraphics.size();
-            if (size > 1) {
-                TextSymbol symbol = new TextSymbol(20, cluster.getGraphics().size() + "", Color.RED);
-                Graphic graphic = new Graphic(cluster.mPoint, symbol);
-                mMapView.addGraphic(graphic);
-            } else if (size == 1) {
-                mMapView.addGraphic(cluster.getGraphics().get(0));
-            }
-
+    private void addClusterToMap(List<Cluster> clusters) {
+        //先删除已有marker
+        mMapView.clearAll();
+        //再添加marker
+        for (Cluster cluster : clusters) {
+            addSingleClusterToMap(cluster);
         }
+    }
+
+    /**
+     * 将单个聚合元素添加至地图显示
+     *
+     * @param cluster
+     */
+    private void addSingleClusterToMap(Cluster cluster) {
+        Point centerPoint = cluster.centerPoint;
+        Graphic graphic = getGraphic(cluster.getCount(), centerPoint);
+        mMapView.addGraphic(graphic);
+
+        mAddMarkers.add(graphic);
+    }
+
+    private Graphic getGraphic(int count, Point centerPoint) {
+        Symbol symbol = null;
+        if (count > 1) {
+            symbol = new TextSymbol(20, String.valueOf(count), Color.RED);
+        } else {
+            symbol =
+                    new PictureMarkerSymbol(mMapView.getContext(),
+                            ContextCompat.getDrawable(mMapView.getContext(),
+                                    R.drawable.ic_location_green));
+        }
+        Graphic graphic = new Graphic(centerPoint, symbol);
+        return graphic;
     }
 
     public class Cluster {
 
-        private Point mPoint;
+        private Point centerPoint;
         private List<Graphic> mGraphics;
+        private Graphic marker;
 
         public Cluster(Point point) {
-            this.mPoint = point;
+            this.centerPoint = point;
             mGraphics = new ArrayList<>();
         }
 
-        public void addGraphics(Graphic graphic) {
-            if (mGraphics.contains(graphic)) return;
+        public void addClusterItem(Graphic graphic) {
+//            if (mGraphics.contains(graphic)) return;
             mGraphics.add(graphic);
         }
 
-        public List<Graphic> getGraphics() {
+        public int getCount() {
+            return mGraphics.size();
+        }
+
+        public List<Graphic> getClusterItems() {
             return mGraphics;
+        }
+
+        public Graphic getMarker() {
+            return marker;
+        }
+
+        public void setMarker(Graphic marker) {
+            this.marker = marker;
         }
     }
 }

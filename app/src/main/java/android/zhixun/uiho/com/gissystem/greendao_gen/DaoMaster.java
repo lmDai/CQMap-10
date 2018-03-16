@@ -21,36 +21,36 @@ public class DaoMaster extends AbstractDaoMaster {
 
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(Database db, boolean ifNotExists) {
-        CRModelDao.createTable(db, ifNotExists);
-        CRSubmitServerModelDao.createTable(db, ifNotExists);
         AchievementModelDao.createTable(db, ifNotExists);
-        CGSortTwoModelDao.createTable(db, ifNotExists);
-        CRActiveUserModelDao.createTable(db, ifNotExists);
-        CRImageModelDao.createTable(db, ifNotExists);
-        CRCheckPersonModelDao.createTable(db, ifNotExists);
-        CQPrefectureModelDao.createTable(db, ifNotExists);
-        UserModelDao.createTable(db, ifNotExists);
-        CRResultTypeModelDao.createTable(db, ifNotExists);
-        IndustryCategoryModelDao.createTable(db, ifNotExists);
         CGSortOneModelDao.createTable(db, ifNotExists);
+        CGSortTwoModelDao.createTable(db, ifNotExists);
+        CQPrefectureModelDao.createTable(db, ifNotExists);
+        CRActiveUserModelDao.createTable(db, ifNotExists);
+        CRCheckPersonModelDao.createTable(db, ifNotExists);
+        CRImageModelDao.createTable(db, ifNotExists);
+        CRModelDao.createTable(db, ifNotExists);
+        CRResultTypeModelDao.createTable(db, ifNotExists);
+        CRSubmitServerModelDao.createTable(db, ifNotExists);
+        IndustryCategoryModelDao.createTable(db, ifNotExists);
         UnitModelDao.createTable(db, ifNotExists);
+        UserModelDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
-        CRModelDao.dropTable(db, ifExists);
-        CRSubmitServerModelDao.dropTable(db, ifExists);
         AchievementModelDao.dropTable(db, ifExists);
-        CGSortTwoModelDao.dropTable(db, ifExists);
-        CRActiveUserModelDao.dropTable(db, ifExists);
-        CRImageModelDao.dropTable(db, ifExists);
-        CRCheckPersonModelDao.dropTable(db, ifExists);
-        CQPrefectureModelDao.dropTable(db, ifExists);
-        UserModelDao.dropTable(db, ifExists);
-        CRResultTypeModelDao.dropTable(db, ifExists);
-        IndustryCategoryModelDao.dropTable(db, ifExists);
         CGSortOneModelDao.dropTable(db, ifExists);
+        CGSortTwoModelDao.dropTable(db, ifExists);
+        CQPrefectureModelDao.dropTable(db, ifExists);
+        CRActiveUserModelDao.dropTable(db, ifExists);
+        CRCheckPersonModelDao.dropTable(db, ifExists);
+        CRImageModelDao.dropTable(db, ifExists);
+        CRModelDao.dropTable(db, ifExists);
+        CRResultTypeModelDao.dropTable(db, ifExists);
+        CRSubmitServerModelDao.dropTable(db, ifExists);
+        IndustryCategoryModelDao.dropTable(db, ifExists);
         UnitModelDao.dropTable(db, ifExists);
+        UserModelDao.dropTable(db, ifExists);
     }
 
     /**
@@ -69,19 +69,19 @@ public class DaoMaster extends AbstractDaoMaster {
 
     public DaoMaster(Database db) {
         super(db, SCHEMA_VERSION);
-        registerDaoClass(CRModelDao.class);
-        registerDaoClass(CRSubmitServerModelDao.class);
         registerDaoClass(AchievementModelDao.class);
-        registerDaoClass(CGSortTwoModelDao.class);
-        registerDaoClass(CRActiveUserModelDao.class);
-        registerDaoClass(CRImageModelDao.class);
-        registerDaoClass(CRCheckPersonModelDao.class);
-        registerDaoClass(CQPrefectureModelDao.class);
-        registerDaoClass(UserModelDao.class);
-        registerDaoClass(CRResultTypeModelDao.class);
-        registerDaoClass(IndustryCategoryModelDao.class);
         registerDaoClass(CGSortOneModelDao.class);
+        registerDaoClass(CGSortTwoModelDao.class);
+        registerDaoClass(CQPrefectureModelDao.class);
+        registerDaoClass(CRActiveUserModelDao.class);
+        registerDaoClass(CRCheckPersonModelDao.class);
+        registerDaoClass(CRImageModelDao.class);
+        registerDaoClass(CRModelDao.class);
+        registerDaoClass(CRResultTypeModelDao.class);
+        registerDaoClass(CRSubmitServerModelDao.class);
+        registerDaoClass(IndustryCategoryModelDao.class);
         registerDaoClass(UnitModelDao.class);
+        registerDaoClass(UserModelDao.class);
     }
 
     public DaoSession newSession() {

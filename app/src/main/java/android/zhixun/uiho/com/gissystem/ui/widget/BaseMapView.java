@@ -48,6 +48,8 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
     private Graphic currentDrawGraphic;
 
+    private double mScale = 100000;
+
     @CurrentMapLayer
     private int currentMapLayer;
     @CurrentSpace
@@ -297,7 +299,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
     private PermissionListener listener = new PermissionListener() {
         @Override
         public void onSucceed(int requestCode, List<String> grantedPermissions) {
-            setScale(100000, true);
+            setScale(mScale, true);
             location();
         }
 
