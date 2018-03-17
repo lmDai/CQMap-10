@@ -40,6 +40,7 @@ import android.zhixun.uiho.com.gissystem.ui.widget.DragLayout;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleVerRv;
 import android.zhixun.uiho.com.gissystem.ui.widget.SpaceDialog;
+import android.zhixun.uiho.com.gissystem.util.ClusterUtils;
 import android.zhixun.uiho.com.gissystem.util.DensityUtils;
 import android.zhixun.uiho.com.gissystem.util.OnItemClickListener;
 import android.zhixun.uiho.com.gissystem.util.ScreenUtil;
@@ -630,7 +631,11 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         }
         if (!graphicList.isEmpty()) {
             Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
-            mMapView.addGraphics(graphics);
+            if (mapType == 1) {
+                new ClusterUtils(mMapView, graphics);
+            } else {
+                mMapView.addGraphics(graphics);
+            }
             mMapView.centerAtGraphic(graphicList.get(0));
         }
         dismissLoading();
