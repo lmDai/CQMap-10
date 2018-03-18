@@ -783,19 +783,14 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
                 long fruitId = fruitList.get(position).fruitId;
-//                if (mMapType ==1){
-//
-//                }else {
-//
-//                }
                 fruitList.get(position).selected = true;
                 adapter.notifyItemChanged(position);
 
-                int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
-                if (graphicIDs == null || graphicIDs.length == 0) {
-                    ToastUtil.showShort("未在地图上找到相关信息，请重试");
-                    return;
-                }
+//                int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
+//                if (graphicIDs == null || graphicIDs.length == 0) {
+//                    ToastUtil.showShort("未在地图上找到相关信息，请重试");
+//                    return;
+//                }
                 for (Graphic graphic : mGraphicList) {
 //                    Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
                     if (graphic == null) continue;
@@ -805,8 +800,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                         updateSymbol = new PictureMarkerSymbol(getActivity(),
                                 ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red));
                         attributeValue = ((Double) graphic.getAttributeValue(FRUITID)).longValue();
-                        mMapView.setScale(BaseMapView.mScale);
-                        mMapView.addGraphic(new Graphic(graphic.getGeometry(),updateSymbol));
+
                     } else {
                         updateSymbol = new SimpleFillSymbol(Color.RED);
                         attributeValue = ((Double) graphic.getAttributeValue(FRUITID)).longValue();
@@ -814,8 +808,12 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                     }
 
                     if (fruitId != attributeValue) continue;
-
                     if (graphic.getGeometry() == null) continue;
+
+                    if (mMapType == 1){
+                        mMapView.addGraphic(new Graphic(graphic.getGeometry(),updateSymbol));
+                    }
+                    mMapView.setScale(BaseMapView.mScale);
                     mMapView.centerAtGraphic(graphic);
 
                 }

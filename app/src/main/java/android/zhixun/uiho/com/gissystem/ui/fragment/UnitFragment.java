@@ -538,6 +538,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                                 Graphic graphic1 = new Graphic(graphic.getGeometry(), symbol);
                                 mMapView.centerAt(point, true);
                                 mMapView.addGraphic(graphic1);
+                                mMapView.setScale(BaseMapView.mScale);
                                 showCallout(graphic, companyList.get(position));
                                 break;
                         }
