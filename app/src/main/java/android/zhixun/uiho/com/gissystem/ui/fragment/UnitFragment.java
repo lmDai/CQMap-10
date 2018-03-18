@@ -89,6 +89,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     private DragLayout mDragLayout;
     private RecyclerView mContentRv;
     private View dragView;
+    private List<Graphic> mGraphicList = new ArrayList<>(1000);
 
     public UnitFragment() {
         Bundle args = new Bundle();
@@ -429,7 +430,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                         ContextCompat.getDrawable(getActivity(),
                                 R.drawable.ic_location_green));
 
-        List<Graphic> graphicList = new ArrayList<>(1000);
+        mGraphicList.clear();
         for (Object object : objects) {
             for (CompanyDetailModel companyDetailModel : companyList) {
 
@@ -451,7 +452,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                         LogUtil.d("distance == " + distance);
                         companyDetailModel.distance = distance;
                     }
-                    graphicList.add(graphic);
+                    mGraphicList.add(graphic);
 //                    mMapView.addGraphic(graphic);
                     if (!exitsCompanyList.contains(companyDetailModel)) {
                         exitsCompanyList.add(companyDetailModel);
@@ -459,8 +460,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 }
             }
         }
-        if (!graphicList.isEmpty()) {
-            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
+        if (!mGraphicList.isEmpty()) {
+            Graphic[] graphics = mGraphicList.toArray(new Graphic[mGraphicList.size()]);
 //            mMapView.addGraphics(graphics);
             new ClusterUtils(mMapView, graphics);
         }
@@ -478,6 +479,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         if (graphic == null)
             return;
 
+        if (graphic.getAttributeValue("UNITID") == null) return;
         double unitID = (double) graphic.getAttributeValue("UNITID");
         for (CompanyDetailModel model : companyList) {
             if (model.getCompanyId() != unitID) {
@@ -519,17 +521,23 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
             switch (view.getId()) {
                 case R.id.rl_location:
                     int companyId = companyList.get(position).getCompanyId();
-                    int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
-                    if (graphicIDs == null || graphicIDs.length == 0) return;
-                    for (int id : graphicIDs) {
-                        Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
+//                    int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
+//                    if (graphicIDs == null || graphicIDs.length == 0) return;
+                    for (Graphic graphic : mGraphicList) {
+//                        Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
                         if (graphic == null) continue;
                         double unit_id = (double) graphic.getAttributeValue("UNITID");
                         if (companyId != unit_id) continue;
                         switch (graphic.getGeometry().getType()) {
                             case POINT:
                                 Point point = (Point) graphic.getGeometry();
+                                PictureMarkerSymbol symbol =
+                                        new PictureMarkerSymbol(getActivity(),
+                                                ContextCompat.getDrawable(getActivity(),
+                                                        R.drawable.ic_location_green));
+                                Graphic graphic1 = new Graphic(graphic.getGeometry(), symbol);
                                 mMapView.centerAt(point, true);
+                                mMapView.addGraphic(graphic1);
                                 showCallout(graphic, companyList.get(position));
                                 break;
                         }

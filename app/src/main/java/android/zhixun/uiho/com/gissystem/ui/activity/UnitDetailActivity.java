@@ -156,7 +156,8 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
                         Feature feature = (Feature) o;
 
                         PictureMarkerSymbol symbol =
-                                new PictureMarkerSymbol(ContextCompat.getDrawable(UnitDetailActivity.this,
+                                new PictureMarkerSymbol(UnitDetailActivity.this,
+                                        ContextCompat.getDrawable(UnitDetailActivity.this,
                                         R.drawable.ic_location_green));
                         Graphic graphic = new Graphic(feature.getGeometry(),
                                 symbol, feature.getAttributes());
@@ -259,7 +260,9 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         tvDomicileontent = (TextView) findViewById(R.id.tv_domicile_content);
         tvDomicileontent.setText(mCompanyModelDetail.getAreaName());//注册地
         tvContactsContacts = (TextView) findViewById(R.id.tv_contacts_contacts);
-        tvContactsContacts.setText(mCompanyModelDetail.getCorporation().getName());//联系人
+        if (mCompanyModelDetail.getCorporation()!=null) {
+            tvContactsContacts.setText(mCompanyModelDetail.getCorporation().getName());//联系人
+        }
         tvTelContacts = (TextView) findViewById(R.id.tv_tel_contacts);
         tvTelContacts.setText(mCompanyModelDetail.getCompanyTelephone());//座机电话
         tvPhoneContent = (TextView) findViewById(R.id.tv_phone_content);

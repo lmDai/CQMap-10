@@ -48,7 +48,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
     private Graphic currentDrawGraphic;
 
-    private double mScale = 100000;
+    public static final double mScale = 100000;
 
     @CurrentMapLayer
     private int currentMapLayer;

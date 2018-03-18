@@ -1,5 +1,7 @@
 package android.zhixun.uiho.com.gissystem.flux.models.api;
 
+import android.text.TextUtils;
+
 /**
  * Created by tanyi on 2017/3/21.
  * 单位法人
@@ -72,7 +74,7 @@ public class CorporationModel {
     }
 
     public String getName() {
-        return name;
+        return TextUtils.isEmpty(name) ? "" : name;
     }
 
     public void setName(String name) {

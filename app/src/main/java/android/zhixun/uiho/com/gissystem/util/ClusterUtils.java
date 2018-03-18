@@ -23,6 +23,7 @@ import com.yibogame.util.LogUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by simple on 27/02/2018.
@@ -146,7 +147,7 @@ public class ClusterUtils {
             if (cluster != null) {
                 cluster.addClusterItem(item);
             } else {
-                cluster = new Cluster(point);
+                cluster = new Cluster(point, item.getAttributes());
                 mClusters.add(cluster);
                 cluster.addClusterItem(item);
             }
@@ -202,7 +203,7 @@ public class ClusterUtils {
 
         } else {
 
-            cluster = new Cluster(point);
+            cluster = new Cluster(point, clusterItem.getAttributes());
             mClusters.add(cluster);
             cluster.addClusterItem(clusterItem);
             Message message = Message.obtain();
@@ -282,8 +283,7 @@ public class ClusterUtils {
      * @param cluster
      */
     private void addSingleClusterToMap(Cluster cluster) {
-        Point centerPoint = cluster.centerPoint;
-        Graphic graphic = getGraphic(cluster.getCount(), centerPoint);
+        Graphic graphic = getGraphic(cluster.getCount(), cluster);
         mMapView.addGraphic(graphic);
 
         mAddMarkers.add(graphic);
@@ -299,7 +299,7 @@ public class ClusterUtils {
 
     }
 
-    private Graphic getGraphic(int count, Point centerPoint) {
+    private Graphic getGraphic(int count, Cluster cluster) {
         Symbol symbol = null;
         if (count > 1) {
             View markerView = View.inflate(
@@ -314,14 +314,14 @@ public class ClusterUtils {
             Bitmap bitmap = markerView.getDrawingCache();
             BitmapDrawable drawable = new BitmapDrawable(mMapView.getContext().getResources(),
                     bitmap);
-            symbol = new PictureMarkerSymbol(mMapView.getContext(),drawable);
+            symbol = new PictureMarkerSymbol(mMapView.getContext(), drawable);
         } else {
             symbol =
                     new PictureMarkerSymbol(mMapView.getContext(),
                             ContextCompat.getDrawable(mMapView.getContext(),
                                     R.drawable.ic_location_green));
         }
-        return new Graphic(centerPoint, symbol);
+        return new Graphic(cluster.centerPoint, symbol, cluster.getAttributes());
     }
 
     public class Cluster {
@@ -329,9 +329,11 @@ public class ClusterUtils {
         private Point centerPoint;
         private List<Graphic> mGraphics;
         private Graphic marker;
+        private Map<String, Object> mAttributes;
 
-        public Cluster(Point point) {
+        public Cluster(Point point, Map<String, Object> attributes) {
             this.centerPoint = point;
+            this.mAttributes = attributes;
             mGraphics = new ArrayList<>();
         }
 
@@ -354,6 +356,10 @@ public class ClusterUtils {
 
         public void setMarker(Graphic marker) {
             this.marker = marker;
+        }
+
+        public Map<String, Object> getAttributes() {
+            return mAttributes;
         }
     }
 }

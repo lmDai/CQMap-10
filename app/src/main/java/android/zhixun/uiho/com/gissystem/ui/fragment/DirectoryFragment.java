@@ -80,7 +80,6 @@ import static android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView.DEM_LAYER;
 @Keep
 public class DirectoryFragment extends BaseFragment implements View.OnClickListener {
 
-
     private BaseMapView mMapView;
     private View mCVLayer, mCVSift, mCVLocation, mZoomIn, mZoomOut, mCVSpace, mCVClear,
             mCvClassifySearch;
@@ -105,6 +104,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private List<FruitListModel> mFruitList = new ArrayList<>();
     //
     private static final String FRUITID = "FRUITID";
+    private List<Graphic> mGraphicList = new ArrayList<>(1000);
 
     public DirectoryFragment() {
         Bundle args = new Bundle();
@@ -620,23 +620,24 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             symbol = createSimpleFillSymbol();
         }
         Graphic graphic;
-        List<Graphic> graphicList = new ArrayList<>(1000);
+
+        mGraphicList.clear();
         for (Object object : result) {
             if (object instanceof Feature) {
                 Feature feature = (Feature) object;
                 graphic = new Graphic(feature.getGeometry(),
                         symbol, feature.getAttributes());
-                graphicList.add(graphic);
+                mGraphicList.add(graphic);
             }
         }
-        if (!graphicList.isEmpty()) {
-            Graphic[] graphics = graphicList.toArray(new Graphic[graphicList.size()]);
+        if (!mGraphicList.isEmpty()) {
+            Graphic[] graphics = mGraphicList.toArray(new Graphic[mGraphicList.size()]);
             if (mapType == 1) {
                 new ClusterUtils(mMapView, graphics);
             } else {
                 mMapView.addGraphics(graphics);
             }
-            mMapView.centerAtGraphic(graphicList.get(0));
+            mMapView.centerAtGraphic(mGraphicList.get(0));
         }
         dismissLoading();
         //地图单击事件
@@ -782,31 +783,41 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder holder, int position) {
                 long fruitId = fruitList.get(position).fruitId;
+//                if (mMapType ==1){
+//
+//                }else {
+//
+//                }
+                fruitList.get(position).selected = true;
+                adapter.notifyItemChanged(position);
+
                 int[] graphicIDs = mMapView.getDrawLayer().getGraphicIDs();
                 if (graphicIDs == null || graphicIDs.length == 0) {
                     ToastUtil.showShort("未在地图上找到相关信息，请重试");
                     return;
                 }
-                for (int id : graphicIDs) {
-                    Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
+                for (Graphic graphic : mGraphicList) {
+//                    Graphic graphic = mMapView.getDrawLayer().getGraphic(id);
                     if (graphic == null) continue;
                     double attributeValue;
                     Symbol updateSymbol;
-                    if (mMapType == 1) {
+                    if (mMapType == 1) {//水准点
                         updateSymbol = new PictureMarkerSymbol(getActivity(),
                                 ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red));
                         attributeValue = ((Double) graphic.getAttributeValue(FRUITID)).longValue();
+                        mMapView.setScale(BaseMapView.mScale);
+                        mMapView.addGraphic(new Graphic(graphic.getGeometry(),updateSymbol));
                     } else {
                         updateSymbol = new SimpleFillSymbol(Color.RED);
                         attributeValue = ((Double) graphic.getAttributeValue(FRUITID)).longValue();
+                        mMapView.getDrawLayer().updateGraphic(graphic.getUid(), updateSymbol);
                     }
 
                     if (fruitId != attributeValue) continue;
-                    mMapView.getDrawLayer().updateGraphic(id, updateSymbol);
+
                     if (graphic.getGeometry() == null) continue;
                     mMapView.centerAtGraphic(graphic);
-                    fruitList.get(position).selected = true;
-                    adapter.notifyItemChanged(position);
+
                 }
             }
         });
