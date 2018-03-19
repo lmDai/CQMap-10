@@ -53,17 +53,19 @@ public class HolderSizeMarkActivity extends BaseActivityWithTitle {
         companyId = getIntent().getIntExtra("companyId",-1);
         companyName = getIntent().getStringExtra("companyName");
         holdersModels = getIntent().getParcelableArrayListExtra("holders");
-        for (HoldersModel holdersModel : holdersModels) {
-            HoldersParentModel holdersParentModel = new HoldersParentModel();
-            holdersParentModel.setName(holdersModel.getName());
-            holdersParentModel.setCardBeginTime(holdersModel.getCardBeginTime());
-            holdersParentModel.setCardEndTime(holdersModel.getCardEndTime());
-            holdersParentModel.setStatus(holdersModel.getStatus());
-            holdersParentModel.setIsHoldCard(holdersModel.getIsHoldCard());
-            ArrayList<HoldersModel> arrayList = new ArrayList<>();
-            arrayList.add(holdersModel);
-            holdersParentModel.setHoldersModels(arrayList);
-            holdersParentModels.add(holdersParentModel);
+        if (holdersModels != null && !holdersModels.isEmpty()) {
+            for (HoldersModel holdersModel : holdersModels) {
+                HoldersParentModel holdersParentModel = new HoldersParentModel();
+                holdersParentModel.setName(holdersModel.getName());
+                holdersParentModel.setCardBeginTime(holdersModel.getCardBeginTime());
+                holdersParentModel.setCardEndTime(holdersModel.getCardEndTime());
+                holdersParentModel.setStatus(holdersModel.getStatus());
+                holdersParentModel.setIsHoldCard(holdersModel.getIsHoldCard());
+                ArrayList<HoldersModel> arrayList = new ArrayList<>();
+                arrayList.add(holdersModel);
+                holdersParentModel.setHoldersModels(arrayList);
+                holdersParentModels.add(holdersParentModel);
+            }
         }
         //初始化
         initViews();

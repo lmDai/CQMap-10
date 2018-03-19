@@ -158,7 +158,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
                         PictureMarkerSymbol symbol =
                                 new PictureMarkerSymbol(UnitDetailActivity.this,
                                         ContextCompat.getDrawable(UnitDetailActivity.this,
-                                        R.drawable.ic_location_green));
+                                                R.drawable.ic_location_green));
                         Graphic graphic = new Graphic(feature.getGeometry(),
                                 symbol, feature.getAttributes());
 
@@ -200,6 +200,9 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         rlHolder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (mCompanyModelDetail.getHolders() == null || mCompanyModelDetail.getHolders().isEmpty()) {
+                    return;
+                }
                 Intent intent = new Intent(UnitDetailActivity.this, HolderSizeMarkActivity.class);
                 intent.putParcelableArrayListExtra("holders", mCompanyModelDetail.getHolders());
                 intent.putExtra("companyId", mCompanyModelDetail.getCompanyId());
@@ -227,7 +230,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
             public void onClick(View view) {
                 Intent intent = new Intent(UnitDetailActivity.this, OwnSecretResultActivity.class);
                 intent.putExtra("company", (long) mCompanyModelDetail.getCompanyId());//这个数据是个long
-                intent.putExtra(OwnSecretResultActivity.COMPANY_NAME,mCompanyModelDetail.getCompanyName());
+                intent.putExtra(OwnSecretResultActivity.COMPANY_NAME, mCompanyModelDetail.getCompanyName());
                 startActivity(intent);
 
             }
@@ -260,7 +263,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         tvDomicileontent = (TextView) findViewById(R.id.tv_domicile_content);
         tvDomicileontent.setText(mCompanyModelDetail.getAreaName());//注册地
         tvContactsContacts = (TextView) findViewById(R.id.tv_contacts_contacts);
-        if (mCompanyModelDetail.getCorporation()!=null) {
+        if (mCompanyModelDetail.getCorporation() != null) {
             tvContactsContacts.setText(mCompanyModelDetail.getCorporation().getName());//联系人
         }
         tvTelContacts = (TextView) findViewById(R.id.tv_tel_contacts);
