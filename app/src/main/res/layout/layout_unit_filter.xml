@@ -1,92 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="328dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_marginLeft="16dp"
-    android:background="#FFFFFF"
-    android:orientation="vertical"
-    android:paddingLeft="8dp"
-    android:paddingRight="8dp">
+    android:layout_marginRight="10dp"
+    android:layout_marginLeft="16dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:background="#FFFFFF"
-        android:gravity="center_vertical"
-        android:text="单位名称/统一社会信用代码"
-        android:textColor="@color/colorPrimary"
-        android:textSize="14sp" />
-
-    <EditText
-        android:id="@+id/et_search"
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:background="#DDDDDD"
-        android:hint="请输入单位名称或统一社会信用代码"
-        android:imeOptions="actionDone"
-        android:maxLines="1"
-        android:paddingLeft="8dp"
-        android:singleLine="true"
-        android:textColorHint="#BBBBBB"
-        android:textSize="12sp"></EditText>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:layout_marginTop="8dp"
-        android:background="#FFFFFF"
-        android:gravity="center_vertical"
-        android:text="注册地"
-        android:textColor="@color/colorPrimary"
-        android:textSize="14dp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/colorDivider" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerViewZCD"
-        android:layout_width="match_parent"
-        android:layout_height="110dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp">
-
-    </android.support.v7.widget.RecyclerView>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:background="#FFFFFF"
-        android:gravity="center_vertical"
-        android:text="单位类别"
-        android:textColor="@color/colorPrimary"
-        android:textSize="14dp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/colorDivider" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerViewLB"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp">
-
-    </android.support.v7.widget.RecyclerView>
-
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/acb_query"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/sp_rr_2395fc"
-        android:text="查询"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
+        android:layout_gravity="center"
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp">
 
-</LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:background="#FFFFFF"
+            android:gravity="center_vertical"
+            android:text="单位名称/统一社会信用代码"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:background="#DDDDDD"
+            android:hint="请输入单位名称或统一社会信用代码"
+            android:imeOptions="actionDone"
+            android:maxLines="1"
+            android:paddingLeft="8dp"
+            android:singleLine="true"
+            android:textColorHint="#BBBBBB"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:background="#FFFFFF"
+            android:gravity="center_vertical"
+            android:text="注册地"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/colorDivider" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerViewZCD"
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:background="#FFFFFF"
+            android:gravity="center_vertical"
+            android:text="单位类别"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/colorDivider" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerViewLB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/acb_query"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/sp_rr_2395fc"
+            android:text="查询"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

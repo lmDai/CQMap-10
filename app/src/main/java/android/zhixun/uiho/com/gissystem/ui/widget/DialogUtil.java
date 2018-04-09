@@ -1,6 +1,7 @@
 package android.zhixun.uiho.com.gissystem.ui.widget;
 
 import android.app.Dialog;
+import android.support.v4.widget.NestedScrollView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,7 +45,11 @@ public class DialogUtil {
             rightMargin = ((LinearLayout.LayoutParams) layoutParams).rightMargin;
             LogUtil.i("LinearLayout.LayoutParams" + leftMargin + "," + rightMargin);
 //            ((LinearLayout.LayoutParams) layoutParams).topMargin += contentView.getContext().getResources().getDimensionPixelSize(R.dimen.cardView_elevation) * 2;
-        } else {
+        }else if (layoutParams instanceof NestedScrollView.LayoutParams){
+            leftMargin =  ((NestedScrollView.LayoutParams) layoutParams).leftMargin;
+            rightMargin =  ((NestedScrollView.LayoutParams) layoutParams).rightMargin;
+        }
+        else {
             leftMargin = DeviceUtil.dip2px(contentView.getContext(), 12);
             rightMargin = DeviceUtil.dip2px(contentView.getContext(), 12);
             LogUtil.i("12...");
