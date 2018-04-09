@@ -104,7 +104,7 @@ public class OwnSecretResultActivity extends BaseActivityWithTitle {
                 orderModelList) {
             @Override
             protected void convert(ViewHolder holder, ReportHandoutListModel item, int position) {
-                holder.setText(R.id.tv_companyName, item.companyName);
+                holder.setText(R.id.tv_companyName, item.purposeUse);
 //                holder.setText(R.id.tv_date, DateUtil.translateDate(orderModel.createTime));
                 holder.setText(R.id.tv_reportNo, item.reportNo);
                 String time = DateUtil.longToString(DateUtil.yyyyMMDD,
