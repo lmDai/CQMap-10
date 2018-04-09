@@ -11,6 +11,7 @@ import android.zhixun.uiho.com.gissystem.greendao_gen.DaoMaster;
 import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
 
 import com.alibaba.fastjson.JSON;
+import com.esri.android.runtime.ArcGISRuntime;
 import com.yibogame.app.BaseApplication;
 import com.yibogame.util.SPUtil;
 
@@ -101,6 +102,9 @@ public class MyBaseApplication extends BaseApplication {
         daoSession = new DaoMaster(db).newSession();
         QueryBuilder.LOG_SQL = true;
         QueryBuilder.LOG_VALUES = true;
+        ArcGISRuntime.setClientId("");
+        //"runtimestandard,101,rux00000,none,XXXXXXX";
+        ArcGISRuntime.License.setLicense("runtimelite,1000,rud4807136520,none,FA0RJAY3FY2M2J7EZ039");
 //        ArcGISRuntimeEnvironment.setLicense("runtimelite,1000,rud4807136520,none,FA0RJAY3FY2M2J7EZ039");
     }
 

@@ -33,7 +33,7 @@ public class DownloadAPI {
 //    public static final String BASE_URL_DOWNLOAD = "http://192.168.31.130:8080/Test/DownloadServlet/";//测试下载接口地址
 
     //public static final String BASE_URL_UPLOAD = "http://dili.dev.uiho.com/comm/files/up";
-    public static final String BASE_URL_UPLOAD = "http://www.map023.cn:8180/comm/files/up";
+    public static final String BASE_URL_UPLOAD = "http://www.map023.cn:8080/comm/files/up";
 
     public DownloadAPI(DownloadProgressListener listener) {
 

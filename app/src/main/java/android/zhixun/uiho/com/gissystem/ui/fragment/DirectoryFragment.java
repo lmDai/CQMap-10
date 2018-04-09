@@ -804,15 +804,17 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                     } else {
                         updateSymbol = new SimpleFillSymbol(Color.RED);
                         attributeValue = ((Double) graphic.getAttributeValue(FRUITID)).longValue();
-                        mMapView.getDrawLayer().updateGraphic(graphic.getUid(), updateSymbol);
+//                        mMapView.getDrawLayer().updateGraphic(graphic.getUid(), updateSymbol);
                     }
 
                     if (fruitId != attributeValue) continue;
                     if (graphic.getGeometry() == null) continue;
 
-                    if (mMapType == 1){
-                        mMapView.addGraphic(new Graphic(graphic.getGeometry(),updateSymbol));
-                    }
+//                    if (mMapType == 1) {
+                        mMapView.addGraphic(new Graphic(graphic.getGeometry(), updateSymbol));
+//                    } else {
+//                        mMapView.getDrawLayer().updateGraphic(graphic.getUid(),updateSymbol);
+//                    }
                     mMapView.setScale(BaseMapView.mScale);
                     mMapView.centerAtGraphic(graphic);
 

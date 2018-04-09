@@ -276,7 +276,7 @@ public class UnitDetailActivity extends BaseActivityWithTitle {
         tvPositionContent.setText(mCompanyModelDetail.getCompanyAddre());
         tvOwnNumber = (TextView) findViewById(R.id.tv_own_number);
         //拥有的测绘成果几条
-        tvOwnNumber.setText(String.valueOf(mCompanyModelDetail.getFruitNum()) + "个报件");
+        tvOwnNumber.setText(String.valueOf(mCompanyModelDetail.getFruitNum()) + "条");
 
         aivMethodLeft = (AppCompatImageView) findViewById(R.id.aiv_method_left);//管理方法左滑动
         aivMethodRight = (AppCompatImageView) findViewById(R.id.aiv_method_right);//管理方法右滑动

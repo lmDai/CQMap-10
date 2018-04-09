@@ -72,10 +72,10 @@ public class APIService {
     /***
      * 网络连接超时时间(单位：秒)
      */
-    public static final int DEFAULT_TIMEOUT = 59;
+    public static final int DEFAULT_TIMEOUT = 20;
     //    public static final String BASE_URL = "http://open.uiho.com/Test/TestServlet/";//测试接口地址
 //    public static final String BASE_URL = "http://dili.dev.uiho.com/info/InfoServlet/";
-    public static final String BASE_URL = "http://www.map023.cn:8180/info/InfoServlet/";
+    public static final String BASE_URL = "http://www.map023.cn:8081/info/InfoServlet/";
     //    public static final String BASE_URL = "http://192.168.31.139:8080/dlxx_appx/InfoServlet/";
     //            public static final String BASE_URL = "http://192.168.31.130:8080/Test/TestServlet/";//测试接口地址
     public static final String APP_ID = "UIHOKX161024", APP_KEY = "lwgdta91eh3nxzc7";
