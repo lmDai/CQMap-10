@@ -90,6 +90,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     private RecyclerView mContentRv;
     private View dragView;
     private List<Graphic> mGraphicList = new ArrayList<>(1000);
+    private boolean isCluster = false;
+    private ClusterUtils mClusterUtils;
 
     public UnitFragment() {
         Bundle args = new Bundle();
@@ -204,6 +206,10 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 mMapView.zoomout();
                 break;
             case R.id.cv_space://空间查询
+                isCluster = false;
+                if (mClusterUtils != null){
+                    mClusterUtils.release();
+                }
                 if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
                     showSpaceDialog(v);
                 } else if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_BUFFER) {
@@ -279,6 +285,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
 
     //显示过滤dialog
     private void showSiftDialog(View view) {
+        isCluster = true;
         View contentView = LayoutInflater
                 .from(getActivity())
                 .inflate(R.layout.layout_unit_filter, (ViewGroup) getView(),
@@ -462,8 +469,12 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         }
         if (!mGraphicList.isEmpty()) {
             Graphic[] graphics = mGraphicList.toArray(new Graphic[mGraphicList.size()]);
-//            mMapView.addGraphics(graphics);
-            new ClusterUtils(mMapView, graphics);
+            if (!isCluster) {
+                mMapView.addGraphics(graphics);
+            }else {
+                mClusterUtils = new ClusterUtils();
+                mClusterUtils.cluster(mMapView, graphics);
+            }
         }
 
         showBottomLayout(exitsCompanyList);

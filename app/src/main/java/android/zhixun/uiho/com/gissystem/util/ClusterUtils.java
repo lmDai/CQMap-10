@@ -44,7 +44,7 @@ public class ClusterUtils {
     private List<Cluster> mClusters = new ArrayList<>();
     private List<Graphic> mAddMarkers = new ArrayList<>();
 
-    public ClusterUtils(BaseMapView mapView, Graphic[] graphics) {
+    public void cluster(BaseMapView mapView, Graphic[] graphics) {
 
         int length = graphics.length;
         LogUtil.d("length == " + length);
@@ -73,6 +73,10 @@ public class ClusterUtils {
 
         initThreadHandler();
         assignClusters();
+    }
+
+    public void release() {
+        mMapView.setOnZoomListener(null);
     }
 
 

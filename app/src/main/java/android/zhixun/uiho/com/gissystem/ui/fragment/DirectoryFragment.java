@@ -633,7 +633,8 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         if (!mGraphicList.isEmpty()) {
             Graphic[] graphics = mGraphicList.toArray(new Graphic[mGraphicList.size()]);
             if (mapType == 1) {
-                new ClusterUtils(mMapView, graphics);
+                ClusterUtils clusterUtils = new ClusterUtils();
+                clusterUtils.cluster(mMapView, graphics);
             } else {
                 mMapView.addGraphics(graphics);
             }
@@ -811,7 +812,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                     if (graphic.getGeometry() == null) continue;
 
 //                    if (mMapType == 1) {
-                        mMapView.addGraphic(new Graphic(graphic.getGeometry(), updateSymbol));
+                    mMapView.addGraphic(new Graphic(graphic.getGeometry(), updateSymbol));
 //                    } else {
 //                        mMapView.getDrawLayer().updateGraphic(graphic.getUid(),updateSymbol);
 //                    }

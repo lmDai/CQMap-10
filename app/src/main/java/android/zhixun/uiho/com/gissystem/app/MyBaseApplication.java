@@ -102,7 +102,7 @@ public class MyBaseApplication extends BaseApplication {
         daoSession = new DaoMaster(db).newSession();
         QueryBuilder.LOG_SQL = true;
         QueryBuilder.LOG_VALUES = true;
-        ArcGISRuntime.setClientId("");
+        ArcGISRuntime.setClientId("5SKIXc21JlankElJ");
         //"runtimestandard,101,rux00000,none,XXXXXXX";
         ArcGISRuntime.License.setLicense("runtimelite,1000,rud4807136520,none,FA0RJAY3FY2M2J7EZ039");
 //        ArcGISRuntimeEnvironment.setLicense("runtimelite,1000,rud4807136520,none,FA0RJAY3FY2M2J7EZ039");
