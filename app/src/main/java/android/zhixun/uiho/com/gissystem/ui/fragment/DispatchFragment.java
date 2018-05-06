@@ -693,16 +693,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
             GraphicsLayer drawLayer = mMapView.getDrawLayer();
             Graphic graphic = drawLayer.getGraphic(ids[0]);
             if (graphic == null) return;
-            double FRUIT_ID;
-            if (mapType == 1) {
-                drawLayer.updateGraphic(ids[0], new PictureMarkerSymbol(getActivity(),
-                        ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red)));
-                FRUIT_ID = (double) graphic.getAttributeValue("FRUITID");
-            } else {
-                drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
-                FRUIT_ID = ((Double) graphic.getAttributeValue("FRUITID")).longValue();
-            }
-
+            double FRUIT_ID = FRUIT_ID = (Double) graphic.getAttributeValue("FRUITID");
             List<ReportHandoutListModel> selectHandoutList = new ArrayList<>();
 
             for (ReportHandoutListModel handout : mHandoutList) {
@@ -719,7 +710,27 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     }
                 }
             }
-            //遍历删除地图上没也graphic的数据，这真的坑爹
+
+            if (mapType == 1) {//点标记
+                drawLayer.updateGraphic(ids[0], new PictureMarkerSymbol(getActivity(),
+                        ContextCompat.getDrawable(getActivity(), R.drawable.ic_location_red)));
+                showBottomLayout(selectHandoutList, false);
+            } else {
+                if (graphic.getSymbol() instanceof SimpleFillSymbol) {
+                    SimpleFillSymbol fillSymbol = (SimpleFillSymbol) graphic.getSymbol();
+                    if (fillSymbol.getColor() == Color.RED) {//反选
+                        drawLayer.updateGraphic(ids[0], createSimpleFillSymbol());
+                        hideBottomLayout();
+                    } else {
+                        drawLayer.updateGraphic(ids[0], new SimpleFillSymbol(Color.RED));
+                        showBottomLayout(selectHandoutList, false);
+                    }
+                }
+
+//                FRUIT_ID = ((Double) graphic.getAttributeValue("FRUITID")).longValue();
+            }
+
+            //
             for (ReportHandoutListModel handout : selectHandoutList) {
 
                 for (ReportHandoutListModel.FruitCategoryList fruitCategory :
@@ -748,7 +759,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                     fruitCategory.fruitList.addAll(existList);
                 }
             }
-            showBottomLayout(selectHandoutList, false);
+
         });
     }
 
