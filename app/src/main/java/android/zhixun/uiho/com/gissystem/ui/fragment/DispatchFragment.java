@@ -1396,8 +1396,9 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
     //查询行政区域
     private void searchAdminRegion(String searchText) {
         showLoading();
-        String url = getString(R.string.query_admin_region);
-        String where = String.format("1=1 and MC='%s'", searchText);
+//        String url = getString(R.string.query_admin_region);
+        String url = "http://ddk.digitalcq.com:6080/arcgis/rest/services/zgqxdt/xzqhj/MapServer/0";
+        String where = String.format("1=1 and QXMC='%s'", searchText);
         mMapView.querySQL(getActivity(), url, where,
                 new BaseMapView.MainThreadCallback<FeatureResult>() {
                     @Override
@@ -1415,6 +1416,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
                                                 SimpleLineSymbol.STYLE.SOLID);
                                 Graphic graphic = new Graphic(feature.getGeometry(), symbol);
                                 mMapView.setCurrentDrawGraphic(graphic);
+                                mMapView.centerAtGraphic(graphic);
                             }
                         }
 
