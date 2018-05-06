@@ -42,6 +42,7 @@
     <string name="query_symbol">http://ddk.digitalcq.com:6080/arcgis/rest/services/CQGRID_2000/Mapserver/0</string>
     <!--行政区域查询-->
     <string name="query_admin_region">http://www.digitalcq.com/RemoteRest/services/CQ_XZQH/MapServer/1</string>
+    <string name="new_admin_region">http://ddk.digitalcq.com:6080/arcgis/rest/services/zgqxdt/xzqhj/MapServer/0</string>
 
 
     <string name="alert_title">提示</string>
