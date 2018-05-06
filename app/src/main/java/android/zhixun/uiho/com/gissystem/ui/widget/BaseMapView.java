@@ -176,7 +176,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
         this.currentDrawSpace = currentDrawSpace;
         if (currentDrawSpace == SPACE_NONE) {
             drawTool.deactivate();
-            drawLayer.removeAll();
+//            drawLayer.removeAll();
 //            currentDrawGraphic = null;
         }
     }

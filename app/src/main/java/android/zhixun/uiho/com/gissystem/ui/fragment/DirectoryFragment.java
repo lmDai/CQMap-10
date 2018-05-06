@@ -1267,7 +1267,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private void restoreSpaceStatus() {
         mMapView.setCurrentDrawSpace(BaseMapView.SPACE_NONE);
         mCVSpace.setBackgroundResource(R.drawable.ic_space);
-        mMapView.clearAll();
+//        mMapView.clearAll();
         hideClearBtn();
     }
 
@@ -1275,7 +1275,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
         restoreSpaceStatus();
         hideBottomLayout();
         hideClearBtn();
-        mMapView.clearAll();
+//        mMapView.clearAll();
     }
 
     private void showClearBtn() {
