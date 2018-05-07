@@ -1079,7 +1079,7 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
                         now.get(Calendar.DAY_OF_MONTH)
                 );
                 dpd1.setVersion(DatePickerDialog.Version.VERSION_2);
-                dpd1.show(getFragmentManager(), "Datepickerdialog");
+                dpd1.show(getSupportFragmentManager(), "Datepickerdialog");
 //
             }
         });
@@ -1328,7 +1328,7 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
                 now.get(Calendar.SECOND),
                 true);
         dpd2.setVersion(TimePickerDialog.Version.VERSION_2);
-        dpd2.show(getFragmentManager(), "TimePickerDialog");
+        dpd2.show(getSupportFragmentManager(), "TimePickerDialog");
     }
 
     @Override

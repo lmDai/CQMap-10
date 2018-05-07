@@ -47,6 +47,8 @@ import android.zhixun.uiho.com.gissystem.ui.fragment.DispatchFragment;
 import android.zhixun.uiho.com.gissystem.ui.fragment.UnitFragment;
 import android.zhixun.uiho.com.gissystem.ui.itemY.OwnSMCHResultItem;
 import android.zhixun.uiho.com.gissystem.ui.widget.DividerItemDecoration;
+import android.zhixun.uiho.com.gissystem.ui.widget.FragmentVpAdapter;
+import android.zhixun.uiho.com.gissystem.ui.widget.NoScrollViewPager;
 import android.zhixun.uiho.com.gissystem.ui.widget.VerticalRecyclerView;
 import android.zhixun.uiho.com.gissystem.ui.widget.tree_recyclerview.adapter.TreeRecyclerViewAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.tree_recyclerview.viewholder.TreeAdapterItem;
@@ -97,6 +99,7 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
     private DispatchFragmentStore mDispatchFragmentStore;
 
     private DrawerLayout mDrawerLayout;
+    private NoScrollViewPager mViewPager;
 
     @Override
     protected int getLayoutRes() {
@@ -105,26 +108,11 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
 
     @Override
     protected void onCreateActivity(@Nullable Bundle savedInstanceState) {
-//        ArrayList<TreeAdapterItem> treeBeen1 = new ArrayList<>();//一级
-//        List<CityBean> cityBeen = JSON.parseArray(getResources().getString(R.string.location), CityBean.class);
-//        for (int i = 0; i < cityBeen.size(); i++) {
-//            treeBeen1.add(new OneItem(cityBeen.get(i)));
-//        }
-//        recyclerView.setAdapter(new TreeRecyclerViewAdapter<>(this, treeBeen1));
-
-
         mDaoSession = ((MyBaseApplication) getApplication()).getDaoSession();
-
-//        CRActiveUserModelDao crActiveUserModelDao = mDaoSession.getCRActiveUserModelDao();
-//        crActiveUserModelDao.queryBuilder().limit(1).orderDesc(CRActiveUserModelDao.Properties.Id);
-//        CRActiveUserModel crActiveUserModel = crActiveUserModelDao.queryBuilder().build().unique();
-//        ToastUtil.showLong(crActiveUserModel.getNickname() + "," + crActiveUserModel.getUserId() +
-// "," + crActiveUserModel.getUserUnitId());
-
 
         actionbarSizeTypedArray.recycle();
         initViews();
-        initFragments(savedInstanceState);
+//        initFragments(savedInstanceState);
         mSubscriptionEmptyAction = RxBus.getInstance().toObservable(MainActivityAction.class)
                 .subscribe(new Action1<MainActivityAction>() {
                     @Override
@@ -148,22 +136,6 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
                                 animToHalf();
                                 break;
                             case MainActivityAction.ACTION_REFRESH_DATA_DISPATCH:
-//                        buildUnitListFromAchievementList(mainActivityAction, new IOnComplete() {
-//                            @Override
-//                            public void onComplete() {
-//                                if (!(mRecyclerView.getWrapAdapter().getAdapter() instanceof TreeRecyclerViewAdapter)) {
-//                                    mRecyclerView.setAdapter(mTreeRecyclerViewAdapter);
-//                                } else {
-//                                    mTreeRecyclerViewAdapter.notifyDataSetChanged();
-//                                }
-//                                animToHalf();
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable throwable) {
-//
-//                            }
-//                        });
                                 LogUtil.d("askldjflasjflasjdfl;asjklfjas;ldfjklaskjf");
                                 for (Object object : mainActivityAction.getList()) {
                                     OwnSMCHResultItem ownSMCHResultItem = (OwnSMCHResultItem) object;
@@ -178,188 +150,9 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
                                 animToHalf();
                                 break;
                             case MainActivityAction.ACTION_SELECT_ITEM://当选中了某个条目
-//                                boolean listUnitContainFlag = false;
-//                                for (int i = 0; i < listCompany.size(); i++) {
-//                                    if (listCompany.get(i).getGeometry().getExtent().getCenter()
-//                                            .equals(mainActivityAction.getFeature().getGeometry()
-//                                                    .getExtent().getCenter())) {
-//                                        listUnitContainFlag = true;
-//                                        animToHalf();
-//                                        Observable.just(i)
-//                                                .delay(0, TimeUnit.MILLISECONDS)
-//                                                .subscribeOn(Schedulers.io())
-//                                                .observeOn(AndroidSchedulers.mainThread())
-//                                                .doOnNext(new Action1<Integer>() {
-//                                                    @Override
-//                                                    public void call(Integer integer) {
-//                                                        scrollToPosition = integer + mRecyclerView.getWrapAdapter().getHeadersCount();
-//                                                        if (scrollToPosition != 0) {
-//                                                            linearLayoutManager.scrollToPositionWithOffset(scrollToPosition, 0);
-//                                                        }
-//                                                    }
-//                                                })
-//                                                .delay(0, TimeUnit.MILLISECONDS)
-//                                                .subscribeOn(Schedulers.io())
-//                                                .observeOn(AndroidSchedulers.mainThread())
-//                                                .subscribe(new Subscriber<Integer>() {
-//                                                    @Override
-//                                                    public void onCompleted() {
-//
-//                                                    }
-//
-//                                                    @Override
-//                                                    public void onError(Throwable e) {
-//
-//                                                    }
-//
-//                                                    @Override
-//                                                    public void onNext(Integer integer) {
-//                                                        ObjectAnimator anim = ObjectAnimator
-//                                                                .ofObject(linearLayoutManager
-//                                                                                .findViewByPosition(scrollToPosition),
-//                                                                        "backgroundColor", new ArgbEvaluator(),
-//                                                                        getResources().getColor(R.color.colorPrimaryLight),
-//                                                                        Color.WHITE, getResources().getColor(R.color.colorPrimaryLight), Color.WHITE);
-//                                                        anim.setDuration(2000);
-//                                                        anim.start();
-////                                        ToastUtil.showShort("已滚动");
-//                                                    }
-//                                                });
-//
-//                                        break;
-//                                    }
-//
-//                                }
-//                                if (!listUnitContainFlag) {
-//                                    MyBaseApplication myBaseApplication = (MyBaseApplication) getApplication();
-////                            int arcGisId = Integer.parseInt(mainActivityAction.getFeature().getAttributes()
-//// .get(Config.ARCGIS_UNITID).toString());
-//                                    Object o = mainActivityAction.getFeature()
-//                                            .getAttributes().get(Config.ARCGIS_UNITID);
-////                                    if (o == null) {
-////                                        o = mainActivityAction.getFeature()
-////                                                .getAttributes().get(Config.FRUIT_ID);
-////                                    }
-//                                    if (o == null) return;
-//                                    int companyId = Integer.parseInt(o.toString());
-////                            UnitModelDao unitModelDao = mDaoSession.getUnitModelDao();
-////                            myBaseApplication.setUnitModel(unitModelDao.queryBuilder().where(UnitModelDao.Properties.ArcGisId.eq(arcGisId)).unique());
-//                                    APIService.getInstance().getCompanyDetailObservable(String.valueOf(companyId))
-//                                            .subscribeOn(Schedulers.io())
-//                                            .observeOn(AndroidSchedulers.mainThread())
-//                                            .subscribe(new Subscriber<CompanyDetailModel>() {
-//                                                @Override
-//                                                public void onCompleted() {
-//
-//                                                }
-//
-//                                                @Override
-//                                                public void onError(Throwable e) {
-//                                                    ToastUtil.showShort("暂无数据");
-//                                                }
-//
-//                                                @Override
-//                                                public void onNext(CompanyDetailModel companyDetailModel) {
-//                                                    myBaseApplication.setCompanyDetailModel(companyDetailModel);
-//                                                    Intent intent = new Intent(MainActivity.this, UnitDetailActivity.class);
-//                                                    startActivity(intent);
-//                                                }
-//                                            });
-//                                }
                                 break;
 
                             case MainActivityAction.ACTION_SELECT_ITEM_DISPATCH://成果分发条目点击
-//                        ToastUtil.showShort("点击已被注释");
-//                        buildUnitListFromAchievementList(mainActivityAction, new IOnComplete() {
-//                            @Override
-//                            public void onComplete() {
-//                                boolean isShowListFlag = false;
-//                                for (int i = 0; i < listUnitDispatchForBottomRecyclerView.size(); i++) {
-//                                    isShowListFlag = true;
-//                                    CompanyDetailModel unitModel = listUnitDispatchForBottomRecyclerView.get(i);
-//                                    if (unitModel.getGeometry() == null) {
-//                                        continue;
-//                                    }
-//                                    if (unitModel.getGeometry().getExtent().getCenter().equals(mainActivityAction.getFeature().getGeometry().getExtent().getCenter())) {
-//                                        animToHalf();
-//                                        Observable.just(i)
-//                                                .delay(0, TimeUnit.MILLISECONDS)
-//                                                .subscribeOn(Schedulers.io())
-//                                                .observeOn(AndroidSchedulers.mainThread())
-//                                                .doOnNext(new Action1<Integer>() {
-//                                                    @Override
-//                                                    public void call(Integer integer) {
-//                                                        scrollToPosition = integer + mRecyclerView.getWrapAdapter().getHeadersCount();
-//                                                        if (scrollToPosition != 0) {
-//                                                            linearLayoutManager.scrollToPositionWithOffset(scrollToPosition, 0);
-//                                                        }
-//                                                    }
-//                                                })
-//                                                .delay(0, TimeUnit.MILLISECONDS)
-//                                                .subscribeOn(Schedulers.io())
-//                                                .observeOn(AndroidSchedulers.mainThread())
-//                                                .subscribe(new Subscriber<Integer>() {
-//                                                    @Override
-//                                                    public void onCompleted() {
-//
-//                                                    }
-//
-//                                                    @Override
-//                                                    public void onError(Throwable e) {
-//
-//                                                    }
-//
-//                                                    @Override
-//                                                    public void onNext(Integer integer) {
-//                                                        ObjectAnimator anim = ObjectAnimator.ofObject(linearLayoutManager.findViewByPosition(scrollToPosition), "backgroundColor", new ArgbEvaluator(), getResources().getColor(R.color.colorPrimaryLight), Color.WHITE, getResources().getColor(R.color.colorPrimaryLight), Color.WHITE);
-//                                                        anim.setDuration(2000);
-//                                                        anim.start();
-////                                        ToastUtil.showShort("已滚动");
-//                                                    }
-//                                                });
-//
-//                                        break;
-//                                    }
-//                                }
-//
-//                                if (!isShowListFlag) {
-//                                    MyBaseApplication myBaseApplication = (MyBaseApplication) getApplication();
-////                                    int arcGisId = Integer.parseInt(mainActivityAction.getFeature().getAttributes().get(Config.ARCGIS_UNITID).toString());
-//                                    int companyId = Integer.parseInt(mainActivityAction.getFeature().getAttributes().get(Config.ARCGIS_UNITID).toString());
-////                                    UnitModelDao unitModelDao = mDaoSession.getUnitModelDao();
-////                                    UnitModel unitModel = unitModelDao.queryBuilder().where(UnitModelDao.Properties.ArcGisId.eq(arcGisId)).unique();
-//                                    APIService.getInstance().getCompanyDetailObservable(String.valueOf(companyId))
-//                                            .subscribeOn(Schedulers.io())
-//                                            .observeOn(AndroidSchedulers.mainThread())
-//                                            .subscribe(new Subscriber<CompanyDetailModel>() {
-//                                                @Override
-//                                                public void onCompleted() {
-//
-//                                                }
-//
-//                                                @Override
-//                                                public void onError(Throwable e) {
-//
-//                                                }
-//
-//                                                @Override
-//                                                public void onNext(CompanyDetailModel companyDetailModel) {
-//                                                    myBaseApplication.setCompanyDetailModel(companyDetailModel);
-//                                                    Intent intent = new Intent(MainActivity.this, OwnSecretResultActivity.class);
-//                                                    intent.putExtra("company", (long) companyDetailModel.getCompanyId());
-//                                                    startActivity(intent);
-//                                                }
-//                                            });
-////                                    myBaseApplication.setUnitModel(unitModel);
-//
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onError(Throwable throwable) {
-//
-//                            }
-//                        });
                                 break;
                             case MainActivityAction.ACTION_GET_UNIT_ID:
                                 //这个没走RxBus.send了，所以这里不会收到了，以后再来删
@@ -416,70 +209,48 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
         ToastUtil.showShort("还未做，已注释掉了");
         listUnitDispatchForBottomRecyclerView.clear();
         listUnitDispatchForBottomRecyclerView.addAll(mainActivityAction.getList());
-//        mUnitItemList.clear();
-//        List<AchievementModel> achievementModelList = mainActivityAction.getList();
-//        Observable.from(achievementModelList)
-//                .flatMap(new Func1<AchievementModel, Observable<CompanyDetailModel>>() {
-//                    @Override
-//                    public Observable<CompanyDetailModel> call(AchievementModel achievementModel) {
-//                        mUnitItemList.add(new UnitItem(achievementModel, mDaoSession));
-//                        return APIService.getInstance().getCompanyDetailObservable(achievementModel.getUnitKey().toString());
-//                    }
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Subscriber<CompanyDetailModel>() {
-//                    @Override
-//                    public void onCompleted() {
-//                        iOnComplete.onComplete();
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        iOnComplete.onError(e);
-//                    }
-//
-//                    @Override
-//                    public void onNext(CompanyDetailModel companyDetailModel) {
-//                        listUnitDispatchForBottomRecyclerView.add(companyDetailModel);
-//                    }
-//                });
     }
 
     /***
      * 初始化Views
      */
     private void initViews() {
+        mViewPager = findViewById(R.id.vp_main);
+        mViewPager.setOffscreenPageLimit(4);
+        List<android.support.v4.app.Fragment> fragments = new ArrayList<>();
+        fragments.add(new UnitFragment());
+        fragments.add(new DispatchFragment());
+        fragments.add(new DirectoryFragment());
+        fragments.add(new CheckFragment());
+        FragmentVpAdapter adapter = new FragmentVpAdapter(getSupportFragmentManager(), fragments);
+        mViewPager.setAdapter(adapter);
         rgBottomRadioNavigation = (RadioGroup) findViewById(R.id.rg_bottom_radio_navigation);
         mRecyclerView = (VerticalRecyclerView) findViewById(R.id.recyclerViewUnit);
 //        //添加分割线
-//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(MainActivity.this, DividerItemDecoration.VERTICAL_LIST);
-//        dividerItemDecoration.setShowFirstLine(true);
-//        dividerItemDecoration.setShowLastLine(true);
-//        mRecyclerView.addItemDecoration(dividerItemDecoration);
         rgBottomRadioNavigation.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (i) {
                 case R.id.rb_tab_unit:
                     selectedIndex = 0;
 //                    showFragment(UnitFragment.class);
-                    showFagmentByReplace(UnitFragment.class);
+//                    showFagmentByReplace(UnitFragment.class);
                     break;
                 case R.id.rb_tab_dispatch:
                     selectedIndex = 1;
 //                    showFragment(DispatchFragment.class);
-                    showFagmentByReplace(DispatchFragment.class);
+//                    showFagmentByReplace(DispatchFragment.class);
                     break;
                 case R.id.rb_tab_directory:
                     selectedIndex = 2;
 //                    showFragment(DirectoryFragment.class);
-                    showFagmentByReplace(DirectoryFragment.class);
+//                    showFagmentByReplace(DirectoryFragment.class);
                     break;
                 case R.id.rb_tab_check:
                     selectedIndex = 3;
 //                    showFragment(CheckFragment.class);
-                    showFagmentByReplace(CheckFragment.class);
+//                    showFagmentByReplace(CheckFragment.class);
                     break;
             }
+            mViewPager.setCurrentItem(selectedIndex, false);
         });
         llTitle = (LinearLayout) findViewById(R.id.ll_title);
         llTitle.setOnClickListener(new View.OnClickListener() {
@@ -659,34 +430,34 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
      *
      * @param savedInstanceState
      */
-    private void initFragments(Bundle savedInstanceState) {
-        mFragmentManager = getFragmentManager();
-        if (savedInstanceState == null) {
-            createAndAddFragment(UnitFragment.class);
-        } else {
-            selectedIndex = savedInstanceState.getInt("selectedIndex");
-            rgBottomRadioNavigation.check(rgBottomRadioNavigation.getChildAt(selectedIndex).getId());
-            switch (selectedIndex) {
-                case 0:
-//                    showFragment(UnitFragment.class);
-                    showFagmentByReplace(UnitFragment.class);
-                    break;
-                case 1:
-                    showFagmentByReplace(DirectoryFragment.class);
-//                    showFragment(DispatchFragment.class);
-                    break;
-                case 2:
-//                    showFragment(DirectoryFragment.class);
-                    showFagmentByReplace(DirectoryFragment.class);
-                    break;
-                case 3:
-//                    showFragment(CheckFragment.class);
-                    showFagmentByReplace(CheckFragment.class);
-                    break;
-            }
-
-        }
-    }
+//    private void initFragments(Bundle savedInstanceState) {
+//        mFragmentManager = getFragmentManager();
+//        if (savedInstanceState == null) {
+//            createAndAddFragment(UnitFragment.class);
+//        } else {
+//            selectedIndex = savedInstanceState.getInt("selectedIndex");
+//            rgBottomRadioNavigation.check(rgBottomRadioNavigation.getChildAt(selectedIndex).getId());
+//            switch (selectedIndex) {
+//                case 0:
+////                    showFragment(UnitFragment.class);
+//                    showFagmentByReplace(UnitFragment.class);
+//                    break;
+//                case 1:
+//                    showFagmentByReplace(DirectoryFragment.class);
+////                    showFragment(DispatchFragment.class);
+//                    break;
+//                case 2:
+////                    showFragment(DirectoryFragment.class);
+//                    showFagmentByReplace(DirectoryFragment.class);
+//                    break;
+//                case 3:
+////                    showFragment(CheckFragment.class);
+//                    showFagmentByReplace(CheckFragment.class);
+//                    break;
+//            }
+//
+//        }
+//    }
 
     /***
      * 展开的动画
@@ -946,64 +717,64 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
      *
      * @param clazz
      */
-    private void showFragment(Class<? extends Fragment> clazz) {
-        hideAllFragment();
-        Fragment myBaseFragment = (Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
-        if (myBaseFragment == null) {
-            myBaseFragment = createAndAddFragment(clazz);
-        }
-        mFragmentManager.beginTransaction().show(myBaseFragment).commit();
-//        mFragmentManager.beginTransaction().attach(myBaseFragment).commit();
-    }
-
-    private android.app.Fragment showFagmentByReplace(Class<? extends android.app.Fragment> clazz) {
-        if (mFragmentManager.findFragmentByTag(clazz.getSimpleName()) != null) {
-            return (android.app.Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
-        }
-        try {
-            android.app.Fragment fragment = clazz.newInstance();
-//            mFragmentManager.beginTransaction().add(R.id.contentContainer, myBaseFragment,
-// myBaseFragment.getArguments().getString("name")).commit();
-            String tag = fragment.getArguments().getString("name");
-            mFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.contentContainer, fragment, tag)
-                    .commit();
-            return fragment;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    private void showFragment(Class<? extends Fragment> clazz) {
+//        hideAllFragment();
+//        Fragment myBaseFragment = (Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
+//        if (myBaseFragment == null) {
+//            myBaseFragment = createAndAddFragment(clazz);
+//        }
+//        mFragmentManager.beginTransaction().show(myBaseFragment).commit();
+////        mFragmentManager.beginTransaction().attach(myBaseFragment).commit();
+//    }
+//
+//    private android.app.Fragment showFagmentByReplace(Class<? extends android.app.Fragment> clazz) {
+//        if (mFragmentManager.findFragmentByTag(clazz.getSimpleName()) != null) {
+//            return (android.app.Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
+//        }
+//        try {
+//            android.app.Fragment fragment = clazz.newInstance();
+////            mFragmentManager.beginTransaction().add(R.id.contentContainer, myBaseFragment,
+//// myBaseFragment.getArguments().getString("name")).commit();
+//            String tag = fragment.getArguments().getString("name");
+//            mFragmentManager
+//                    .beginTransaction()
+//                    .replace(R.id.contentContainer, fragment, tag)
+//                    .commit();
+//            return fragment;
+//        } catch (InstantiationException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
 
     /***
      * 创建并且Add fragment
      *
-     * @param clazz
+//     * @param clazz
      * @return
      */
     @SuppressWarnings("TryWithIdenticalCatches")
-    private Fragment createAndAddFragment(Class<? extends Fragment> clazz) {
-        if (mFragmentManager.findFragmentByTag(clazz.getSimpleName()) != null) {
-            return (Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
-        }
-        try {
-            Fragment myBaseFragment = clazz.newInstance();
-            mFragmentManager.beginTransaction()
-                    .add(R.id.contentContainer, myBaseFragment,
-                            myBaseFragment.getArguments().getString("name"))
-                    .commit();
-            return myBaseFragment;
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+//    private Fragment createAndAddFragment(Class<? extends Fragment> clazz) {
+//        if (mFragmentManager.findFragmentByTag(clazz.getSimpleName()) != null) {
+//            return (Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
+//        }
+//        try {
+//            Fragment myBaseFragment = clazz.newInstance();
+//            mFragmentManager.beginTransaction()
+//                    .add(R.id.contentContainer, myBaseFragment,
+//                            myBaseFragment.getArguments().getString("name"))
+//                    .commit();
+//            return myBaseFragment;
+//        } catch (InstantiationException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
 
     /***
@@ -1064,7 +835,7 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
     public void openDrawer() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
-           imm.hideSoftInputFromWindow(mDrawerLayout.getWindowToken(),0);
+            imm.hideSoftInputFromWindow(mDrawerLayout.getWindowToken(), 0);
         }
 
         mDrawerLayout.openDrawer(Gravity.START);

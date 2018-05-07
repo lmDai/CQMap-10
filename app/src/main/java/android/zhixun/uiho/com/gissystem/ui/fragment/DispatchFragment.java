@@ -838,6 +838,7 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         relativeLayoutLeft.setOnClickListener(view1 -> {
             isFirst = true;
             Calendar now = Calendar.getInstance();
+
             DatePickerDialog dpd1 = DatePickerDialog.newInstance(DispatchFragment.this,
                     now.get(Calendar.YEAR),
                     now.get(Calendar.MONTH) - 1,
