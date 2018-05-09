@@ -477,7 +477,8 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
             }
         }
 
-        showBottomLayout(exitsCompanyList);
+//        showBottomLayout(exitsCompanyList);
+        showBottomLayout(companyList);
     }
 
     private void OnMapSingleTap(float x, float y) {
