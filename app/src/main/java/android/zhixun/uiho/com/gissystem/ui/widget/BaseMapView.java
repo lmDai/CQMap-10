@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.IntDef;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.zhixun.uiho.com.gissystem.R;
 import android.zhixun.uiho.com.gissystem.drawtool.DrawEvent;
 import android.zhixun.uiho.com.gissystem.drawtool.DrawEventListener;
@@ -315,8 +316,10 @@ public class BaseMapView extends MapView implements DrawEventListener {
             switch (status) {
                 case INITIALIZED:
                     requestLocationPermission();
+                    Log.d("simple","INITIALIZED");
                     break;
                 case LAYER_LOADED:
+                    Log.d("simple","LAYER_LOADED");
                     break;
             }
         }

@@ -93,17 +93,60 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
     private boolean isCluster = false;
     private ClusterUtils mClusterUtils;
 
+    private String mMapState = null;
+    private final String KEY_MAP_STATE = "MapState";
+
     public UnitFragment() {
         Bundle args = new Bundle();
         args.putString("name", this.getClass().getSimpleName());
         setArguments(args);
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            mMapState = savedInstanceState.getString(KEY_MAP_STATE, null);
+        }
         return inflater.inflate(R.layout.fragment_unit, container, false);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mMapState != null) {
+            outState.putString(KEY_MAP_STATE, mMapState);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Save map state and pause the MapView to save battery
+        mMapState = mMapView.retainState();
+        mMapView.pause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Start the MapView threads running again
+        mMapView.unpause();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Release MapView resources
+        mMapView.recycle();
+        mMapView = null;
     }
 
     @Override
@@ -140,40 +183,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
         mIvUser.setOnClickListener(this);
         mTvSearch.setOnClickListener(this);
         mMapView.setOnSingleTapListener(this::OnMapSingleTap);
-//        mMapView.setOnStatusChangedListener(this::OnStatusChange);
     }
-
-//    private void OnStatusChange(Object o, OnStatusChangedListener.STATUS status) {
-//        switch (status) {
-//            case INITIALIZED:
-//                location();
-//                break;
-//            case LAYER_LOADED:
-//
-//                break;
-//        }
-//    }
-
-//    private void location() {
-//        AndPermission.with(this)
-//                .permission(Manifest.permission_group.LOCATION)
-//                .callback(listener)
-//                .start();
-//
-//    }
-
-//    private PermissionListener listener = new PermissionListener() {
-//        @Override
-//        public void onSucceed(int requestCode, List<String> grantedPermissions) {
-//            mMapView.setScale(100000, true);
-//            mMapView.location();
-//        }
-//
-//        @Override
-//        public void onFailed(int requestCode, List<String> deniedPermissions) {
-//
-//        }
-//    };
 
     private void initData() {
         showLoading();
@@ -207,7 +217,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                 break;
             case R.id.cv_space://空间查询
                 isCluster = false;
-                if (mClusterUtils != null){
+                if (mClusterUtils != null) {
                     mClusterUtils.release();
                 }
                 if (mMapView.getCurrentDrawSpace() == BaseMapView.SPACE_NONE) {
@@ -471,7 +481,7 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
             Graphic[] graphics = mGraphicList.toArray(new Graphic[mGraphicList.size()]);
             if (!isCluster) {
                 mMapView.addGraphics(graphics);
-            }else {
+            } else {
                 mClusterUtils = new ClusterUtils();
                 mClusterUtils.cluster(mMapView, graphics);
             }
@@ -758,6 +768,18 @@ public class UnitFragment extends BaseFragment implements View.OnClickListener {
                     }
                 });
     }
+
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        mMapView.retainState();
+//    }
+//
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        mMapView.pause();
+//    }
 
     private void showClearBtn() {
         mCVClear.setVisibility(View.VISIBLE);

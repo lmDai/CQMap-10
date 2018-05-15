@@ -41,13 +41,14 @@ import android.zhixun.uiho.com.gissystem.flux.stores.DispatchFragmentStore;
 import android.zhixun.uiho.com.gissystem.greendao_gen.DaoSession;
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 import android.zhixun.uiho.com.gissystem.ui.adapter.MainBottomAdapter;
+import android.zhixun.uiho.com.gissystem.ui.adapter.MainViewPagerAdapter;
+import android.zhixun.uiho.com.gissystem.ui.fragment.BaseFragment;
 import android.zhixun.uiho.com.gissystem.ui.fragment.CheckFragment;
 import android.zhixun.uiho.com.gissystem.ui.fragment.DirectoryFragment;
 import android.zhixun.uiho.com.gissystem.ui.fragment.DispatchFragment;
 import android.zhixun.uiho.com.gissystem.ui.fragment.UnitFragment;
 import android.zhixun.uiho.com.gissystem.ui.itemY.OwnSMCHResultItem;
 import android.zhixun.uiho.com.gissystem.ui.widget.DividerItemDecoration;
-import android.zhixun.uiho.com.gissystem.ui.widget.FragmentVpAdapter;
 import android.zhixun.uiho.com.gissystem.ui.widget.NoScrollViewPager;
 import android.zhixun.uiho.com.gissystem.ui.widget.VerticalRecyclerView;
 import android.zhixun.uiho.com.gissystem.ui.widget.tree_recyclerview.adapter.TreeRecyclerViewAdapter;
@@ -217,13 +218,8 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
     private void initViews() {
         mViewPager = findViewById(R.id.vp_main);
         mViewPager.setOffscreenPageLimit(4);
-        List<android.support.v4.app.Fragment> fragments = new ArrayList<>();
-        fragments.add(new UnitFragment());
-        fragments.add(new DispatchFragment());
-        fragments.add(new DirectoryFragment());
-        fragments.add(new CheckFragment());
-        FragmentVpAdapter adapter = new FragmentVpAdapter(getSupportFragmentManager(), fragments);
-        mViewPager.setAdapter(adapter);
+//        List<android.support.v4.app.Fragment> fragments = new ArrayList<>();
+        mViewPager.setAdapter(new MainViewPagerAdapter(getSupportFragmentManager()));
         rgBottomRadioNavigation = (RadioGroup) findViewById(R.id.rg_bottom_radio_navigation);
         mRecyclerView = (VerticalRecyclerView) findViewById(R.id.recyclerViewUnit);
 //        //添加分割线
@@ -231,27 +227,21 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
             switch (i) {
                 case R.id.rb_tab_unit:
                     selectedIndex = 0;
-//                    showFragment(UnitFragment.class);
-//                    showFagmentByReplace(UnitFragment.class);
                     break;
                 case R.id.rb_tab_dispatch:
                     selectedIndex = 1;
-//                    showFragment(DispatchFragment.class);
-//                    showFagmentByReplace(DispatchFragment.class);
                     break;
                 case R.id.rb_tab_directory:
                     selectedIndex = 2;
-//                    showFragment(DirectoryFragment.class);
-//                    showFagmentByReplace(DirectoryFragment.class);
                     break;
                 case R.id.rb_tab_check:
                     selectedIndex = 3;
-//                    showFragment(CheckFragment.class);
-//                    showFagmentByReplace(CheckFragment.class);
                     break;
             }
+//            switchFragment(selectedIndex);
             mViewPager.setCurrentItem(selectedIndex, false);
         });
+//        switchFragment(0);
         llTitle = (LinearLayout) findViewById(R.id.ll_title);
         llTitle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -301,14 +291,6 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
         mainBottomAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-//                try {
-//                    Envelope envelope = listCompany.get((position - mRecyclerView.getWrapAdapter().getHeadersCount()) > 0 ? position - mRecyclerView.getWrapAdapter().getHeadersCount() : 0).getGeometry().getExtent();
-//                    //RxBus.send(envelope)到UnitFragment来实现点击的效果
-//                    RxBus.getInstance().send(new UnitFragmentActionTemp<>(UnitFragmentActionTemp.ACTION_SYNC_ENVELOPE, envelope));
-//                } catch (Exception e) {
-//                    ToastUtil.showShort("无法定位该点，数据不匹配~");
-//                    e.printStackTrace();
-//                }
             }
         });
         mainBottomAdapter.setOnItemClickListenerDetail(new OnItemClickListener() {
@@ -335,32 +317,6 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
             intent.putExtra("company", (long) achievementModel.getCompanyId());
             intent.putExtra("HandoutId", achievementModel.getHandoutId());
             startActivity(intent);
-
-//                LogUtil.e("----------position" + position + "-------sonItem" + sonItem + "--------mListMap" + mListMap + "---------tat" + tat);
-//                try {
-//                    Intent intent = new Intent(MainActivity.this, ResultDispatchDetailActivity.class);
-//                    AchievementModel achievementModel = (AchievementModel) node.getData();
-//                    intent.putExtra("company", achievementModel.getUnitKey().longValue());
-//                    intent.putExtra("achievementModelId", achievementModel.getId().longValue());
-//                    startActivity(intent);
-////                    RxBus.getInstance().send(new DispatchFragmentActionTemp<>(DispatchFragmentActionTemp.ACTION_GET_ITEM_DATA_BY_POSITION, chaievementModel.getUnitKey()));
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                int positionM = 0;
-//                int item = 0;
-//                if (position == 0) {
-//                    positionM = 0;
-//                } else if (position > 0) {
-//                    for (int i = 0; i < position; i++) {
-//                        int a = mListMap.get(i);
-//                        item += a;
-//
-//                    }
-//                    positionM = position - item;
-//                }
-//
-//                RxBus.getInstance().send(new DispatchFragmentActionTemp<>(DispatchFragmentActionTemp.ACTION_GET_ITEM_DATA_BY_POSITION, positionM));
         });
         mTreeRecyclerViewAdapter.setOnTreeItemClickListener(new TreeRecyclerViewAdapter.OnTreeItemClickListener() {
             @Override
@@ -372,11 +328,6 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
                         RxBus.getInstance()
                                 .send(new DispatchFragmentActionTemp<>(DispatchFragmentActionTemp.ACTION_SHOW,
                                         node.getData(), position));
-//                        if (node.getData() instanceof CGSortOneModel) {
-//                            RxBus.getInstance().send(new DispatchFragmentActionTemp<>(DispatchFragmentActionTemp.ACTION_SHOW_ONE, node.getData()));
-//                        } else {
-//                            RxBus.getInstance().send(new DispatchFragmentActionTemp<>(DispatchFragmentActionTemp.ACTION_SHOW_TWO, node.getData()));
-//                        }
 
                     } else {
                         LogUtil.e("点击的为标题");
@@ -419,45 +370,59 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
 
     }
 
+    private UnitFragment unitFragment;
+    private DispatchFragment dispatchFragment;
+    private DirectoryFragment directoryFragment;
+    private CheckFragment checkFragment;
+
+    BaseFragment lastFragment = null;
+
+//    private void switchFragment(int index) {
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        BaseFragment fragment = null;
+//        switch (index) {
+//            case 0:
+//                if (unitFragment == null) {
+//                    unitFragment = new UnitFragment();
+//                    transaction.add(R.id.contentContainer, unitFragment);
+//                }
+//                fragment = unitFragment;
+//                break;
+//            case 1:
+//                if (dispatchFragment == null) {
+//                    dispatchFragment = new DispatchFragment();
+//                    transaction.add(R.id.contentContainer, dispatchFragment);
+//                }
+//                fragment = dispatchFragment;
+//                break;
+//            case 2:
+//                if (directoryFragment == null) {
+//                    directoryFragment = new DirectoryFragment();
+//                    transaction.add(R.id.contentContainer, directoryFragment);
+//                }
+//                fragment = directoryFragment;
+//                break;
+//            case 3:
+//                if (checkFragment == null) {
+//                    checkFragment = new CheckFragment();
+//                    transaction.add(R.id.contentContainer, checkFragment);
+//                }
+//                fragment = checkFragment;
+//                break;
+//        }
+//        if (lastFragment != null) {
+//            transaction.hide(lastFragment);
+//        }
+//        transaction.show(fragment);
+//        transaction.commitNow();
+//        lastFragment = fragment;
+//    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("selectedIndex", selectedIndex);
     }
-
-    /***
-     * 初始化Fragments
-     *
-     * @param savedInstanceState
-     */
-//    private void initFragments(Bundle savedInstanceState) {
-//        mFragmentManager = getFragmentManager();
-//        if (savedInstanceState == null) {
-//            createAndAddFragment(UnitFragment.class);
-//        } else {
-//            selectedIndex = savedInstanceState.getInt("selectedIndex");
-//            rgBottomRadioNavigation.check(rgBottomRadioNavigation.getChildAt(selectedIndex).getId());
-//            switch (selectedIndex) {
-//                case 0:
-////                    showFragment(UnitFragment.class);
-//                    showFagmentByReplace(UnitFragment.class);
-//                    break;
-//                case 1:
-//                    showFagmentByReplace(DirectoryFragment.class);
-////                    showFragment(DispatchFragment.class);
-//                    break;
-//                case 2:
-////                    showFragment(DirectoryFragment.class);
-//                    showFagmentByReplace(DirectoryFragment.class);
-//                    break;
-//                case 3:
-////                    showFragment(CheckFragment.class);
-//                    showFagmentByReplace(CheckFragment.class);
-//                    break;
-//            }
-//
-//        }
-//    }
 
     /***
      * 展开的动画
@@ -711,71 +676,6 @@ public class MainActivity extends BaseActivityWithStatusBar implements Navigatio
         });
         objectAnimator.start();
     }
-
-    /***
-     * 显示fragment
-     *
-     * @param clazz
-     */
-//    private void showFragment(Class<? extends Fragment> clazz) {
-//        hideAllFragment();
-//        Fragment myBaseFragment = (Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
-//        if (myBaseFragment == null) {
-//            myBaseFragment = createAndAddFragment(clazz);
-//        }
-//        mFragmentManager.beginTransaction().show(myBaseFragment).commit();
-////        mFragmentManager.beginTransaction().attach(myBaseFragment).commit();
-//    }
-//
-//    private android.app.Fragment showFagmentByReplace(Class<? extends android.app.Fragment> clazz) {
-//        if (mFragmentManager.findFragmentByTag(clazz.getSimpleName()) != null) {
-//            return (android.app.Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
-//        }
-//        try {
-//            android.app.Fragment fragment = clazz.newInstance();
-////            mFragmentManager.beginTransaction().add(R.id.contentContainer, myBaseFragment,
-//// myBaseFragment.getArguments().getString("name")).commit();
-//            String tag = fragment.getArguments().getString("name");
-//            mFragmentManager
-//                    .beginTransaction()
-//                    .replace(R.id.contentContainer, fragment, tag)
-//                    .commit();
-//            return fragment;
-//        } catch (InstantiationException e) {
-//            e.printStackTrace();
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
-
-    /***
-     * 创建并且Add fragment
-     *
-//     * @param clazz
-     * @return
-     */
-    @SuppressWarnings("TryWithIdenticalCatches")
-//    private Fragment createAndAddFragment(Class<? extends Fragment> clazz) {
-//        if (mFragmentManager.findFragmentByTag(clazz.getSimpleName()) != null) {
-//            return (Fragment) mFragmentManager.findFragmentByTag(clazz.getSimpleName());
-//        }
-//        try {
-//            Fragment myBaseFragment = clazz.newInstance();
-//            mFragmentManager.beginTransaction()
-//                    .add(R.id.contentContainer, myBaseFragment,
-//                            myBaseFragment.getArguments().getString("name"))
-//                    .commit();
-//            return myBaseFragment;
-//        } catch (InstantiationException e) {
-//            e.printStackTrace();
-//        } catch (IllegalAccessException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
 
     /***
      * 隐藏所有fragment

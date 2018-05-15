@@ -171,7 +171,7 @@ public interface API {
      * @param data
      * @return
      */
-    @POST(BASE_URL)
+    @POST("http://www.map023.cn:8082/pdf/InfoServlet/")
     @FormUrlEncoded
     Observable<BaseResultModel<String>> export(@Field("data") String data);
 

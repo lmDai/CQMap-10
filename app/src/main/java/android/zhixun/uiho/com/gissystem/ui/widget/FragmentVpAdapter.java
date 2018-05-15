@@ -2,13 +2,13 @@ package android.zhixun.uiho.com.gissystem.ui.widget;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class FragmentVpAdapter extends FragmentStatePagerAdapter {
+public class FragmentVpAdapter extends FragmentPagerAdapter {
 
     private List<Fragment> mFragments = new ArrayList<>();
 

@@ -106,16 +106,59 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     private static final String FRUITID = "FRUITID";
     private List<Graphic> mGraphicList = new ArrayList<>(1000);
 
+    private String mMapState = null;
+    private final String KEY_MAP_STATE = "MapState";
+
     public DirectoryFragment() {
         Bundle args = new Bundle();
         args.putString("name", this.getClass().getSimpleName());
         setArguments(args);
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mMapState != null) {
+            outState.putString(KEY_MAP_STATE, mMapState);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Save map state and pause the MapView to save battery
+        mMapState = mMapView.retainState();
+        mMapView.pause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Start the MapView threads running again
+        mMapView.unpause();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Release MapView resources
+        mMapView.recycle();
+        mMapView = null;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            mMapState = savedInstanceState.getString(KEY_MAP_STATE, null);
+        }
         return inflater.inflate(R.layout.fragment_directory, container, false);
     }
 
@@ -214,11 +257,6 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     }
 
     private void searchBtnClick() {
-//        String searchStr = mEtSearch.getText().toString();
-//        if (TextUtils.isEmpty(searchStr)) {
-//            setSearhText("全部");
-//        }
-
         showSearchClearView();
         getFruitList();
     }
@@ -915,6 +953,12 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                                                    int position) {
                                 String text = item.attrName + ":" + item.attrValue;
                                 holder.setText(R.id.tv_notListShowItem, text);
+                                holder.setOnClickListener(R.id.tv_notListShowItem, new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        ToastUtil.showShort(item.attrValue);
+                                    }
+                                });
                             }
                         });
                         //

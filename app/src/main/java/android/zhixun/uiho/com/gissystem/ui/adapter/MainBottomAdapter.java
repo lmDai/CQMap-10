@@ -87,7 +87,7 @@ public class MainBottomAdapter extends RecyclerView.Adapter<MainBottomAdapter.Vi
 //            LogUtil.e("--->"+list.getCompanyName());
 //        }
         CompanyDetailModel mainBottomModel = lists.get(position);
-        holder.tvompany.setText(String.format("%s，%s", (position + 1), mainBottomModel.getCompanyName()));
+        holder.tvompany.setText(String.format("%s、%s", (position + 1), mainBottomModel.getCompanyName()));
         holder.tvAddress.setText(mainBottomModel.getCompanyAddre());
         holder.tvDistance.setText(mainBottomModel.getDistance());
     }
