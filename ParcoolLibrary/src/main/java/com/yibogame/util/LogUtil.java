@@ -13,6 +13,8 @@ import java.util.List;
  * Created by parcool on 2015/12/29.
  */
 public class LogUtil {
+    public static final String TAG = "simple";
+
     private static final int DEBUG = 1;
     private static final int WARNING = 2;
     private static final int INFO = 3;

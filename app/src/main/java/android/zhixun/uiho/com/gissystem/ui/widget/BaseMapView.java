@@ -56,20 +56,30 @@ public class BaseMapView extends MapView implements DrawEventListener {
     @CurrentSpace
     private int currentDrawSpace = SPACE_NONE;
 
+    public BaseMapView(Context context) {
+        super(context);
+        init(context);
+    }
+
     public BaseMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init(context);
+    }
+
+    private void init(Context context) {
+        String path = context.getCacheDir().getAbsolutePath();
         //天地图的layer
-        vecTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_2000);
+        vecTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_2000,path);
         this.addLayer(vecTTDLayer);
-        demTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_2000);
-        imgTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_2000);
+        demTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_2000,path);
+        imgTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_2000,path);
         //天地图文字的layer
-        vecTextTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_ANNOTATION_CHINESE_2000);
+        vecTextTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_ANNOTATION_CHINESE_2000,path);
         this.addLayer(vecTextTTDLayer);
         demTextTTDLayer =
-                new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_ANNOTATION_CHINESE_2000);
+                new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_ANNOTATION_CHINESE_2000,path);
         imageTextTTDLayer =
-                new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_ANNOTATION_CHINESE_2000);
+                new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_ANNOTATION_CHINESE_2000,path);
         //重庆地图的layer
         vecLayer = new ArcGISTiledMapServiceLayer(context.getString(R.string.tdt_vec_base_map_url));
         this.addLayer(vecLayer);
