@@ -128,52 +128,11 @@ public class DispatchFragment extends BaseFragment implements View.OnClickListen
         setArguments(args);
     }
 
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            mMapState = savedInstanceState.getString(KEY_MAP_STATE, null);
-        }
         return inflater.inflate(R.layout.fragment_dispatch, container, false);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mMapState != null) {
-            outState.putString(KEY_MAP_STATE, mMapState);
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        // Save map state and pause the MapView to save battery
-        mMapState = mMapView.retainState();
-        mMapView.pause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // Start the MapView threads running again
-        mMapView.unpause();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Release MapView resources
-        mMapView.recycle();
-        mMapView = null;
     }
 
     @Override
