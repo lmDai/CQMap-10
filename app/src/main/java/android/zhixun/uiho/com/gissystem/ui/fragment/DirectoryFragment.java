@@ -58,6 +58,7 @@ import com.esri.core.symbol.PictureMarkerSymbol;
 import com.esri.core.symbol.SimpleFillSymbol;
 import com.esri.core.symbol.SimpleLineSymbol;
 import com.esri.core.symbol.Symbol;
+import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.yibogame.util.LogUtil;
 import com.yibogame.util.ToastUtil;
 import com.zhy.adapter.recyclerview.CommonAdapter;
@@ -78,7 +79,7 @@ import static android.zhixun.uiho.com.gissystem.ui.widget.BaseMapView.DEM_LAYER;
  */
 
 @Keep
-public class DirectoryFragment extends BaseFragment implements View.OnClickListener {
+public class DirectoryFragment extends BaseFragment implements View.OnClickListener, BaseMapView.OnLayerLoaderListener {
 
     private BaseMapView mMapView;
     private View mCVLayer, mCVSift, mCVLocation, mZoomIn, mZoomOut, mCVSpace, mCVClear,
@@ -125,6 +126,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        showLayerLoadingDialog();
         initView(view);
         initBottomDragView(view);
         initEvent();
@@ -151,6 +153,7 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
     }
 
     private void initEvent() {
+        mMapView.setOnLayerLoaderListener(this);
         mCVLayer.setOnClickListener(this);
         mCVSift.setOnClickListener(this);
         mCVLocation.setOnClickListener(this);
@@ -1330,5 +1333,28 @@ public class DirectoryFragment extends BaseFragment implements View.OnClickListe
                                 mFirstClassifyTypeBelowList.addAll(response);
                             }
                         });
+    }
+
+    QMUITipDialog mProgressDialog;
+
+    private void showLayerLoadingDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new QMUITipDialog.Builder(getActivity())
+                    .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
+                    .setTipWord("加载中...")
+                    .create();
+        }
+        mProgressDialog.show();
+    }
+
+    private void hideLayerLoadingDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void onLayerLoaded() {
+        hideLayerLoadingDialog();
     }
 }

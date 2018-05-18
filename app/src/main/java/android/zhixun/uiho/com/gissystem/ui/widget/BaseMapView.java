@@ -55,6 +55,7 @@ public class BaseMapView extends MapView implements DrawEventListener {
     private int currentMapLayer;
     @CurrentSpace
     private int currentDrawSpace = SPACE_NONE;
+    String path;
 
     public BaseMapView(Context context) {
         super(context);
@@ -67,28 +68,19 @@ public class BaseMapView extends MapView implements DrawEventListener {
     }
 
     private void init(Context context) {
-        String path = context.getCacheDir().getAbsolutePath();
+        path = context.getCacheDir().getAbsolutePath();
         //天地图的layer
-        vecTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_2000,path);
+        vecTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_2000, path);
         this.addLayer(vecTTDLayer);
-        demTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_2000,path);
-        imgTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_2000,path);
+
         //天地图文字的layer
-        vecTextTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_ANNOTATION_CHINESE_2000,path);
+        vecTextTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_VECTOR_ANNOTATION_CHINESE_2000, path);
         this.addLayer(vecTextTTDLayer);
-        demTextTTDLayer =
-                new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_ANNOTATION_CHINESE_2000,path);
-        imageTextTTDLayer =
-                new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_ANNOTATION_CHINESE_2000,path);
+
         //重庆地图的layer
         vecLayer = new ArcGISTiledMapServiceLayer(context.getString(R.string.tdt_vec_base_map_url));
         this.addLayer(vecLayer);
         currentMapLayer = VEC_LAYER;
-
-        demLayer = new ArcGISTiledMapServiceLayer(context.getString(R.string.tdt_dem_base_map_url));
-
-        imgLayer =
-                new ArcGISTiledMapServiceLayer(context.getString(R.string.tdt_img_base_map_url));
 
         //画图形的layer
         drawLayer = new GraphicsLayer();
@@ -134,19 +126,32 @@ public class BaseMapView extends MapView implements DrawEventListener {
 
         removeAll();
         switch (currentMapLayer) {
-            case DEM_LAYER:
+            case DEM_LAYER://地形
+                demTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_2000, path);
                 this.addLayer(demTTDLayer);
+
+                demTextTTDLayer =
+                        new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_TERRAIN_ANNOTATION_CHINESE_2000, path);
                 this.addLayer(demTextTTDLayer);
+
+                demLayer = new ArcGISTiledMapServiceLayer(getContext().getString(R.string.tdt_dem_base_map_url));
                 this.addLayer(demLayer);
                 break;
-            case VEC_LAYER:
+            case VEC_LAYER://矢量
                 this.addLayer(vecTTDLayer);
                 this.addLayer(vecTextTTDLayer);
                 this.addLayer(vecLayer);
                 break;
-            case IMG_LAYER:
+            case IMG_LAYER://图形
+                imgTTDLayer = new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_2000, path);
                 this.addLayer(imgTTDLayer);
+
+                imageTextTTDLayer =
+                        new TianDiTuLayer(TianDiTuLayerTypes.TIANDITU_IMAGE_ANNOTATION_CHINESE_2000, path);
                 this.addLayer(imageTextTTDLayer);
+
+                imgLayer =
+                        new ArcGISTiledMapServiceLayer(getContext().getString(R.string.tdt_img_base_map_url));
                 this.addLayer(imgLayer);
                 break;
         }
@@ -320,18 +325,28 @@ public class BaseMapView extends MapView implements DrawEventListener {
         }
     };
 
-    OnStatusChangedListener onStatusChangedListener = new OnStatusChangedListener() {
-        @Override
-        public void onStatusChanged(Object o, OnStatusChangedListener.STATUS status) {
-            switch (status) {
-                case INITIALIZED:
-                    requestLocationPermission();
-                    Log.d("simple","INITIALIZED");
-                    break;
-                case LAYER_LOADED:
-                    Log.d("simple","LAYER_LOADED");
-                    break;
-            }
+    public interface OnLayerLoaderListener {
+        void onLayerLoaded();
+    }
+
+    public OnLayerLoaderListener mOnLayerLoaderListener;
+
+    public void setOnLayerLoaderListener(OnLayerLoaderListener layerLoaderListener) {
+        this.mOnLayerLoaderListener = layerLoaderListener;
+    }
+
+    OnStatusChangedListener onStatusChangedListener = (OnStatusChangedListener) (o, status) -> {
+        switch (status) {
+            case INITIALIZED:
+                requestLocationPermission();
+                Log.d("simple", "INITIALIZED");
+                break;
+            case LAYER_LOADED:
+                Log.d("simple", "LAYER_LOADED");
+                if (mOnLayerLoaderListener != null) {
+                    mOnLayerLoaderListener.onLayerLoaded();
+                }
+                break;
         }
     };
 
