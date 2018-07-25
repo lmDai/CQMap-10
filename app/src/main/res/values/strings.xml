@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">测绘成果保密监管移动查询系统</string>
+    <string name="app_name">测绘地理信息成果监督查询系统Android端</string>
 
     <string name="tab_unit">单位</string>
     <string name="tab_dispatch">成果分发</string>

@@ -717,11 +717,13 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
             @Override
             public void onNext(List<CheckUserModel> checkUserModels) {
                 mListCheckPersonUser.addAll(checkUserModels);
-                for (SecrecyPersonListModel secrecyPersonListModel : dd.getSecrecyPersonList()) {
-                    for (CheckUserModel checkUserModel : mListCheckPersonUser) {
-                        if (checkUserModel.getUserId() == secrecyPersonListModel.getUserId()) {
-                            checkUserModel.setChecked(true);
-                            break;
+                if (dd != null) {
+                    for (SecrecyPersonListModel secrecyPersonListModel : dd.getSecrecyPersonList()) {
+                        for (CheckUserModel checkUserModel : mListCheckPersonUser) {
+                            if (checkUserModel.getUserId() == secrecyPersonListModel.getUserId()) {
+                                checkUserModel.setChecked(true);
+                                break;
+                            }
                         }
                     }
                 }
