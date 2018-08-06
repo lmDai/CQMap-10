@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="(二) 是否需要进一步健全保密结构"
+            android:text="(二) 是否需要进一步健全保密机构"
             android:textColor="#666666"
             android:textSize="12sp" />
 
