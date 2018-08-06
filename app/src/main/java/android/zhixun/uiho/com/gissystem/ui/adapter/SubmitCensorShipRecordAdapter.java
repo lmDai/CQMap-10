@@ -11,6 +11,7 @@ import android.zhixun.uiho.com.gissystem.flux.models.api.CompanyDetailByCheckedM
 import android.zhixun.uiho.com.gissystem.interfaces.OnItemClickListener;
 import android.zhixun.uiho.com.gissystem.rest.APIService;
 import android.zhixun.uiho.com.gissystem.rest.SimpleSubscriber;
+import android.zhixun.uiho.com.gissystem.ui.activity.BaseActivityWithTitle;
 import android.zhixun.uiho.com.gissystem.ui.widget.SimpleAlertDialog;
 
 import com.yibogame.util.ToastUtil;
@@ -88,7 +89,7 @@ public class SubmitCensorShipRecordAdapter extends RecyclerView.Adapter<SubmitCe
                         ToastUtil.showShort("请输入一个正确的邮箱地址哦！");
                         return;
                     }
-                    export(dialog,secrecyInspectId, email);
+                    export(dialog, secrecyInspectId, email);
                 }).setCancelOnClickListener("取消", null)
                 .show();
 //        final EditText et = new EditText(context);
@@ -138,7 +139,16 @@ public class SubmitCensorShipRecordAdapter extends RecyclerView.Adapter<SubmitCe
 
     }
 
+    BaseActivityWithTitle baseAct = null;
+
     private void export(SimpleAlertDialog dialog, int secrecyInspectId, String email) {
+
+        if (context instanceof BaseActivityWithTitle) {
+            baseAct = ((BaseActivityWithTitle) context);
+        }
+        if (baseAct != null) {
+            baseAct.showLoading();
+        }
         Map<Object, Object> map = new HashMap<>();
         map.put("secrecyInspectId", secrecyInspectId);
         map.put("toMail", email);
@@ -146,6 +156,9 @@ public class SubmitCensorShipRecordAdapter extends RecyclerView.Adapter<SubmitCe
                 .export(map, new SimpleSubscriber<String>() {
                     @Override
                     public void onResponse(String response) {
+                        if (baseAct != null) {
+                            baseAct.hideLoading();
+                        }
                         ToastUtil.showShort("导出成功！");
                         dialog.dismiss();
                     }
@@ -153,6 +166,9 @@ public class SubmitCensorShipRecordAdapter extends RecyclerView.Adapter<SubmitCe
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
+                        if (baseAct != null) {
+                            baseAct.hideLoading();
+                        }
                         ToastUtil.showShort(e.getMessage());
                     }
                 });

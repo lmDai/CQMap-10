@@ -102,4 +102,7 @@ dependencies {
     //
     compile 'com.yanzhenjie:permission:1.1.2'
     compile 'co.infinum:materialdatetimepicker-support:3.5.1'
+
+    debugCompile 'com.readystatesoftware.chuck:library:1.1.0'
+    releaseCompile 'com.readystatesoftware.chuck:library-no-op:1.1.0'
 }

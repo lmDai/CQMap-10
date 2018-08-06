@@ -181,6 +181,7 @@ public class LocalFileActivity extends BaseActivityWithTitle {
     }
 
     private void export(SimpleAlertDialog dialog, String secrecyInspectId, String email) {
+        showLoading();
         Map<Object, Object> map = new HashMap<>();
         map.put("secrecyInspectId", secrecyInspectId);
         map.put("toMail", email);
@@ -188,6 +189,7 @@ public class LocalFileActivity extends BaseActivityWithTitle {
                 .export(map, new SimpleSubscriber<String>() {
                     @Override
                     public void onResponse(String response) {
+                        hideLoading();
                         dialog.dismiss();
                         ToastUtil.showShort("导出成功！");
                     }
@@ -195,6 +197,7 @@ public class LocalFileActivity extends BaseActivityWithTitle {
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
+                        hideLoading();
                         ToastUtil.showShort(e.getMessage());
                     }
                 });

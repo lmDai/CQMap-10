@@ -26,6 +26,8 @@ import android.zhixun.uiho.com.gissystem.interfaces.ProgressListener;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.readystatesoftware.chuck.ChuckInterceptor;
+import com.yibogame.app.BaseApplication;
 import com.yibogame.app.DoOnSubscriber;
 import com.yibogame.app.FastJsonConverterFactory;
 import com.yibogame.util.LogUtil;
@@ -88,6 +90,7 @@ public class APIService {
         httpClientBuilder.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
         httpClientBuilder.writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
         httpClientBuilder.readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+        httpClientBuilder.addInterceptor(new ChuckInterceptor(BaseApplication.context));
         httpClientBuilder.addInterceptor(new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {

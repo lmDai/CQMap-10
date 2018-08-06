@@ -678,6 +678,7 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
     }
 
     private void export(String secrecyInspectId, String email) {
+        showLoading();
         Map<Object, Object> map = new HashMap<>();
         map.put("secrecyInspectId", secrecyInspectId);
         map.put("toMail", email);
@@ -685,6 +686,7 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
                 .export(map, new SimpleSubscriber<String>() {
                     @Override
                     public void onResponse(String response) {
+                        hideLoading();
                         ToastUtil.showShort("导出成功！");
                         finish();
                     }
@@ -692,6 +694,7 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
+                        hideLoading();
                         ToastUtil.showShort(e.getMessage());
                     }
                 });

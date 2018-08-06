@@ -102,7 +102,7 @@ public abstract class BaseActivityWithTitle extends BaseActivityWithStatusBar {
 
     private QMUITipDialog mProgressDialog;
 
-    protected void showLoading() {
+    public void showLoading() {
         if (mProgressDialog == null) {
             mProgressDialog = new QMUITipDialog.Builder(this)
                     .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
@@ -112,7 +112,7 @@ public abstract class BaseActivityWithTitle extends BaseActivityWithStatusBar {
         mProgressDialog.show();
     }
 
-    protected void hideLoading() {
+    public void hideLoading() {
         mProgressDialog.dismiss();
     }
 }
