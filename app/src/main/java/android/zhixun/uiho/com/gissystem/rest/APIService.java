@@ -8,6 +8,7 @@ import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCMode
 import android.zhixun.uiho.com.gissystem.flux.models.HandoutFruitModel;
 import android.zhixun.uiho.com.gissystem.flux.models.RXProgress;
 import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
+import android.zhixun.uiho.com.gissystem.flux.models.SecrecyInspectEntryModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AchievementModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AchievementTypeAndCountModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
@@ -690,6 +691,18 @@ public class APIService {
      */
     public void getFruitList(Map<Object, Object> map, DoOnSubscriber<List<FruitListModel>> subscriber) {
         api.getFruitList(buildParams(map, "getFruitList", "fruit"))
+                .compose(applySchedulers())
+                .doOnSubscribe(subscriber::doOnSubscriber)
+                .compose(handleResponseList())
+                .subscribe(subscriber);
+    }
+
+    /**
+     * 保密检查登记 / 检查情况
+     */
+    public void getSecrecyInspectEntry(Map<Object, Object> map,
+                                       DoOnSubscriber<List<SecrecyInspectEntryModel>> subscriber) {
+        api.getSecrecyInspectEntry(buildParams(map, "getFruitList", "fruit"))
                 .compose(applySchedulers())
                 .doOnSubscribe(subscriber::doOnSubscriber)
                 .compose(handleResponseList())

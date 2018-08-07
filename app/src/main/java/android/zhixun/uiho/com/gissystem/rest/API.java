@@ -5,6 +5,7 @@ import android.zhixun.uiho.com.gissystem.flux.models.FruitListModel;
 import android.zhixun.uiho.com.gissystem.flux.models.GethandoutConditionByFCModel;
 import android.zhixun.uiho.com.gissystem.flux.models.HandoutFruitModel;
 import android.zhixun.uiho.com.gissystem.flux.models.ReportHandoutListModel;
+import android.zhixun.uiho.com.gissystem.flux.models.SecrecyInspectEntryModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AchievementModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AchievementTypeAndCountModel;
 import android.zhixun.uiho.com.gissystem.flux.models.api.AreaModel;
@@ -229,4 +230,11 @@ public interface API {
     @POST(BASE_URL)
     @FormUrlEncoded
     Observable<BaseListResultModel<FruitListModel>> getFruitList(@Field("data") String data);
+
+    /**
+     * 保密检查登记 / 检查情况
+     */
+    @POST(BASE_URL)
+    @FormUrlEncoded
+    Observable<BaseListResultModel<SecrecyInspectEntryModel>> getSecrecyInspectEntry(@Field("data") String data);
 }
