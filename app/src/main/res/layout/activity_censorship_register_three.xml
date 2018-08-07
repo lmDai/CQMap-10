@@ -59,7 +59,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="wrap_content"
         android:background="#FFF"
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="领导是否签字确认"
+            android:text="领导签字确认"
             android:textColor="#666666"
             android:textSize="12sp" />
 
@@ -79,8 +79,13 @@
             android:layout_centerVertical="true"
             android:orientation="horizontal">
 
-
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="签字"
+                />
             <RadioGroup
+                android:visibility="gone"
                 android:id="@+id/RadioGroup_LI_two"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
