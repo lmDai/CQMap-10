@@ -748,6 +748,7 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
     }
 
     private EditText etValues;
+    private Button btn_signature;
 
     private void initView() {
         searchRvTips = (RecyclerView) findViewById(R.id.search_lv_tips);//展示搜索结果的RecyclerView
@@ -760,7 +761,14 @@ public class CensorshipRegisterActivity extends BaseActivityWithTitle implements
         llArrowLDYJ = (LinearLayout) findViewById(R.id.ll_arrow_LDYJ);
         etTempCheckPerson = (EditText) findViewById(R.id.et_temp_check_person);//临时参检人员
         etOtherZGIdea = (EditText) findViewById(R.id.et_otherZGIdea);//其它整改意见
+        btn_signature = findViewById(R.id.btn_signature);
 
+        btn_signature.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(CensorshipRegisterActivity.this, SignaturePadActivity.class));
+            }
+        });
         arrowLDYJ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

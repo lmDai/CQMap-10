@@ -66,6 +66,7 @@
         <activity android:name=".ui.activity.ResultDeclareMessageDetailActivity" />
         <!---->
         <activity android:name=".AppCashActivity" />
+        <activity android:name=".ui.activity.SignaturePadActivity" />
     </application>
 
 </manifest>

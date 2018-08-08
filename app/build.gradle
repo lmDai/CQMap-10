@@ -105,4 +105,6 @@ dependencies {
 
     debugCompile 'com.readystatesoftware.chuck:library:1.1.0'
     releaseCompile 'com.readystatesoftware.chuck:library-no-op:1.1.0'
+    //
+    compile 'com.github.gcacace:signature-pad:1.2.1'
 }
